@@ -5,7 +5,7 @@ NavigIQ is a highly controlled, single-workstation agentic AI software engineeri
 
 ## Current Status
 - **Current Phase:** Phase 0 — Foundation
-- **Current Task:** NQ-002 — Host / environment verification (Completed)
+- **Current Task:** NQ-003 — PostgreSQL + PostGIS + pgvector (Completed)
 
 ## Architecture Summary
 NavigIQ operates as a **Modular Monolith** built on a single-workstation architecture. It strictly divides logic between a **Deterministic Planner** (authoritative for routing, optimization, and spatial operations) and an **LLM** (acting as an orchestration and language layer via typed tools).

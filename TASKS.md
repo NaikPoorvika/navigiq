@@ -9,7 +9,7 @@ Legend:
 ## Phase 0 — FOUNDATION
 - [x] NQ-001 — Repository + project control files
 - [x] NQ-002 — Host / environment verification
-- [ ] NQ-003 — PostgreSQL + PostGIS + pgvector
+- [x] NQ-003 — PostgreSQL + PostGIS + pgvector
 - [ ] NQ-004 — FastAPI foundation
 - [ ] NQ-005 — Database models + migrations
 - [ ] NQ-006 — Authentication

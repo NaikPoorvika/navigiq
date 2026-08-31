@@ -1,0 +1,15 @@
+services:
+  db:
+    build:
+      context: ./database
+    container_name: navigiq_db
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - "5433:5432"
+    volumes:
+      - navigiq_postgres_data:/var/lib/postgresql/data
+
+volumes:
+  navigiq_postgres_data:
