@@ -7,8 +7,8 @@ Legend:
 - [!] BLOCKED
 
 ## Phase 0 — FOUNDATION
-- [~] NQ-001 — Repository + project control files
-- [ ] NQ-002 — Host / environment verification
+- [x] NQ-001 — Repository + project control files
+- [x] NQ-002 — Host / environment verification
 - [ ] NQ-003 — PostgreSQL + PostGIS + pgvector
 - [ ] NQ-004 — FastAPI foundation
 - [ ] NQ-005 — Database models + migrations
