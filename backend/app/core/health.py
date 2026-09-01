@@ -1,13 +1,8 @@
-from fastapi import APIRouter, HTTPException, Depends
-from sqlalchemy.ext.asyncio import create_async_engine
+from fastapi import APIRouter, HTTPException
 from sqlalchemy import text
-from app.config import settings
+from app.db.session import engine
 
 router = APIRouter()
-
-# Create engine for health check probe. 
-# In a real app this might be shared, but for early NQ-004 we test connectivity here directly.
-engine = create_async_engine(settings.DATABASE_URL, echo=False)
 
 @router.get("/health")
 async def health_check():
