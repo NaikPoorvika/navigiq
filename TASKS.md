@@ -17,7 +17,7 @@ Legend:
 - [x] NQ-007 — React frontend shell
 - [x] NQ-008 — Redis
 - [x] NQ-009 — Observability / tracing
-- [ ] NQ-010 — Testing infrastructure
+- [x] NQ-010 — Testing infrastructure
 
 ## Phase 1 — DETERMINISTIC PLANNER
 (Tasks TBD upon entering phase)

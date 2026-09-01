@@ -4,8 +4,8 @@
 NavigIQ is a highly controlled, single-workstation agentic AI software engineering project designed to serve as an intelligent, robust, and verifiable travel planning application. 
 
 ## Current Status
-- **Current Phase:** Phase 0 — Foundation
-- **Current Task:** NQ-009 — Observability / tracing (Completed)
+- **Current Phase:** Phase 1 — Deterministic Planner
+- **Current Task:** TBD
 
 ## Architecture Summary
 NavigIQ operates as a **Modular Monolith** built on a single-workstation architecture. It strictly divides logic between a **Deterministic Planner** (authoritative for routing, optimization, and spatial operations) and an **LLM** (acting as an orchestration and language layer via typed tools).
