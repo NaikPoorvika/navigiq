@@ -13,7 +13,7 @@ Legend:
 - [x] NQ-GH-01 — GitHub Remote Push
 - [x] NQ-004 — FastAPI foundation
 - [x] NQ-005 — Database models + migrations
-- [ ] NQ-006 — Authentication
+- [x] NQ-006 — Authentication
 - [ ] NQ-007 — React frontend shell
 - [ ] NQ-008 — Redis
 - [ ] NQ-009 — Observability / tracing
