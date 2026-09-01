@@ -15,7 +15,7 @@ Legend:
 - [x] NQ-005 — Database models + migrations
 - [x] NQ-006 — Authentication
 - [x] NQ-007 — React frontend shell
-- [ ] NQ-008 — Redis
+- [x] NQ-008 — Redis
 - [ ] NQ-009 — Observability / tracing
 - [ ] NQ-010 — Testing infrastructure
 

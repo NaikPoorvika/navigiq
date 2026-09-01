@@ -23,7 +23,10 @@ services:
     env_file:
       - ../backend/.env.example
     depends_on:
-      - db
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
 
   frontend:
     build:
@@ -39,5 +42,15 @@ services:
     depends_on:
       - backend
 
+  redis:
+    image: redis:7-alpine
+    container_name: navigiq_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - navigiq_redis_data:/data
+
 volumes:
   navigiq_postgres_data:
+  navigiq_redis_data:
