@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<osm version="0.6" generator="NavigIQ-Mock">
+  <bounds minlat="39.8" minlon="-75.6" maxlat="39.9" maxlon="-75.5"/>
+  <!-- Nodes -->
+  <node id="1" lat="39.80" lon="-75.60" visible="true" version="1" timestamp="2023-01-01T00:00:00Z"/>
+  <node id="2" lat="39.90" lon="-75.60" visible="true" version="1" timestamp="2023-01-01T00:00:00Z"/>
+  <node id="3" lat="39.90" lon="-75.50" visible="true" version="1" timestamp="2023-01-01T00:00:00Z"/>
+  <node id="4" lat="39.80" lon="-75.50" visible="true" version="1" timestamp="2023-01-01T00:00:00Z"/>
+  <node id="5" lat="39.85" lon="-75.55" visible="true" version="1" timestamp="2023-01-01T00:00:00Z"/>
+
+  <!-- Ways (Roads) -->
+  <!-- Left edge -->
+  <way id="101" visible="true" version="1" timestamp="2023-01-01T00:00:00Z">
+    <nd ref="1"/>
+    <nd ref="2"/>
+    <tag k="highway" v="residential"/>
+    <tag k="oneway" v="no"/>
+  </way>
+  <!-- Top edge -->
+  <way id="102" visible="true" version="1" timestamp="2023-01-01T00:00:00Z">
+    <nd ref="2"/>
+    <nd ref="3"/>
+    <tag k="highway" v="residential"/>
+    <tag k="oneway" v="no"/>
+  </way>
+  <!-- Right edge -->
+  <way id="103" visible="true" version="1" timestamp="2023-01-01T00:00:00Z">
+    <nd ref="3"/>
+    <nd ref="4"/>
+    <tag k="highway" v="residential"/>
+    <tag k="oneway" v="no"/>
+  </way>
+  <!-- Bottom edge -->
+  <way id="104" visible="true" version="1" timestamp="2023-01-01T00:00:00Z">
+    <nd ref="4"/>
+    <nd ref="1"/>
+    <tag k="highway" v="residential"/>
+    <tag k="oneway" v="no"/>
+  </way>
+  <!-- Cross path 1 -->
+  <way id="105" visible="true" version="1" timestamp="2023-01-01T00:00:00Z">
+    <nd ref="1"/>
+    <nd ref="5"/>
+    <nd ref="3"/>
+    <tag k="highway" v="primary"/>
+    <tag k="oneway" v="no"/>
+  </way>
+  <!-- Cross path 2 -->
+  <way id="106" visible="true" version="1" timestamp="2023-01-01T00:00:00Z">
+    <nd ref="2"/>
+    <nd ref="5"/>
+    <nd ref="4"/>
+    <tag k="highway" v="primary"/>
+    <tag k="oneway" v="no"/>
+  </way>
+</osm>

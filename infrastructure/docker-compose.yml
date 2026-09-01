@@ -51,6 +51,16 @@ services:
     volumes:
       - navigiq_redis_data:/data
 
+  osrm:
+    image: osrm/osrm-backend:latest
+    container_name: navigiq_osrm
+    restart: always
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./osrm-data:/data
+    command: osrm-routed --algorithm mld /data/map.osrm
+
 volumes:
   navigiq_postgres_data:
   navigiq_redis_data:

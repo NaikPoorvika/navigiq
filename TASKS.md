@@ -20,7 +20,11 @@ Legend:
 - [x] NQ-010 — Testing infrastructure
 
 ## Phase 1 — DETERMINISTIC PLANNER
-(Tasks TBD upon entering phase)
+- [x] NQ-101 — OSRM Docker Infrastructure
+- [ ] NQ-102 — OSRM Backend Client
+- [ ] NQ-103 — OR-Tools Integration
+- [ ] NQ-104 — Planner API Endpoints
+- [ ] NQ-105 — Planner Frontend Integration
 
 ## Phase 2 — LLM + RAG
 (Tasks TBD upon entering phase)
