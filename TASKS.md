@@ -14,7 +14,7 @@ Legend:
 - [x] NQ-004 — FastAPI foundation
 - [x] NQ-005 — Database models + migrations
 - [x] NQ-006 — Authentication
-- [ ] NQ-007 — React frontend shell
+- [x] NQ-007 — React frontend shell
 - [ ] NQ-008 — Redis
 - [ ] NQ-009 — Observability / tracing
 - [ ] NQ-010 — Testing infrastructure
