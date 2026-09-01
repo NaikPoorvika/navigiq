@@ -10,7 +10,8 @@ Legend:
 - [x] NQ-001 — Repository + project control files
 - [x] NQ-002 — Host / environment verification
 - [x] NQ-003 — PostgreSQL + PostGIS + pgvector
-- [ ] NQ-004 — FastAPI foundation
+- [x] NQ-GH-01 — GitHub Remote Push
+- [x] NQ-004 — FastAPI foundation
 - [ ] NQ-005 — Database models + migrations
 - [ ] NQ-006 — Authentication
 - [ ] NQ-007 — React frontend shell

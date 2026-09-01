@@ -11,5 +11,19 @@ services:
     volumes:
       - navigiq_postgres_data:/var/lib/postgresql/data
 
+  backend:
+    build:
+      context: ../backend
+    container_name: navigiq_backend
+    restart: unless-stopped
+    ports:
+      - "8001:8000"
+    volumes:
+      - ../backend:/app
+    env_file:
+      - ../backend/.env.example
+    depends_on:
+      - db
+
 volumes:
   navigiq_postgres_data:
