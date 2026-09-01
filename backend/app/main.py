@@ -1,8 +1,13 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
+from asgi_correlation_id import CorrelationIdMiddleware
 from app.config import settings
 from app.api.v1.router import api_router
+from app.core.logging import setup_logging
+
+# Setup structlog
+setup_logging()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -16,6 +21,9 @@ app = FastAPI(
     version="0.1.0",
     lifespan=lifespan,
 )
+
+# Add Request ID / Correlation ID tracking
+app.add_middleware(CorrelationIdMiddleware)
 
 # Parse CORS origins
 if isinstance(settings.CORS_ORIGINS, str):

@@ -2,11 +2,14 @@ from fastapi import APIRouter, HTTPException
 from sqlalchemy import text
 from app.db.session import engine
 from app.core.redis import redis_client
+import structlog
 
 router = APIRouter()
+logger = structlog.get_logger(__name__)
 
 @router.get("/health")
 async def health_check():
+    logger.info("Health check requested")
     status = {
         "status": "ok",
         "database": "unknown",

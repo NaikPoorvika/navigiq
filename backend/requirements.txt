@@ -10,3 +10,5 @@ bcrypt<4.1
 python-jose[cryptography]>=3.3.0
 python-multipart>=0.0.9
 redis>=5.0.0
+structlog>=24.1.0
+asgi-correlation-id>=4.3.0
