@@ -20,11 +20,22 @@ Legend:
 - [x] NQ-010 — Testing infrastructure
 
 ## Phase 1 — DETERMINISTIC PLANNER
-- [x] NQ-101 — OSRM Docker Infrastructure
-- [ ] NQ-102 — OSRM Backend Client
-- [ ] NQ-103 — OR-Tools Integration
-- [ ] NQ-104 — Planner API Endpoints
-- [ ] NQ-105 — Planner Frontend Integration
+- [ ] NQ-011 — OSM extract -> Bengaluru clip -> tag filter -> staging JSONL
+- [ ] NQ-012 — POI schema migration
+- [ ] NQ-013 — Normalize -> dedupe -> enrich -> load + curated seed set
+- [ ] NQ-014 — Opening-hours parsing
+- [ ] NQ-015 — Cost model: POI costs, auto/cab/metro fare estimator
+- [ ] NQ-016 — POI search service + hard filters + endpoints
+- [ ] NQ-017 — Deterministic ranking
+- [ ] NQ-018 — OSRM car + foot builds, containers, health checks
+- [ ] NQ-019 — Routing service: client, retries, cache, time-of-day multipliers
+- [ ] NQ-020 — Static metro graph
+- [ ] NQ-021 — TripSpec Pydantic schema + semantic validation
+- [ ] NQ-022 — Feasibility pre-check + relaxation ladder
+- [ ] NQ-023 — OR-Tools CP-SAT optimizer + fallback
+- [ ] NQ-024 — Independent itinerary validator
+- [ ] NQ-025 — Planning orchestrator + `POST /plan` + weather client
+- [ ] NQ-026 — Plan form + Leaflet map + timeline + cost breakdown
 
 ## Phase 2 — LLM + RAG
 (Tasks TBD upon entering phase)
