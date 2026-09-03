@@ -1,0 +1,45 @@
+﻿# data/config/ranking.yaml
+#
+# NQ-017 - Deterministic POI ranking weights.
+#
+# Rebalanced against measured data, not the draft plan. Prominence
+# distribution across 14,851 POIs:
+#   0.000  9,705 (65%)   0.028  3,387 (23%)   0.056  884
+#   ~94% score below 0.06; only 60 POIs exceed 0.3.
+#
+# The plan allocated 0.20 to prominence. At that weight it contributes
+# almost nothing to ordering while appearing to represent quality, so it
+# is reduced to 0.10 and the difference moved to proximity and diversity.
+# It rises again on its own as curated POIs gain editorial_score.
+#
+# This is NOT a quality signal. Prominence measures documentation and
+# notability only (ADR-013). No star ratings, ever.
+
+version: 2
+updated: 2026-09-03
+rebalanced_against: measured prominence distribution, 14851 POIs
+
+weights:
+  category_match: 0.40    # exact 1.0, secondary by link weight, else 0
+  prominence:     0.10    # was 0.20; see note above
+  proximity:      0.25    # was 0.15
+  diversity:      0.20    # was 0.15
+  weather_fit:    0.05    # was 0.10; binary indoor/outdoor is coarse
+
+# Distance at which proximity score reaches zero. Beyond this a POI scores
+# 0 on proximity but is not excluded - the radius filter is the hard bound.
+proximity_falloff_m: 5000
+
+# Each additional POI already chosen in the same category multiplies the
+# diversity score by this. Three cafes in a row should be unattractive.
+diversity_decay: 0.5
+
+weather:
+  # Applied when the caller supplies weather context.
+  rain_indoor_bonus: 1.0
+  rain_outdoor_penalty: 0.2
+  golden_hour_sunset_bonus: 1.0
+  golden_hour_start_min: 1020   # 17:00
+  golden_hour_end_min: 1170     # 19:30
+
+candidate_limit: 50   # cut-off passed to the optimizer
