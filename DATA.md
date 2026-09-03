@@ -12,3 +12,15 @@
 - Category mapping: 50 rules, 51 drops, 18 landmark overrides
 - Note: ~57% of staging records are water features, largely unnamed rural
   ponds from the wide bbox. Dropped in NQ-013 via the category mapping.
+
+## Opening hours coverage (NQ-014)
+
+- POIs with an OSM opening_hours tag: 1,288 of 14,851 (8.7%)
+- Successfully parsed: 1,262 (98% of those tagged, 8.5% of all POIs)
+- Unparseable: 26 - malformed source values and 8 'sunrise-sunset'
+- Category defaults applied: 13,589 POIs at confidence 0.3
+
+This 8.5% figure is why low-confidence hours are a soft optimizer
+constraint. It is also the single strongest argument for the curated
+seed set: hand-verified hours are the difference between an itinerary
+that works and one that sends someone to a closed restaurant.
