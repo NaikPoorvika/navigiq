@@ -1,0 +1,42 @@
+﻿# data/config/traffic_factors.yaml
+#
+# NQ-019 - Static time-of-day travel time multipliers.
+#
+# THIS IS NOT A TRAFFIC MODEL. OSRM returns free-flow durations from road
+# geometry and speed limits. Bengaluru traffic makes those optimistic,
+# sometimes by a factor of two. These multipliers are a blunt correction so
+# itineraries are not systematically too tight.
+#
+# Every figure here is an ASSUMPTION. There is no live traffic feed and
+# there will not be one. All durations shown to a user must be labelled
+# "estimated".
+#
+# Post-MVP these become the output of a model trained on
+# trip_segments.actual_s vs planned_eta_s. That column exists from NQ-048
+# precisely so this file can eventually be replaced by measurement.
+
+version: 1
+valid_from: 2026-09-03
+basis: assumption
+
+buckets:
+  - {name: early,   start: 0,    end: 420,  weekday: 0.85, weekend: 0.85}
+  - {name: am_peak, start: 420,  end: 660,  weekday: 1.75, weekend: 1.10}
+  - {name: midday,  start: 660,  end: 960,  weekday: 1.25, weekend: 1.20}
+  - {name: pm_peak, start: 960,  end: 1260, weekday: 1.90, weekend: 1.35}
+  - {name: evening, start: 1260, end: 1380, weekday: 1.30, weekend: 1.30}
+  - {name: night,   start: 1380, end: 1440, weekday: 0.90, weekend: 1.00}
+
+area_multipliers:
+  core:  1.15
+  ring:  1.00
+  outer: 0.90
+
+area_boundaries:
+  centre_lat: 12.9794
+  centre_lon: 77.5912
+  core_radius_km: 5
+  ring_radius_km: 15
+
+unaffected_modes: [walking, metro]
+bike_dampening: 0.4
