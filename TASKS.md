@@ -51,3 +51,16 @@ Legend:
 
 ## Phase 6 — ADVANCED FEATURES
 (Tasks TBD upon entering phase)
+
+## Deferred idea - Google Maps export (for NQ-026 / NQ-055)
+
+Build a Google Maps directions URL from itinerary coordinates:
+  https://www.google.com/maps/dir/?api=1&origin=LAT,LON&destination=LAT,LON
+    &waypoints=LAT,LON|LAT,LON&travelmode=driving
+
+Gives the USER live traffic and turn-by-turn without any API key or cost.
+Does NOT give NavigIQ live traffic - planning still uses our estimates.
+Waypoint cap is 9 intermediate stops; itineraries are 3-6, so fine.
+
+NQ-026: "Open in Google Maps" button on the itinerary.
+NQ-055: "Navigate to next stop" during an active trip.
