@@ -23,7 +23,7 @@ from app.services.costs.estimator import (
     estimate_leg_cost,
     mode_overhead_min,
 )
-from app.services.metro.graph import MetroUnavailable, get_metro_graph
+
 from app.services.routing.service import RoutingService, RoutingUnavailable
 
 # Accept a mode up to this much slower than the fastest if it costs less.
@@ -77,7 +77,6 @@ class _Candidate:
 class MultiModalRouter:
     def __init__(self, routing: RoutingService | None = None) -> None:
         self.routing = routing or RoutingService()
-        self.metro = get_metro_graph()
 
     async def _walking(self, o, d, depart_at) -> _Candidate | None:
         try:

@@ -22,7 +22,6 @@ CONFIG_PATH = Path(__file__).resolve().parents[4] / "data" / "config" / "fares.y
 
 class TransportMode(str, Enum):
     WALKING = "walking"
-    METRO = "metro"
     AUTO = "auto"
     CAB = "cab"
     OWN_CAR = "own_car"
