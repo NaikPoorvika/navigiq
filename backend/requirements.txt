@@ -22,3 +22,6 @@ geoalchemy2>=0.20.0
 
 # NQ-013: direct Postgres access for the offline POI loader
 psycopg[binary]>=3.3.0
+
+# NQ-023: CP-SAT constraint solver for itinerary optimization
+ortools>=9.10
