@@ -56,9 +56,7 @@ def test_walking_is_never_adjusted():
     assert traffic_factor("walking", TUE_0900, *INDIRANAGAR) == 1.0
 
 
-def test_metro_is_never_adjusted():
-    """Metro runs on rails. Road congestion is irrelevant."""
-    assert traffic_factor("metro", TUE_0900, *INDIRANAGAR) == 1.0
+
 
 
 def test_weekday_peak_exceeds_weekend_peak():

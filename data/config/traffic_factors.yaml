@@ -38,5 +38,5 @@ area_boundaries:
   core_radius_km: 5
   ring_radius_km: 15
 
-unaffected_modes: [walking, metro]
+unaffected_modes: [walking]
 bike_dampening: 0.4

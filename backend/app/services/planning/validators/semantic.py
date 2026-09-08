@@ -143,7 +143,7 @@ def validate_semantics(
             "WALKING_ONLY_MANY_STOPS", "transport",
             f"{spec.total_requested_stops} stops on foot is ambitious",
             Severity.WARNING,
-            "Add auto or metro, or reduce the number of stops"))
+            "Add auto or cab , or reduce the number of stops"))
 
     if walk_only and spec.constraints.max_walking_km < 3:
         report.issues.append(Issue(

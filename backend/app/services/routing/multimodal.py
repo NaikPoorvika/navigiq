@@ -1,14 +1,12 @@
-"""NQ-020 - Multi-modal arc builder.
+﻿"""NQ-020 - Multi-modal arc builder.
 
 Picks the best mode for each leg BEFORE the optimizer sees it. This keeps
 the CP-SAT model single-commodity: the optimizer reasons about one duration
 and one cost per arc, not a mode choice per arc.
 
 SELECTION RULE: cheapest within a time tolerance.
-  Fastest-wins would mean metro is never chosen - Indiranagar to Lalbagh is
-  47 min by metro against ~25 by auto. A rule that guarantees a mode is
-  never selected makes building it pointless. This instead matches how
-  people travel: take the cheaper option if it is not much slower.
+  Matches how people travel: take the cheaper option if it is not much
+  slower. Metro was removed in ADR-020 after losing every arc tested.
 
 HARD CONSTRAINT: an arc whose walking distance exceeds the trip's
 max_walking_km is rejected outright, not penalised.
@@ -46,7 +44,7 @@ class Arc:
     cost_inr: int
     walk_m: float
     rejected: list[str]           # modes considered and why they lost
-    detail: dict | None = None    # metro leg breakdown, when relevant
+    detail: dict | None = None    # mode-specific breakdown, when relevant
 
     def to_dict(self) -> dict:
         return {
@@ -103,15 +101,6 @@ class MultiModalRouter:
         return _Candidate(mode, r.duration_s, r.raw_duration_s,
                           r.distance_m, cost, 0.0)
 
-    def _metro(self, o, d, depart_at, party_size) -> _Candidate | None:
-        try:
-            r = self.metro.route(o, d, depart_at)
-        except MetroUnavailable:
-            return None
-        walk_m = r.access_walk_m + r.egress_walk_m
-        return _Candidate("metro", r.total_duration_s, r.total_duration_s,
-                          r.network_km * 1000, r.fare_inr * party_size,
-                          walk_m, r.to_dict())
 
     async def build_arc(
         self,
@@ -139,10 +128,6 @@ class MultiModalRouter:
                 if c:
                     candidates.append(c)
 
-        if "metro" in allowed_modes:
-            c = self._metro(origin, destination, depart_at, party_size)
-            if c:
-                candidates.append(c)
 
         rejected: list[str] = []
 
@@ -208,3 +193,5 @@ class MultiModalRouter:
                 except RoutingUnavailable:
                     arcs[i][j] = None
         return arcs
+
+

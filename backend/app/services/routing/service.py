@@ -11,7 +11,7 @@ The UI and the validator both need to distinguish these. Presenting the
 adjusted figure as if it were measured would be dishonest; presenting the
 raw figure would produce itineraries that are systematically too tight.
 
-OSRM HAS NO LIVE TRAFFIC AND NO TRANSIT. Metro is NQ-020's static graph.
+SRM HAS NO LIVE TRAFFIC AND NO TRANSIT. NavigIQ has no public transit support (ADR-020).
 
 ON FAILURE: raises RoutingUnavailable. The planner must NOT substitute a
 guessed distance into a delivered itinerary - an honest error beats a

@@ -39,18 +39,7 @@ own_car:
   parking_flat: 40
   parking_overhead_min: 8
 
-metro:
-  # Namma Metro distance bands. km is the upper bound of each band.
-  bands:
-    - {max_km: 2,  fare: 10}
-    - {max_km: 4,  fare: 20}
-    - {max_km: 6,  fare: 30}
-    - {max_km: 8,  fare: 40}
-    - {max_km: 12, fare: 50}
-    - {max_km: 18, fare: 60}
-    - {max_km: 25, fare: 70}
-    - {max_km: 999, fare: 90}
-  access_overhead_min: 8    # walk to platform, security, wait
+
 
 walking:
   per_km: 0

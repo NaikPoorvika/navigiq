@@ -14,11 +14,11 @@ SAT_1800 = datetime(2026, 9, 5, 18, 0)
 
 async def main():
     r = MultiModalRouter()
-    modes = ["walking", "auto", "cab", "metro"]
+    modes = ["walking", "auto", "cab"]
 
     cases = [
         ("short hop (walkable)", INDIRANAGAR, NEARBY),
-        ("medium (metro competitive?)", INDIRANAGAR, MG_ROAD),
+        ("medium (competitive?)", INDIRANAGAR, MG_ROAD),
         ("long cross-city", INDIRANAGAR, LALBAGH),
     ]
 

@@ -54,17 +54,6 @@ def test_vehicle_modes_are_per_vehicle_not_per_person():
     assert solo == four
 
 
-def test_metro_is_per_person():
-    solo = estimate_leg_cost(TransportMode.METRO, 5000, 900, party_size=1)
-    four = estimate_leg_cost(TransportMode.METRO, 5000, 900, party_size=4)
-    assert four == solo * 4
-
-
-@pytest.mark.parametrize("km,expected", [(1, 10), (3, 20), (5, 30), (10, 50), (50, 90)])
-def test_metro_distance_bands(km, expected):
-    assert estimate_leg_cost(TransportMode.METRO, km * 1000, 600) == expected
-
-
 def test_own_car_includes_parking():
     # 5 km = 5*8 + 40 = 80
     assert estimate_leg_cost(TransportMode.OWN_CAR, 5000, 900) == 80
@@ -78,7 +67,7 @@ def test_zero_distance_leg():
 def test_mode_overhead_is_nonzero_for_vehicles():
     assert mode_overhead_min(TransportMode.AUTO) > 0
     assert mode_overhead_min(TransportMode.CAB) > 0
-    assert mode_overhead_min(TransportMode.METRO) > 0
+    assert mode_overhead_min(TransportMode.OWN_CAR) > 0
     assert mode_overhead_min(TransportMode.WALKING) == 0
 
 

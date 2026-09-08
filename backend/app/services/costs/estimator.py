@@ -88,11 +88,7 @@ def estimate_leg_cost(
     if mode in (TransportMode.WALKING, TransportMode.BIKE):
         return 0
 
-    if mode == TransportMode.METRO:
-        for band in cfg["metro"]["bands"]:
-            if km <= band["max_km"]:
-                return int(band["fare"]) * party_size
-        return int(cfg["metro"]["bands"][-1]["fare"]) * party_size
+    
 
     if mode == TransportMode.OWN_CAR:
         c = cfg["own_car"]
@@ -128,7 +124,6 @@ def mode_overhead_min(mode: TransportMode) -> int:
         TransportMode.AUTO: cfg["auto"]["hail_overhead_min"],
         TransportMode.CAB: cfg["cab"]["hail_overhead_min"],
         TransportMode.OWN_CAR: cfg["own_car"]["parking_overhead_min"],
-        TransportMode.METRO: cfg["metro"]["access_overhead_min"],
     }.get(mode, 0)
 
 
