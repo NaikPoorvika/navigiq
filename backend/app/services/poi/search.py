@@ -35,6 +35,7 @@ class POISummary:
     lon: float
     distance_m: int
     prominence: float
+    editorial_score: float | None
     cost_estimate_inr: int | None
     category_typical_inr: int
     visit_minutes: int
@@ -53,6 +54,8 @@ class POISummary:
             "lon": self.lon,
             "distance_m": self.distance_m,
             "prominence": float(self.prominence),
+            "editorial_score": (float(self.editorial_score)
+                                if self.editorial_score is not None else None),
             "cost_estimate_inr": self.cost_estimate_inr,
             "category_typical_inr": self.category_typical_inr,
             "visit_minutes": self.visit_minutes,
@@ -99,6 +102,7 @@ SELECT
     ST_X(p.geom::geometry)      AS lon,
     ST_Distance(p.geom, origin.g) AS distance_m,
     p.prominence,
+    p.editorial_score,
     p.cost_estimate_inr,
     c.typical_cost_inr,
     COALESCE(p.visit_minutes, c.default_visit_minutes) AS visit_minutes,
@@ -186,6 +190,7 @@ async def search_pois(
             lat=float(r.lat), lon=float(r.lon),
             distance_m=int(round(r.distance_m)),
             prominence=float(r.prominence),
+            editorial_score=r.editorial_score,
             cost_estimate_inr=r.cost_estimate_inr,
             category_typical_inr=r.typical_cost_inr,
             visit_minutes=r.visit_minutes, indoor=r.indoor,
