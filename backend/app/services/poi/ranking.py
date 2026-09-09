@@ -52,7 +52,11 @@ def _category_match(poi: dict, wanted: list[str]) -> float:
     """1.0 exact primary match, else the best secondary link weight, else 0."""
     if not wanted:
         return 0.5          # no preference stated - neutral, not zero
-    if poi.get("category") in wanted:
+    # Match on the category the search actually matched, not the primary. A
+    # lake found via a sunset link must score as a sunset match, or it ranks
+    # below everything and never reaches the optimizer.
+    matched = poi.get("matched_category") or poi.get("category")
+    if matched in wanted:
         return 1.0
     best = 0.0
     for link in poi.get("secondary_categories", []):
@@ -72,7 +76,8 @@ def _diversity(poi: dict, counts: dict[str, int], decay: float) -> float:
     Without this the optimizer happily returns three cafes in a row because
     each individually scores well.
     """
-    already = counts.get(poi.get("category", ""), 0)
+    already = counts.get(poi.get("matched_category")
+                         or poi.get("category", ""), 0)
     return decay ** already
 
 
@@ -157,8 +162,8 @@ class DeterministicRanker:
             scored = [self.score(p, ctx) for p in remaining]
             best = max(scored, key=lambda s: (s.score, -s.poi.get("distance_m", 0)))
             chosen.append(best)
-            counts[best.poi.get("category", "")] = \
-                counts.get(best.poi.get("category", ""), 0) + 1
+            key = best.poi.get("matched_category") or best.poi.get("category", "")
+            counts[key] = counts.get(key, 0) + 1
             remaining.remove(best.poi)
 
         return chosen

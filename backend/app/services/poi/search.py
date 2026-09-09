@@ -30,6 +30,7 @@ class POISummary:
     id: int
     name: str
     category: str
+    matched_category: str
     lat: float
     lon: float
     distance_m: int
@@ -47,6 +48,7 @@ class POISummary:
             "id": self.id,
             "name": self.name,
             "category": self.category,
+            "matched_category": self.matched_category,
             "lat": self.lat,
             "lon": self.lon,
             "distance_m": self.distance_m,
@@ -82,7 +84,17 @@ hours AS (
 SELECT
     p.id,
     p.name,
-    c.key                       AS category,
+        c.key                       AS category,
+    COALESCE((
+        SELECT lc.key
+        FROM poi_category_links l
+        JOIN poi_categories lc ON lc.id = l.category_id
+        WHERE l.poi_id = p.id
+          AND CAST(:categories AS text[]) IS NOT NULL
+          AND lc.key = ANY(CAST(:categories AS text[]))
+        ORDER BY l.weight DESC
+        LIMIT 1
+    ), c.key)                   AS matched_category,
     ST_Y(p.geom::geometry)      AS lat,
     ST_X(p.geom::geometry)      AS lon,
     ST_Distance(p.geom, origin.g) AS distance_m,
@@ -104,7 +116,16 @@ JOIN poi_categories c ON c.id = p.primary_category
 LEFT JOIN hours h ON h.poi_id = p.id
 WHERE p.active
   AND ST_DWithin(p.geom, origin.g, :radius_m)
-  AND (CAST(:categories AS text[]) IS NULL OR c.key = ANY(CAST(:categories AS text[])))
+    AND (
+        CAST(:categories AS text[]) IS NULL
+        OR EXISTS (
+            SELECT 1
+            FROM poi_category_links l
+            JOIN poi_categories lc ON lc.id = l.category_id
+            WHERE l.poi_id = p.id
+              AND lc.key = ANY(CAST(:categories AS text[]))
+        )
+      )
   AND (CAST(:exclude_ids AS bigint[]) IS NULL OR NOT (p.id = ANY(CAST(:exclude_ids AS bigint[]))))
   AND (
         CAST(:max_cost AS int) IS NULL
@@ -161,7 +182,7 @@ async def search_pois(
 
     return [
         POISummary(
-            id=r.id, name=r.name, category=r.category,
+            id=r.id, name=r.name, category=r.category, matched_category=r.matched_category,
             lat=float(r.lat), lon=float(r.lon),
             distance_m=int(round(r.distance_m)),
             prominence=float(r.prominence),

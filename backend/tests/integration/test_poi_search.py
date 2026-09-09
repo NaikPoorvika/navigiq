@@ -81,10 +81,13 @@ async def test_category_filter_is_exclusive(db):
 
 
 async def test_multiple_categories(db):
+    """With link-based matching the PRIMARY category may differ from what was
+    requested - a bakery linked to cafe is a valid cafe result.
+    matched_category is what actually matched."""
     rows = await search_pois(db, **INDIRANAGAR, radius_km=3,
                              categories=["cafe", "bar"], limit=30)
-    assert {r.category for r in rows} <= {"cafe", "bar"}
-
+    assert rows
+    assert {r.matched_category for r in rows} <= {"cafe", "bar"}
 
 async def test_budget_ceiling_excludes_expensive(db):
     rows = await search_pois(db, **INDIRANAGAR, radius_km=3,

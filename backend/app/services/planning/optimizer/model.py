@@ -265,13 +265,21 @@ def optimize(
 
     # --- meal --------------------------------------------------------------
     if meal_required and meal_windows:
+        # Only enforce a meal if a window genuinely overlaps the trip with
+        # room to reach somewhere. A 15:00-20:00 trip against windows of
+        # 12:00-15:00 and 19:00-22:00 leaves a 60-minute slot at the very end,
+        # and a hard constraint there makes the whole model infeasible.
+        MIN_USABLE_OVERLAP_MIN = 90
+        usable = [
+            (max(lo, start_min + 30), min(hi, end_min))
+            for lo, hi in meal_windows
+            if min(hi, end_min) - max(lo, start_min + 30) >= MIN_USABLE_OVERLAP_MIN
+        ]
         meal_nodes = [i for i in range(1, n) if nodes[i].is_meal]
-        if meal_nodes:
+        if usable and meal_nodes:
             in_window = []
             for i in meal_nodes:
-                for lo, hi in meal_windows:
-                    if lo > end_min or hi < start_min:
-                        continue
+                for lo, hi in usable:
                     b = m.NewBoolVar(f"meal_{i}_{lo}")
                     m.Add(arrive[i] >= lo).OnlyEnforceIf(b)
                     m.Add(arrive[i] <= hi).OnlyEnforceIf(b)

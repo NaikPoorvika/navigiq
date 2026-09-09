@@ -8,7 +8,9 @@ from app.models.poi import (
     POIInteraction,
     POIOpeningHours,
 )
-
+from app.models.itinerary import (
+    Itinerary, ItineraryStop, ItineraryVersion, PlanSnapshot, TripSpecRecord,
+)
 __all__ = [
     "Base", "User", "POI", "POICategory",
     "POICategoryLink", "POIInteraction", "POIOpeningHours",
