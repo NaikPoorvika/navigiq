@@ -1,8 +1,9 @@
-from fastapi import FastAPI
+﻿from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from asgi_correlation_id import CorrelationIdMiddleware
 from app.config import settings
+from app.db.base import Base  # noqa: F401  registers all models
 from app.api.v1.router import api_router
 from app.core.logging import setup_logging
 
@@ -40,3 +41,4 @@ app.add_middleware(
 )
 
 app.include_router(api_router, prefix="/api/v1")
+
