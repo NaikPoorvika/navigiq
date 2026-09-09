@@ -63,7 +63,10 @@ class ItineraryVersion(Base):
     total_cost_inr = Column(Integer, nullable=False, default=0)
     total_duration_min = Column(Integer, nullable=False, default=0)
     total_walk_m = Column(Integer, nullable=False, default=0)
-    quality_score = Column(Numeric(6, 3))
+    # The raw CP-SAT objective, not a 0-1 quality measure. Scales with the
+    # MUST weight (100,000), so it needs integer range, and it is only
+    # comparable between plans built from the same candidate set.
+    objective_value = Column(Integer)
     # The validator's verdict is stored, not just its outcome. An itinerary
     # nobody can audit is an itinerary nobody should trust.
     validator_report = Column(JSONB, nullable=False)

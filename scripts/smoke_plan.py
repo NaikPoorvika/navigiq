@@ -1,4 +1,4 @@
-"""NQ-025 - the demo scenario, end to end, no AI involved.
+﻿"""NQ-025 - the demo scenario, end to end, no AI involved.
 
 'I have Rs 1500 and 5 hours starting from Indiranagar this Saturday
  afternoon. I want good food, one historical place and a sunset spot.
@@ -14,6 +14,7 @@ os.environ.setdefault(
     "DATABASE_URL",
     "postgresql+asyncpg://navigiq:navigiq_local_dev@localhost:5433/navigiq")
 
+from app.db.base import Base  # noqa: F401  registers all models
 from app.db.session import AsyncSessionLocal
 from app.schemas.tripspec import TripSpec
 from app.services.planning.orchestrator import plan
@@ -48,7 +49,7 @@ def hhmm(minutes):
 
 async def main():
     async with AsyncSessionLocal() as db:
-        r = await plan(db, SPEC, persist=False)
+        r = await plan(db, SPEC, persist=True)
 
     print("=" * 68)
     print(f"  {SPEC.date}  {SPEC.start_time_local}-{SPEC.end_time_local}  "

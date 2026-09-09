@@ -1,4 +1,4 @@
-"""NQ-025 - Planning orchestrator.
+﻿"""NQ-025 - Planning orchestrator.
 
 Wires every deterministic component into one call. This is the whole product:
 
@@ -43,6 +43,9 @@ from app.services.poi.search import search_pois
 from app.services.routing.multimodal import MultiModalRouter
 from app.services.routing.service import RoutingUnavailable
 from app.services.weather.client import WeatherWindow, get_window
+from app.models.itinerary import (
+    Itinerary, ItineraryStop, ItineraryVersion, PlanSnapshot, TripSpecRecord,
+)
 
 # Meal bands, minutes since midnight.
 MEAL_WINDOWS = [(12 * 60, 15 * 60), (19 * 60, 22 * 60)]
@@ -126,6 +129,73 @@ async def _candidate_summaries(
         )
     return out
 
+async def _persist(
+    db: AsyncSession,
+    spec: TripSpec,
+    opt,
+    report,
+    weather,
+    feasibility: dict,
+    ranked,
+    user_id,
+    relaxations: list[str],
+) -> int:
+    """Write the itinerary. Versions are immutable - a modification or reroute
+    creates a new one rather than mutating this."""
+    spec_row = TripSpecRecord(
+        user_id=user_id, payload=spec.model_dump(mode="json"),
+        version=spec.version, source=spec.source,
+    )
+    db.add(spec_row)
+    await db.flush()
+
+    itin = Itinerary(
+        user_id=user_id, tripspec_id=spec_row.id,
+        status="draft", mode=spec.mode.value,
+    )
+    db.add(itin)
+    await db.flush()
+
+    version = ItineraryVersion(
+        itinerary_id=itin.id, version_no=1, reason="initial",
+        total_cost_inr=opt.total_cost_inr,
+        total_duration_min=opt.total_duration_min,
+        total_walk_m=opt.total_walk_m,
+        objective_value=int(opt.objective_value),
+        validator_report=report.to_dict(),
+    )
+    db.add(version)
+    await db.flush()
+
+    for s in opt.stops:
+        db.add(ItineraryStop(
+            version_id=version.id, seq=s.seq, poi_id=s.poi_id,
+            arrive_min=s.arrive_min, depart_min=s.depart_min,
+            visit_minutes=s.visit_minutes, cost_inr=s.cost_inr,
+            mode_from_prev=s.mode_from_prev,
+            travel_seconds_from_prev=s.travel_minutes_from_prev * 60,
+            notes={},
+        ))
+
+    # Everything needed to replay this plan exactly as it was produced.
+    db.add(PlanSnapshot(
+        version_id=version.id,
+        tripspec=spec.model_dump(mode="json"),
+        candidate_poi_ids=[s.poi["id"] for s in ranked],
+        optimizer_params={
+            "mode": spec.mode.value,
+            "candidate_count": len(ranked),
+            "relaxations_applied": relaxations,
+        },
+        optimizer_status=opt.status.value,
+        solve_ms=opt.solve_ms,
+        weather=weather.to_dict(),
+        feasibility_report=feasibility,
+    ))
+
+    itin.current_version_id = version.id
+    await db.commit()
+    return itin.id
 
 async def plan(
     db: AsyncSession,
@@ -353,5 +423,12 @@ async def plan(
 
     result.ok = True
     result.itinerary = opt.to_dict()
+
+    if persist:
+        itinerary_id = await _persist(
+            db, spec, opt, report, weather, result.feasibility or {},
+            ranked, user_id, result.relaxations_applied)
+        result.itinerary["itinerary_id"] = itinerary_id
+
     result.timings_ms = t
     return result
