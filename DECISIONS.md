@@ -102,3 +102,46 @@ to 20.
 candidate set. The optimizer chooses from the 20 best-ranked POIs rather than
 50. If the cap is ever raised, the time limit must rise with it and
 determinism must be re-verified.
+
+## ASSUMPTION-002: Interactive latency budget for LLM stages
+
+**Status:** Assumed, not measured against users
+**Date:** 2026-09-12
+**Owner:** B1
+**Used by:** NQ-027 gate `extraction_latency_p95`, and NQ-028 onwards
+
+**The assumption.** TripSpec extraction must complete within **8000 ms at p95**,
+measured at context 8192, concurrency 1, schema-constrained, on a warm model.
+
+**Why this number.** Extraction is not the whole wait. It sits in front of the
+deterministic pipeline, which is itself not free: feasibility, POI search,
+routing and CP-SAT all run after the spec exists, on real I/O (Postgres,
+OSRM) that the NQ-025 verification run exercised for real (itinerary 7, 3
+stops, a 167-minute *planned trip* - not pipeline latency - built and
+persisted over HTTP). A user who types a sentence and presses plan
+experiences the LLM stage plus all of that, not the LLM stage alone.
+Holding the language stage to 8 s leaves the rest of the pipeline room inside a
+perceived wait of roughly ten seconds, which is the range where a progress
+indicator still reads as working rather than broken.
+
+**What it is not.** It is not a measured tolerance from real users of this
+product, because there are none yet. It is a design budget chosen so that the
+model selected in ADR-012 cannot be one that only looks acceptable when nobody
+is waiting for it.
+
+**How it could be wrong.** Three ways, each with a visible consequence:
+
+- If NL planning turns out to be a background action rather than an
+  interactive one - the user submits and returns later - the budget is far
+  too strict and is excluding models unnecessarily.
+- If the deterministic pipeline is slower than assumed on a cold cache, 8 s
+  for the LLM alone may already be too generous.
+- The budget is stated at concurrency 1. On this workstation that is the
+  honest single-user case; it says nothing about what happens when several
+  requests arrive together, which the NQ-027 concurrency sweep measures
+  separately.
+
+**Revisit when:** NQ-033 puts the NL input in front of a real user, or NQ-030
+produces an eval set from real traffic. If either shows the budget is wrong,
+change it here first and re-run the gate rather than quietly accepting a model
+that fails it.

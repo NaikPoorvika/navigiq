@@ -1,0 +1,25 @@
+[
+  {"id": "clq-001", "utterance": "Plan me something nice for the weekend.",
+   "gold": {"missing_fields": ["origin", "date", "start_time_local", "end_time_local", "interests"]}},
+
+  {"id": "clq-002", "utterance": "I want to see some temples on Saturday.",
+   "gold": {"missing_fields": ["origin", "start_time_local", "end_time_local"]}},
+
+  {"id": "clq-003", "utterance": "We are starting from Indiranagar, four of us, budget 2000.",
+   "gold": {"missing_fields": ["date", "start_time_local", "end_time_local", "interests"]}},
+
+  {"id": "clq-004", "utterance": "Tomorrow from 10:00 to 18:00, cafes and parks please.",
+   "gold": {"missing_fields": ["origin"]}},
+
+  {"id": "clq-005", "utterance": "From Koramangala tomorrow, we want street food.",
+   "gold": {"missing_fields": ["start_time_local", "end_time_local"]}},
+
+  {"id": "clq-006", "utterance": "A museum day out, starting at MG Road at 09:00.",
+   "gold": {"missing_fields": ["date", "end_time_local"]}},
+
+  {"id": "clq-007", "utterance": "Take us somewhere on Sunday from Jayanagar between 11:00 and 16:00.",
+   "gold": {"missing_fields": ["interests"]}},
+
+  {"id": "clq-008", "utterance": "Shopping and dinner, 3 people, 2500 rupees.",
+   "gold": {"missing_fields": ["origin", "date", "start_time_local", "end_time_local"]}}
+]

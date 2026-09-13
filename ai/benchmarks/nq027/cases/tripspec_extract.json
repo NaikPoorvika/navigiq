@@ -1,0 +1,201 @@
+[
+  {"id": "tse-001", "utterance": "Plan a day in Indiranagar this Saturday from 10:00 to 18:00. We are 2 people, budget 1500 rupees. We want a cafe, a park and dinner at a restaurant.",
+   "gazetteer": [{"name": "Indiranagar", "lat": 12.9784, "lon": 77.6408}, {"name": "Domlur", "lat": 12.9611, "lon": 77.6387}],
+   "gold": {"origin": [12.9784, 77.6408], "date": "2026-10-03", "start_time_local": "10:00", "end_time_local": "18:00", "budget_inr": 1500, "party_size": 2, "categories": ["cafe", "park", "restaurant"]}},
+
+  {"id": "tse-002", "utterance": "I am in Koramangala tomorrow, free between 11:00 and 16:00. Just want to visit a museum and grab coffee at a cafe.",
+   "gazetteer": [{"name": "Koramangala", "lat": 12.9352, "lon": 77.6245}, {"name": "HSR Layout", "lat": 12.9121, "lon": 77.6446}],
+   "gold": {"origin": [12.9352, 77.6245], "date": "2026-10-02", "start_time_local": "11:00", "end_time_local": "16:00", "categories": ["cafe", "museum"]}},
+
+  {"id": "tse-003", "utterance": "Sunday outing starting from MG Road, 09:00 to 17:00, four of us, 3000 rupees total. Temples and street food please.",
+   "gazetteer": [{"name": "MG Road", "lat": 12.9756, "lon": 77.6068}, {"name": "Church Street", "lat": 12.9752, "lon": 77.6045}],
+   "gold": {"origin": [12.9756, 77.6068], "date": "2026-10-04", "start_time_local": "09:00", "end_time_local": "17:00", "budget_inr": 3000, "party_size": 4, "categories": ["street_food", "temple"]}},
+
+  {"id": "tse-004", "utterance": "Starting at Jayanagar on 2026-10-10, 08:30 to 13:30. I want a market and a bookstore.",
+   "gazetteer": [{"name": "Jayanagar", "lat": 12.9250, "lon": 77.5938}, {"name": "JP Nagar", "lat": 12.9063, "lon": 77.5857}],
+   "gold": {"origin": [12.9250, 77.5938], "date": "2026-10-10", "start_time_local": "08:30", "end_time_local": "13:30", "categories": ["bookstore", "market"]}},
+
+  {"id": "tse-005", "utterance": "Take me around Malleshwaram next Monday 10:00 to 15:00, vegetarian only, 2 of us. Temples and a filter coffee cafe.",
+   "gazetteer": [{"name": "Malleshwaram", "lat": 13.0035, "lon": 77.5647}, {"name": "Rajajinagar", "lat": 12.9982, "lon": 77.5524}],
+   "gold": {"origin": [13.0035, 77.5647], "date": "2026-10-05", "start_time_local": "10:00", "end_time_local": "15:00", "party_size": 2, "vegetarian": true, "categories": ["cafe", "temple"]}},
+
+  {"id": "tse-006", "utterance": "From Whitefield on Saturday, 16:00 to 21:00. We will go by cab only. A bar and dinner at a restaurant.",
+   "gazetteer": [{"name": "Whitefield", "lat": 12.9698, "lon": 77.7500}, {"name": "Marathahalli", "lat": 12.9591, "lon": 77.6974}],
+   "gold": {"origin": [12.9698, 77.7500], "date": "2026-10-03", "start_time_local": "16:00", "end_time_local": "21:00", "transport": ["cab"], "categories": ["bar", "restaurant"]}},
+
+  {"id": "tse-007", "utterance": "Cubbon Park area, this Sunday 07:00 to 11:00, going solo, just a park and a historical site.",
+   "gazetteer": [{"name": "Cubbon Park", "lat": 12.9763, "lon": 77.5929}, {"name": "MG Road", "lat": 12.9756, "lon": 77.6068}],
+   "gold": {"origin": [12.9763, 77.5929], "date": "2026-10-04", "start_time_local": "07:00", "end_time_local": "11:00", "party_size": 1, "categories": ["historical", "park"]}},
+
+  {"id": "tse-008", "utterance": "HSR Layout, tomorrow, 18:00 to 22:00, 6 friends, 5000 rupees. Nightlife and dessert.",
+   "gazetteer": [{"name": "HSR Layout", "lat": 12.9121, "lon": 77.6446}, {"name": "Koramangala", "lat": 12.9352, "lon": 77.6245}],
+   "gold": {"origin": [12.9121, 77.6446], "date": "2026-10-02", "start_time_local": "18:00", "end_time_local": "22:00", "budget_inr": 5000, "party_size": 6, "categories": ["dessert", "nightlife"]}},
+
+  {"id": "tse-009", "utterance": "I want to watch the sunset from a viewpoint at Nandi Hills on 2026-10-11, leaving at 14:00 and back by 20:00, in our own car.",
+   "gazetteer": [{"name": "Nandi Hills", "lat": 13.3702, "lon": 77.6835}, {"name": "Yelahanka", "lat": 13.1007, "lon": 77.5963}],
+   "gold": {"origin": [13.3702, 77.6835], "date": "2026-10-11", "start_time_local": "14:00", "end_time_local": "20:00", "transport": ["own_car"], "categories": ["sunset", "viewpoint"]}},
+
+  {"id": "tse-010", "utterance": "Basavanagudi, Saturday 09:00 to 14:00, 3 people, budget 900. A temple, a market, and breakfast at a restaurant.",
+   "gazetteer": [{"name": "Basavanagudi", "lat": 12.9423, "lon": 77.5730}, {"name": "Lalbagh", "lat": 12.9507, "lon": 77.5848}],
+   "gold": {"origin": [12.9423, 77.5730], "date": "2026-10-03", "start_time_local": "09:00", "end_time_local": "14:00", "budget_inr": 900, "party_size": 3, "categories": ["market", "restaurant", "temple"]}},
+
+  {"id": "tse-011", "utterance": "Plan something light from Domlur tomorrow 10:00 to 16:00, no more than 3 stops. A cafe and a park.",
+   "gazetteer": [{"name": "Domlur", "lat": 12.9611, "lon": 77.6387}, {"name": "Ulsoor", "lat": 12.9812, "lon": 77.6207}],
+   "gold": {"origin": [12.9611, 77.6387], "date": "2026-10-02", "start_time_local": "10:00", "end_time_local": "16:00", "max_stops": 3, "categories": ["cafe", "park"]}},
+
+  {"id": "tse-012", "utterance": "From Ulsoor on Sunday 11:00 to 17:00, two of us. We want to visit a lake and find a pottery workshop.",
+   "gazetteer": [{"name": "Ulsoor", "lat": 12.9812, "lon": 77.6207}, {"name": "Frazer Town", "lat": 13.0022, "lon": 77.6186}],
+   "gold": {"origin": [12.9812, 77.6207], "date": "2026-10-04", "start_time_local": "11:00", "end_time_local": "17:00", "party_size": 2, "categories": ["lake"]}},
+
+  {"id": "tse-013", "utterance": "Electronic City, next Monday, 09:00 to 18:00, budget 2000, 2 people, travelling by auto. Shopping and a restaurant.",
+   "gazetteer": [{"name": "Electronic City", "lat": 12.8452, "lon": 77.6602}, {"name": "Bellandur", "lat": 12.9260, "lon": 77.6762}],
+   "gold": {"origin": [12.8452, 77.6602], "date": "2026-10-05", "start_time_local": "09:00", "end_time_local": "18:00", "budget_inr": 2000, "party_size": 2, "transport": ["auto"], "categories": ["restaurant", "shopping"]}},
+
+  {"id": "tse-014", "utterance": "Art galleries and a museum around MG Road on 2026-10-15 from 10:00 until 16:00.",
+   "gazetteer": [{"name": "MG Road", "lat": 12.9756, "lon": 77.6068}, {"name": "Cubbon Park", "lat": 12.9763, "lon": 77.5929}],
+   "gold": {"origin": [12.9756, 77.6068], "date": "2026-10-15", "start_time_local": "10:00", "end_time_local": "16:00", "categories": ["art_gallery", "museum"]}},
+
+  {"id": "tse-015", "utterance": "Rajajinagar this Saturday 15:00 to 20:00, family of 5, 2500 rupees, a temple and dessert, all vegetarian.",
+   "gazetteer": [{"name": "Rajajinagar", "lat": 12.9982, "lon": 77.5524}, {"name": "Vijayanagar", "lat": 12.9719, "lon": 77.5301}],
+   "gold": {"origin": [12.9982, 77.5524], "date": "2026-10-03", "start_time_local": "15:00", "end_time_local": "20:00", "budget_inr": 2500, "party_size": 5, "vegetarian": true, "categories": ["dessert", "temple"]}},
+
+  {"id": "tse-016", "utterance": "Start from Hebbal on Sunday 08:00 to 12:00, a park and a cafe.",
+   "gazetteer": [{"name": "Hebbal", "lat": 13.0358, "lon": 77.5970}, {"name": "Yelahanka", "lat": 13.1007, "lon": 77.5963}, {"name": "Sadashivanagar", "lat": 13.0068, "lon": 77.5810}],
+   "gold": {"origin": [13.0358, 77.5970], "date": "2026-10-04", "start_time_local": "08:00", "end_time_local": "12:00", "categories": ["cafe", "park"]}},
+
+  {"id": "tse-017", "utterance": "Banashankari, tomorrow 17:00 to 21:00, 2 people, street food and a market.",
+   "gazetteer": [{"name": "Banashankari", "lat": 12.9250, "lon": 77.5460}, {"name": "JP Nagar", "lat": 12.9063, "lon": 77.5857}],
+   "gold": {"origin": [12.9250, 77.5460], "date": "2026-10-02", "start_time_local": "17:00", "end_time_local": "21:00", "party_size": 2, "categories": ["market", "street_food"]}},
+
+  {"id": "tse-018", "utterance": "JP Nagar Saturday 10:00 to 19:00, 4000 rupees for 4 people. Shopping, lunch at a restaurant and dessert.",
+   "gazetteer": [{"name": "JP Nagar", "lat": 12.9063, "lon": 77.5857}, {"name": "Jayanagar", "lat": 12.9250, "lon": 77.5938}],
+   "gold": {"origin": [12.9063, 77.5857], "date": "2026-10-03", "start_time_local": "10:00", "end_time_local": "19:00", "budget_inr": 4000, "party_size": 4, "categories": ["dessert", "restaurant", "shopping"]}},
+
+  {"id": "tse-019", "utterance": "Bellandur on 2026-10-20, 07:00 to 11:00, just me. A lake and then a cafe.",
+   "gazetteer": [{"name": "Bellandur", "lat": 12.9260, "lon": 77.6762}, {"name": "Sarjapur Road", "lat": 12.9010, "lon": 77.6870}],
+   "gold": {"origin": [12.9260, 77.6762], "date": "2026-10-20", "start_time_local": "07:00", "end_time_local": "11:00", "party_size": 1, "categories": ["cafe", "lake"]}},
+
+  {"id": "tse-020", "utterance": "Marathahalli next Monday from 12:00 to 20:00, 3 of us, by cab and auto. Entertainment and dinner at a restaurant.",
+   "gazetteer": [{"name": "Marathahalli", "lat": 12.9591, "lon": 77.6974}, {"name": "Whitefield", "lat": 12.9698, "lon": 77.7500}],
+   "gold": {"origin": [12.9591, 77.6974], "date": "2026-10-05", "start_time_local": "12:00", "end_time_local": "20:00", "party_size": 3, "transport": ["auto", "cab"], "categories": ["entertainment", "restaurant"]}},
+
+  {"id": "tse-021", "utterance": "Vijayanagar, Sunday 09:30 to 14:30, a temple and a landmark, 2 people, budget 600.",
+   "gazetteer": [{"name": "Vijayanagar", "lat": 12.9719, "lon": 77.5301}, {"name": "Rajajinagar", "lat": 12.9982, "lon": 77.5524}],
+   "gold": {"origin": [12.9719, 77.5301], "date": "2026-10-04", "start_time_local": "09:30", "end_time_local": "14:30", "budget_inr": 600, "party_size": 2, "categories": ["landmark", "temple"]}},
+
+  {"id": "tse-022", "utterance": "Sarjapur Road tomorrow 19:00 to 23:00, a bar and nightlife, 4 people.",
+   "gazetteer": [{"name": "Sarjapur Road", "lat": 12.9010, "lon": 77.6870}, {"name": "Bellandur", "lat": 12.9260, "lon": 77.6762}],
+   "gold": {"origin": [12.9010, 77.6870], "date": "2026-10-02", "start_time_local": "19:00", "end_time_local": "23:00", "party_size": 4, "categories": ["bar", "nightlife"]}},
+
+  {"id": "tse-023", "utterance": "Church Street on Saturday from 11:00 to 18:00, a bookstore, a cafe and some shopping.",
+   "gazetteer": [{"name": "Church Street", "lat": 12.9752, "lon": 77.6045}, {"name": "Commercial Street", "lat": 12.9827, "lon": 77.6094}],
+   "gold": {"origin": [12.9752, 77.6045], "date": "2026-10-03", "start_time_local": "11:00", "end_time_local": "18:00", "categories": ["bookstore", "cafe", "shopping"]}},
+
+  {"id": "tse-024", "utterance": "Commercial Street, 2026-10-09, 10:00 to 16:00, shopping and street food, 3 people, 2200 rupees.",
+   "gazetteer": [{"name": "Commercial Street", "lat": 12.9827, "lon": 77.6094}, {"name": "Frazer Town", "lat": 13.0022, "lon": 77.6186}],
+   "gold": {"origin": [12.9827, 77.6094], "date": "2026-10-09", "start_time_local": "10:00", "end_time_local": "16:00", "budget_inr": 2200, "party_size": 3, "categories": ["shopping", "street_food"]}},
+
+  {"id": "tse-025", "utterance": "Lalbagh this Sunday 06:00 to 10:00, just the park and some nature, on my own, walking only.",
+   "gazetteer": [{"name": "Lalbagh", "lat": 12.9507, "lon": 77.5848}, {"name": "Basavanagudi", "lat": 12.9423, "lon": 77.5730}],
+   "gold": {"origin": [12.9507, 77.5848], "date": "2026-10-04", "start_time_local": "06:00", "end_time_local": "10:00", "party_size": 1, "transport": ["walking"], "categories": ["nature", "park"]}},
+
+  {"id": "tse-026", "utterance": "Sadashivanagar Saturday 16:00 to 21:00, 2 people, a sunset viewpoint then dinner at a restaurant.",
+   "gazetteer": [{"name": "Sadashivanagar", "lat": 13.0068, "lon": 77.5810}, {"name": "Malleshwaram", "lat": 13.0035, "lon": 77.5647}],
+   "gold": {"origin": [13.0068, 77.5810], "date": "2026-10-03", "start_time_local": "16:00", "end_time_local": "21:00", "party_size": 2, "categories": ["restaurant", "sunset", "viewpoint"]}},
+
+  {"id": "tse-027", "utterance": "Frazer Town tomorrow 18:00 to 22:00, 4 of us, a restaurant and dessert.",
+   "gazetteer": [{"name": "Frazer Town", "lat": 13.0022, "lon": 77.6186}, {"name": "Ulsoor", "lat": 12.9812, "lon": 77.6207}],
+   "gold": {"origin": [13.0022, 77.6186], "date": "2026-10-02", "start_time_local": "18:00", "end_time_local": "22:00", "party_size": 4, "categories": ["dessert", "restaurant"]}},
+
+  {"id": "tse-028", "utterance": "From Indiranagar on 2026-10-12, 09:00 to 17:00, 2 people, 1800 rupees, a museum, a park and a cafe.",
+   "gazetteer": [{"name": "Indiranagar", "lat": 12.9784, "lon": 77.6408}, {"name": "Ulsoor", "lat": 12.9812, "lon": 77.6207}],
+   "gold": {"origin": [12.9784, 77.6408], "date": "2026-10-12", "start_time_local": "09:00", "end_time_local": "17:00", "budget_inr": 1800, "party_size": 2, "categories": ["cafe", "museum", "park"]}},
+
+  {"id": "tse-029", "utterance": "Koramangala, Saturday, 12:00 to 22:00, 5 people, budget 7000, a restaurant, a bar and entertainment, all by cab.",
+   "gazetteer": [{"name": "Koramangala", "lat": 12.9352, "lon": 77.6245}, {"name": "HSR Layout", "lat": 12.9121, "lon": 77.6446}],
+   "gold": {"origin": [12.9352, 77.6245], "date": "2026-10-03", "start_time_local": "12:00", "end_time_local": "22:00", "budget_inr": 7000, "party_size": 5, "transport": ["cab"], "categories": ["bar", "entertainment", "restaurant"]}},
+
+  {"id": "tse-030", "utterance": "Whitefield next Monday 08:00 to 12:00, a lake and a park, going by bike.",
+   "gazetteer": [{"name": "Whitefield", "lat": 12.9698, "lon": 77.7500}, {"name": "Marathahalli", "lat": 12.9591, "lon": 77.6974}],
+   "gold": {"origin": [12.9698, 77.7500], "date": "2026-10-05", "start_time_local": "08:00", "end_time_local": "12:00", "transport": ["bike"], "categories": ["lake", "park"]}},
+
+  {"id": "tse-031", "utterance": "MG Road tomorrow 14:00 to 19:00, historical places and a museum, maximum 4 stops.",
+   "gazetteer": [{"name": "MG Road", "lat": 12.9756, "lon": 77.6068}, {"name": "Church Street", "lat": 12.9752, "lon": 77.6045}],
+   "gold": {"origin": [12.9756, 77.6068], "date": "2026-10-02", "start_time_local": "14:00", "end_time_local": "19:00", "max_stops": 4, "categories": ["historical", "museum"]}},
+
+  {"id": "tse-032", "utterance": "Jayanagar Sunday 10:00 to 15:00, 2 people, vegetarian, a restaurant and a temple, budget 1200.",
+   "gazetteer": [{"name": "Jayanagar", "lat": 12.9250, "lon": 77.5938}, {"name": "Banashankari", "lat": 12.9250, "lon": 77.5460}],
+   "gold": {"origin": [12.9250, 77.5938], "date": "2026-10-04", "start_time_local": "10:00", "end_time_local": "15:00", "budget_inr": 1200, "party_size": 2, "vegetarian": true, "categories": ["restaurant", "temple"]}},
+
+  {"id": "tse-033", "utterance": "Malleshwaram on 2026-10-18 from 07:30 to 12:30, a temple, a market and street food, 3 people.",
+   "gazetteer": [{"name": "Malleshwaram", "lat": 13.0035, "lon": 77.5647}, {"name": "Sadashivanagar", "lat": 13.0068, "lon": 77.5810}],
+   "gold": {"origin": [13.0035, 77.5647], "date": "2026-10-18", "start_time_local": "07:30", "end_time_local": "12:30", "party_size": 3, "categories": ["market", "street_food", "temple"]}},
+
+  {"id": "tse-034", "utterance": "Hebbal, Saturday 15:00 to 20:00, a lake and the sunset, 2 people, own car.",
+   "gazetteer": [{"name": "Hebbal", "lat": 13.0358, "lon": 77.5970}, {"name": "Yelahanka", "lat": 13.1007, "lon": 77.5963}],
+   "gold": {"origin": [13.0358, 77.5970], "date": "2026-10-03", "start_time_local": "15:00", "end_time_local": "20:00", "party_size": 2, "transport": ["own_car"], "categories": ["lake", "sunset"]}},
+
+  {"id": "tse-035", "utterance": "Ulsoor tomorrow 09:00 to 13:00, solo, the lake and a cafe, 500 rupees.",
+   "gazetteer": [{"name": "Ulsoor", "lat": 12.9812, "lon": 77.6207}, {"name": "Domlur", "lat": 12.9611, "lon": 77.6387}],
+   "gold": {"origin": [12.9812, 77.6207], "date": "2026-10-02", "start_time_local": "09:00", "end_time_local": "13:00", "budget_inr": 500, "party_size": 1, "categories": ["cafe", "lake"]}},
+
+  {"id": "tse-036", "utterance": "Electronic City Sunday 11:00 to 17:00, entertainment and shopping, 4 people.",
+   "gazetteer": [{"name": "Electronic City", "lat": 12.8452, "lon": 77.6602}, {"name": "JP Nagar", "lat": 12.9063, "lon": 77.5857}],
+   "gold": {"origin": [12.8452, 77.6602], "date": "2026-10-04", "start_time_local": "11:00", "end_time_local": "17:00", "party_size": 4, "categories": ["entertainment", "shopping"]}},
+
+  {"id": "tse-037", "utterance": "Basavanagudi next Monday 08:00 to 11:00, a temple and a cafe, we will walk.",
+   "gazetteer": [{"name": "Basavanagudi", "lat": 12.9423, "lon": 77.5730}, {"name": "Lalbagh", "lat": 12.9507, "lon": 77.5848}],
+   "gold": {"origin": [12.9423, 77.5730], "date": "2026-10-05", "start_time_local": "08:00", "end_time_local": "11:00", "transport": ["walking"], "categories": ["cafe", "temple"]}},
+
+  {"id": "tse-038", "utterance": "HSR Layout, 2026-10-14, 19:00 to 23:00, 6 people, 6000 rupees, dinner at a restaurant, dessert and nightlife.",
+   "gazetteer": [{"name": "HSR Layout", "lat": 12.9121, "lon": 77.6446}, {"name": "Koramangala", "lat": 12.9352, "lon": 77.6245}],
+   "gold": {"origin": [12.9121, 77.6446], "date": "2026-10-14", "start_time_local": "19:00", "end_time_local": "23:00", "budget_inr": 6000, "party_size": 6, "categories": ["dessert", "nightlife", "restaurant"]}},
+
+  {"id": "tse-039", "utterance": "Cubbon Park Saturday 09:00 to 13:00, the park, a museum and an art gallery, 2 people.",
+   "gazetteer": [{"name": "Cubbon Park", "lat": 12.9763, "lon": 77.5929}, {"name": "MG Road", "lat": 12.9756, "lon": 77.6068}],
+   "gold": {"origin": [12.9763, 77.5929], "date": "2026-10-03", "start_time_local": "09:00", "end_time_local": "13:00", "party_size": 2, "categories": ["art_gallery", "museum", "park"]}},
+
+  {"id": "tse-040", "utterance": "Yelahanka tomorrow 16:00 to 21:00, 3 people, a lake, the sunset and dinner at a restaurant.",
+   "gazetteer": [{"name": "Yelahanka", "lat": 13.1007, "lon": 77.5963}, {"name": "Hebbal", "lat": 13.0358, "lon": 77.5970}],
+   "gold": {"origin": [13.1007, 77.5963], "date": "2026-10-02", "start_time_local": "16:00", "end_time_local": "21:00", "party_size": 3, "categories": ["lake", "restaurant", "sunset"]}},
+
+  {"id": "tse-041", "utterance": "Domlur Sunday 10:00 to 14:00, a cafe and a bookstore, just me, at most 2 stops.",
+   "gazetteer": [{"name": "Domlur", "lat": 12.9611, "lon": 77.6387}, {"name": "Indiranagar", "lat": 12.9784, "lon": 77.6408}],
+   "gold": {"origin": [12.9611, 77.6387], "date": "2026-10-04", "start_time_local": "10:00", "end_time_local": "14:00", "party_size": 1, "max_stops": 2, "categories": ["bookstore", "cafe"]}},
+
+  {"id": "tse-042", "utterance": "Rajajinagar on 2026-10-16 from 12:00 to 18:00, 4 people, 3200 rupees, shopping, a restaurant and dessert.",
+   "gazetteer": [{"name": "Rajajinagar", "lat": 12.9982, "lon": 77.5524}, {"name": "Malleshwaram", "lat": 13.0035, "lon": 77.5647}],
+   "gold": {"origin": [12.9982, 77.5524], "date": "2026-10-16", "start_time_local": "12:00", "end_time_local": "18:00", "budget_inr": 3200, "party_size": 4, "categories": ["dessert", "restaurant", "shopping"]}},
+
+  {"id": "tse-043", "utterance": "Bellandur Saturday 17:00 to 22:00, a bar and a restaurant, 2 people, by cab.",
+   "gazetteer": [{"name": "Bellandur", "lat": 12.9260, "lon": 77.6762}, {"name": "Sarjapur Road", "lat": 12.9010, "lon": 77.6870}],
+   "gold": {"origin": [12.9260, 77.6762], "date": "2026-10-03", "start_time_local": "17:00", "end_time_local": "22:00", "party_size": 2, "transport": ["cab"], "categories": ["bar", "restaurant"]}},
+
+  {"id": "tse-044", "utterance": "Marathahalli tomorrow 10:00 to 15:00, a market and street food, 3 people, vegetarian.",
+   "gazetteer": [{"name": "Marathahalli", "lat": 12.9591, "lon": 77.6974}, {"name": "Whitefield", "lat": 12.9698, "lon": 77.7500}],
+   "gold": {"origin": [12.9591, 77.6974], "date": "2026-10-02", "start_time_local": "10:00", "end_time_local": "15:00", "party_size": 3, "vegetarian": true, "categories": ["market", "street_food"]}},
+
+  {"id": "tse-045", "utterance": "Vijayanagar next Monday 09:00 to 16:00, historical sites, a temple and a landmark, 900 rupees, 2 people.",
+   "gazetteer": [{"name": "Vijayanagar", "lat": 12.9719, "lon": 77.5301}, {"name": "Rajajinagar", "lat": 12.9982, "lon": 77.5524}],
+   "gold": {"origin": [12.9719, 77.5301], "date": "2026-10-05", "start_time_local": "09:00", "end_time_local": "16:00", "budget_inr": 900, "party_size": 2, "categories": ["historical", "landmark", "temple"]}},
+
+  {"id": "tse-046", "utterance": "Nandi Hills on 2026-10-25 from 05:00 to 12:00, 4 people in our own car, a viewpoint and some nature.",
+   "gazetteer": [{"name": "Nandi Hills", "lat": 13.3702, "lon": 77.6835}, {"name": "Yelahanka", "lat": 13.1007, "lon": 77.5963}],
+   "gold": {"origin": [13.3702, 77.6835], "date": "2026-10-25", "start_time_local": "05:00", "end_time_local": "12:00", "party_size": 4, "transport": ["own_car"], "categories": ["nature", "viewpoint"]}},
+
+  {"id": "tse-047", "utterance": "Church Street Saturday 18:00 to 23:00, 4 people, nightlife, a bar and dessert, 4500 rupees.",
+   "gazetteer": [{"name": "Church Street", "lat": 12.9752, "lon": 77.6045}, {"name": "MG Road", "lat": 12.9756, "lon": 77.6068}],
+   "gold": {"origin": [12.9752, 77.6045], "date": "2026-10-03", "start_time_local": "18:00", "end_time_local": "23:00", "budget_inr": 4500, "party_size": 4, "categories": ["bar", "dessert", "nightlife"]}},
+
+  {"id": "tse-048", "utterance": "JP Nagar Sunday 07:00 to 11:00, a park and a lake, on my own, walking, no more than 3 stops.",
+   "gazetteer": [{"name": "JP Nagar", "lat": 12.9063, "lon": 77.5857}, {"name": "Jayanagar", "lat": 12.9250, "lon": 77.5938}],
+   "gold": {"origin": [12.9063, 77.5857], "date": "2026-10-04", "start_time_local": "07:00", "end_time_local": "11:00", "party_size": 1, "transport": ["walking"], "max_stops": 3, "categories": ["lake", "park"]}},
+
+  {"id": "tse-049", "utterance": "Sarjapur Road on 2026-10-22 from 13:00 to 19:00, 2 people, a cafe, shopping and entertainment.",
+   "gazetteer": [{"name": "Sarjapur Road", "lat": 12.9010, "lon": 77.6870}, {"name": "Bellandur", "lat": 12.9260, "lon": 77.6762}],
+   "gold": {"origin": [12.9010, 77.6870], "date": "2026-10-22", "start_time_local": "13:00", "end_time_local": "19:00", "party_size": 2, "categories": ["cafe", "entertainment", "shopping"]}},
+
+  {"id": "tse-050", "utterance": "Banashankari next Monday 16:00 to 21:00, a temple, street food and dessert, 5 people, 1500 rupees, by auto.",
+   "gazetteer": [{"name": "Banashankari", "lat": 12.9250, "lon": 77.5460}, {"name": "JP Nagar", "lat": 12.9063, "lon": 77.5857}],
+   "gold": {"origin": [12.9250, 77.5460], "date": "2026-10-05", "start_time_local": "16:00", "end_time_local": "21:00", "budget_inr": 1500, "party_size": 5, "transport": ["auto"], "categories": ["dessert", "street_food", "temple"]}}
+]

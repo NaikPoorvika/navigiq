@@ -1,0 +1,49 @@
+[
+  {"id": "rag-001",
+   "utterance": "When is Cubbon Park closed to traffic?",
+   "passages": ["Cubbon Park is a 300-acre green space in central Bengaluru, laid out in 1870.", "The park is closed to vehicle traffic on Sundays and on public holidays, when the internal roads are given over to walkers and cyclists."],
+   "allowed_numbers": [300, 1870],
+   "gold": {"must_mention": ["Sunday"]}},
+
+  {"id": "rag-002",
+   "utterance": "How do auto-rickshaw night fares work?",
+   "passages": ["Auto-rickshaw fares in Bengaluru begin with a minimum fare covering the first two kilometres, with a per-kilometre rate applied after that.", "A night surcharge applies between 22:00 and 05:00, and drivers are required to run the meter at all times."],
+   "allowed_numbers": [22, 5, 0],
+   "gold": {"must_mention": ["surcharge"]}},
+
+  {"id": "rag-003",
+   "utterance": "Does the passage say what Lalbagh charges for entry?",
+   "passages": ["Lalbagh Botanical Garden covers 240 acres and contains a glasshouse modelled on Crystal Palace.", "The garden is best known for its twice-yearly flower show, held around Republic Day and Independence Day."],
+   "allowed_numbers": [240],
+   "gold": {"must_mention": ["not"]}},
+
+  {"id": "rag-004",
+   "utterance": "What is the glasshouse at Lalbagh modelled on?",
+   "passages": ["Lalbagh Botanical Garden covers 240 acres in south Bengaluru.", "Its central glasshouse was modelled on the Crystal Palace in London and hosts the flower show twice a year."],
+   "allowed_numbers": [240],
+   "gold": {"must_mention": ["Crystal Palace"]}},
+
+  {"id": "rag-005",
+   "utterance": "How far is the airport from the city centre?",
+   "passages": ["Kempegowda International Airport lies roughly 35 km north of the Bengaluru city centre.", "Road journey time is typically between one and two hours depending on traffic through Hebbal."],
+   "allowed_numbers": [35],
+   "gold": {"must_mention": ["35"]}},
+
+  {"id": "rag-006",
+   "utterance": "Is there a dress code mentioned for the temple?",
+   "passages": ["The Bull Temple in Basavanagudi dates from the sixteenth century and houses a monolithic Nandi carved from a single granite boulder.", "The Kadalekai Parishe groundnut fair is held nearby every November."],
+   "allowed_numbers": [16],
+   "gold": {"must_mention": ["not"]}},
+
+  {"id": "rag-007",
+   "utterance": "What is the Kadalekai Parishe and when is it held?",
+   "passages": ["The Bull Temple in Basavanagudi houses a monolithic Nandi carved from a single granite boulder.", "Every November the surrounding streets host the Kadalekai Parishe, a groundnut fair that has run for centuries."],
+   "allowed_numbers": [],
+   "gold": {"must_mention": ["November", "groundnut"]}},
+
+  {"id": "rag-008",
+   "utterance": "What are the opening hours of Bangalore Palace?",
+   "passages": ["Bangalore Palace was built in 1887 in a Tudor revival style, with fortified towers and carved wooden interiors.", "The palace grounds are frequently hired out for concerts and exhibitions."],
+   "allowed_numbers": [1887],
+   "gold": {"must_mention": ["not"]}}
+]

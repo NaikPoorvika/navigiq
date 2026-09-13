@@ -1,0 +1,16 @@
+[
+  {"id": "int-001", "utterance": "Plan me a day out in Indiranagar this Saturday, we are two people.", "gold": {"intent": "plan_trip"}},
+  {"id": "int-002", "utterance": "Can you swap the second stop for something vegetarian?", "gold": {"intent": "modify_trip"}},
+  {"id": "int-003", "utterance": "Why did you put the museum before lunch and not after?", "gold": {"intent": "explain_itinerary"}},
+  {"id": "int-004", "utterance": "The road to the lake is blocked, I need another way there.", "gold": {"intent": "reroute"}},
+  {"id": "int-005", "utterance": "What time does Lalbagh close on Sundays?", "gold": {"intent": "poi_question"}},
+  {"id": "int-006", "utterance": "Book me a flight to Delhi next week.", "gold": {"intent": "out_of_scope"}},
+  {"id": "int-007", "utterance": "Make it four stops instead of six, we are running late.", "gold": {"intent": "modify_trip"}},
+  {"id": "int-008", "utterance": "Find me a full itinerary for Sunday from Koramangala, budget 2000.", "gold": {"intent": "plan_trip"}},
+  {"id": "int-009", "utterance": "How much does an auto cost from MG Road to Cubbon Park?", "gold": {"intent": "poi_question"}},
+  {"id": "int-010", "utterance": "I am stuck in traffic near Hebbal, can you redo the route from here?", "gold": {"intent": "reroute"}},
+  {"id": "int-011", "utterance": "Which hotel should I stay at in Bengaluru?", "gold": {"intent": "out_of_scope"}},
+  {"id": "int-012", "utterance": "Explain why this plan costs more than the one you showed me first.", "gold": {"intent": "explain_itinerary"}},
+  {"id": "int-013", "utterance": "Is there a bus from Majestic to Whitefield?", "gold": {"intent": "out_of_scope"}},
+  {"id": "int-014", "utterance": "Add a dessert place at the end of the evening.", "gold": {"intent": "modify_trip"}}
+]

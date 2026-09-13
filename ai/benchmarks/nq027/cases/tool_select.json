@@ -1,0 +1,49 @@
+[
+  {"id": "tls-001", "utterance": "Find me cafes within 2 km of these coordinates.",
+   "context": {"lat": 12.9784, "lon": 77.6408, "radius_km": 2},
+   "gold": {"tool": "search_pois", "required_arguments": {"lat": 12.9784, "lon": 77.6408, "radius_km": 2}}},
+
+  {"id": "tls-002", "utterance": "How long does it take to drive between these two points by cab?",
+   "context": {"from_lat": 12.9784, "from_lon": 77.6408, "to_lat": 12.9763, "to_lon": 77.5929, "mode": "cab"},
+   "gold": {"tool": "route_between", "required_arguments": {"from_lat": 12.9784, "to_lat": 12.9763, "mode": "cab"}}},
+
+  {"id": "tls-003", "utterance": "What are the opening hours of the place we saved earlier?",
+   "context": {"poi_id": 4821},
+   "gold": {"tool": "get_poi_detail", "required_arguments": {"poi_id": 4821}}},
+
+  {"id": "tls-004", "utterance": "Will it rain during our trip window?",
+   "context": {"lat": 12.9352, "lon": 77.6245, "date": "2026-10-03", "start_hour": 10, "end_hour": 18},
+   "gold": {"tool": "get_weather_window", "required_arguments": {"lat": 12.9352, "date": "2026-10-03"}}},
+
+  {"id": "tls-005", "utterance": "Before we spend time optimising, can this trip even fit in the time we have?",
+   "context": {"tripspec": {"date": "2026-10-03", "start_time_local": "10:00", "end_time_local": "12:00", "interests": ["museum", "park", "restaurant"]}},
+   "gold": {"tool": "check_feasibility", "required_arguments": {"tripspec": null}}},
+
+  {"id": "tls-006", "utterance": "Everything looks right, go ahead and build the itinerary.",
+   "context": {"tripspec": {"date": "2026-10-03", "start_time_local": "10:00", "end_time_local": "18:00", "interests": ["cafe", "park"]}},
+   "gold": {"tool": "create_plan", "required_arguments": {"tripspec": null}}},
+
+  {"id": "tls-007", "utterance": "I changed a stop, please re-check that the plan is still valid.",
+   "context": {"itinerary_id": 7},
+   "gold": {"tool": "validate_itinerary", "required_arguments": {"itinerary_id": 7}}},
+
+  {"id": "tls-008", "utterance": "Show me temples and museums near here, up to 10 results.",
+   "context": {"lat": 13.0035, "lon": 77.5647, "limit": 10},
+   "gold": {"tool": "search_pois", "required_arguments": {"lat": 13.0035, "lon": 77.5647, "categories": ["temple", "museum"], "limit": 10}}},
+
+  {"id": "tls-009", "utterance": "Is it walkable from the park to the restaurant?",
+   "context": {"from_lat": 12.9507, "from_lon": 77.5848, "to_lat": 12.9423, "to_lon": 77.5730, "mode": "walking"},
+   "gold": {"tool": "route_between", "required_arguments": {"from_lat": 12.9507, "to_lon": 77.5730, "mode": "walking"}}},
+
+  {"id": "tls-010", "utterance": "Tell me more about stop number 2 - I only have its id.",
+   "context": {"poi_id": 1193},
+   "gold": {"tool": "get_poi_detail", "required_arguments": {"poi_id": 1193}}},
+
+  {"id": "tls-011", "utterance": "Should we plan indoor places on Sunday?",
+   "context": {"lat": 12.9763, "lon": 77.5929, "date": "2026-10-04", "start_hour": 9, "end_hour": 17},
+   "gold": {"tool": "get_weather_window", "required_arguments": {"lat": 12.9763, "date": "2026-10-04"}}},
+
+  {"id": "tls-012", "utterance": "We want five stops in three hours - is that possible before you optimise anything?",
+   "context": {"tripspec": {"date": "2026-10-05", "start_time_local": "14:00", "end_time_local": "17:00", "interests": ["cafe", "park", "museum", "market", "dessert"]}},
+   "gold": {"tool": "check_feasibility", "required_arguments": {"tripspec": null}}}
+]

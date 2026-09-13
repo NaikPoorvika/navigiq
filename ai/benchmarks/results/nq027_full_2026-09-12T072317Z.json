@@ -1,0 +1,3488 @@
+{
+  "run_id": "nq027_full_2026-09-12T072317Z",
+  "seed": 20270927,
+  "environment": {
+    "captured_at_utc": "2026-09-12T07:23:17+00:00",
+    "ollama_version": "0.33.3",
+    "ollama_host": "http://localhost:11434",
+    "ollama_env": {
+      "OLLAMA_MODELS": "E:\\Ollama\\Models"
+    },
+    "python_version": "3.13.2",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "processor": "Intel64 Family 6 Model 85 Stepping 7, GenuineIntel",
+    "cpu_count": 36,
+    "gpu": {
+      "name": "NVIDIA RTX A5000",
+      "memory_total_mib": 24564,
+      "memory_used_mib": 709,
+      "memory_free_mib": 23541,
+      "driver_version": "596.51",
+      "temperature_c": 71,
+      "utilization_pct": 0,
+      "error": null
+    },
+    "git_commit": "8c6e6be1929dae98c5b3b33816a2e1d2d0743dd6",
+    "git_dirty": true
+  },
+  "config": {
+    "models": [
+      "qwen3:8b",
+      "qwen3.5:9b",
+      "gemma3:12b",
+      "qwen3:14b",
+      "mistral-small3.2:24b",
+      "llama3:8b"
+    ],
+    "embed_models": [
+      "bge-m3",
+      "nomic-embed-text"
+    ],
+    "contexts": [
+      4096,
+      8192,
+      16384
+    ],
+    "concurrencies": [
+      1,
+      2,
+      4
+    ],
+    "tasks": [
+      "intent_classify",
+      "tripspec_extract",
+      "tripspec_modify",
+      "tool_select",
+      "explain_itinerary",
+      "rag_answer",
+      "reroute_message",
+      "clarify_question"
+    ],
+    "runs_per_cell": 6,
+    "quality_context": 8192,
+    "quality_concurrency": 1,
+    "sweep_cases_per_task": 3,
+    "stage": "quality"
+  },
+  "probes": {},
+  "sweep": {},
+  "quality": {
+    "qwen3:8b": [
+      {
+        "model": "qwen3:8b",
+        "task": "intent_classify",
+        "num_ctx": 8192,
+        "concurrency": 1,
+        "schema_constrained": true,
+        "n_runs": 14,
+        "n_valid": 14,
+        "validity_rate": 1.0,
+        "truncation_rate": 0.0,
+        "all_truncated": false,
+        "outcomes": {
+          "valid": 14
+        },
+        "latency_ms": {
+          "n": 14,
+          "mean": 195.06,
+          "p50": 188.89,
+          "p95": 225.6,
+          "minimum": 185.96,
+          "maximum": 225.6
+        },
+        "ttft_ms": {
+          "n": 14,
+          "mean": 35.91,
+          "p50": 31.25,
+          "p95": 65.5,
+          "minimum": 28.64,
+          "maximum": 65.5
+        },
+        "gen_tps": {
+          "n": 14,
+          "mean": 107.66,
+          "p50": 107.9,
+          "p95": 108.12,
+          "minimum": 106.1,
+          "maximum": 108.12
+        },
+        "prompt_tps": {
+          "n": 14,
+          "mean": 7525.75,
+          "p50": 7756.62,
+          "p95": 8378.31,
+          "minimum": 3181.02,
+          "maximum": 8378.31
+        },
+        "accuracy_mean": 0.9286,
+        "wall_clock_s": 2.73,
+        "throughput_rps": 5.121
+      },
+      {
+        "model": "qwen3:8b",
+        "task": "tripspec_extract",
+        "num_ctx": 8192,
+        "concurrency": 1,
+        "schema_constrained": true,
+        "n_runs": 50,
+        "n_valid": 50,
+        "validity_rate": 1.0,
+        "truncation_rate": 0.0,
+        "all_truncated": false,
+        "outcomes": {
+          "valid": 50
+        },
+        "latency_ms": {
+          "n": 50,
+          "mean": 1831.97,
+          "p50": 1698.65,
+          "p95": 2712.99,
+          "minimum": 1378.91,
+          "maximum": 2777.98
+        },
+        "ttft_ms": {
+          "n": 50,
+          "mean": 92.84,
+          "p50": 91.77,
+          "p95": 108.44,
+          "minimum": 58.2,
+          "maximum": 146.01
+        },
+        "gen_tps": {
+          "n": 50,
+          "mean": 89.02,
+          "p50": 91.3,
+          "p95": 94.61,
+          "minimum": 76.78,
+          "maximum": 95.15
+        },
+        "prompt_tps": {
+          "n": 50,
+          "mean": 9913.92,
+          "p50": 9132.42,
+          "p95": 13107.14,
+          "minimum": 3446.78,
+          "maximum": 13692.0
+        },
+        "accuracy_mean": 0.8402,
+        "wall_clock_s": 91.62,
+        "throughput_rps": 0.546
+      },
+      {
+        "model": "qwen3:8b",
+        "task": "tripspec_extract",
+        "num_ctx": 8192,
+        "concurrency": 1,
+        "schema_constrained": false,
+        "n_runs": 50,
+        "n_valid": 3,
+        "validity_rate": 0.06,
+        "truncation_rate": 0.0,
+        "all_truncated": false,
+        "outcomes": {
+          "schema_invalid": 47,
+          "valid": 3
+        },
+        "latency_ms": {
+          "n": 3,
+          "mean": 1360.6,
+          "p50": 1320.0,
+          "p95": 1455.39,
+          "minimum": 1306.41,
+          "maximum": 1455.39
+        },
+        "ttft_ms": {
+          "n": 3,
+          "mean": 57.7,
+          "p50": 59.83,
+          "p95": 65.81,
+          "minimum": 47.47,
+          "maximum": 65.81
+        },
+        "gen_tps": {
+          "n": 3,
+          "mean": 101.05,
+          "p50": 101.03,
+          "p95": 101.25,
+          "minimum": 100.86,
+          "maximum": 101.25
+        },
+        "prompt_tps": {
+          "n": 3,
+          "mean": 12873.43,
+          "p50": 12782.21,
+          "p95": 13174.34,
+          "minimum": 12663.76,
+          "maximum": 13174.34
+        },
+        "accuracy_mean": 0.8056,
+        "wall_clock_s": 92.97,
+        "throughput_rps": 0.032
+      },
+      {
+        "model": "qwen3:8b",
+        "task": "tripspec_modify",
+        "num_ctx": 8192,
+        "concurrency": 1,
+        "schema_constrained": true,
+        "n_runs": 12,
+        "n_valid": 12,
+        "validity_rate": 1.0,
+        "truncation_rate": 0.0,
+        "all_truncated": false,
+        "outcomes": {
+          "valid": 12
+        },
+        "latency_ms": {
+          "n": 12,
+          "mean": 2419.62,
+          "p50": 2375.05,
+          "p95": 2846.55,
+          "minimum": 2038.93,
+          "maximum": 2846.55
+        },
+        "ttft_ms": {
+          "n": 12,
+          "mean": 113.76,
+          "p50": 106.9,
+          "p95": 152.85,
+          "minimum": 101.41,
+          "maximum": 152.85
+        },
+        "gen_tps": {
+          "n": 12,
+          "mean": 88.96,
+          "p50": 88.92,
+          "p95": 90.73,
+          "minimum": 86.94,
+          "maximum": 90.73
+        },
+        "prompt_tps": {
+          "n": 12,
+          "mean": 5751.42,
+          "p50": 5864.09,
+          "p95": 6167.93,
+          "minimum": 3610.69,
+          "maximum": 6167.93
+        },
+        "accuracy_mean": 0.9931,
+        "wall_clock_s": 29.04,
+        "throughput_rps": 0.413
+      },
+      {
+        "model": "qwen3:8b",
+        "task": "tripspec_modify",
+        "num_ctx": 8192,
+        "concurrency": 1,
+        "schema_constrained": false,
+        "n_runs": 12,
+        "n_valid": 8,
+        "validity_rate": 0.6667,
+        "truncation_rate": 0.0,
+        "all_truncated": false,
+        "outcomes": {
+          "schema_invalid": 4,
+          "valid": 8
+        },
+        "latency_ms": {
+          "n": 8,
+          "mean": 1942.88,
+          "p50": 1859.23,
+          "p95": 2382.37,
+          "minimum": 1723.23,
+          "maximum": 2382.37
+        },
+        "ttft_ms": {
+          "n": 8,
+          "mean": 128.56,
+          "p50": 129.84,
+          "p95": 136.82,
+          "minimum": 107.78,
+          "maximum": 136.82
+        },
+        "gen_tps": {
+          "n": 8,
+          "mean": 101.27,
+          "p50": 101.25,
+          "p95": 101.45,
+          "minimum": 101.05,
+          "maximum": 101.45
+        },
+        "prompt_tps": {
+          "n": 8,
+          "mean": 8707.07,
+          "p50": 8726.75,
+          "p95": 9013.74,
+          "minimum": 8330.98,
+          "maximum": 9013.74
+        },
+        "accuracy_mean": 1.0,
+        "wall_clock_s": 24.62,
+        "throughput_rps": 0.325
+      },
+      {
+        "model": "qwen3:8b",
+        "task": "tool_select",
+        "num_ctx": 8192,
+        "concurrency": 1,
+        "schema_constrained": true,
+        "n_runs": 12,
+        "n_valid": 12,
+        "validity_rate": 1.0,
+        "truncation_rate": 0.0,
+        "all_truncated": false,
+        "outcomes": {
+          "valid": 12
+        },
+        "latency_ms": {
+          "n": 12,
+          "mean": 811.99,
+          "p50": 875.68,
+          "p95": 1027.63,
+          "minimum": 437.39,
+          "maximum": 1027.63
+        },
+        "ttft_ms": {
+          "n": 12,
+          "mean": 73.17,
+          "p50": 59.9,
+          "p95": 218.58,
+          "minimum": 48.46,
+          "maximum": 218.58
+        },
+        "gen_tps": {
+          "n": 12,
+          "mean": 101.92,
+          "p50": 101.75,
+          "p95": 103.32,
+          "minimum": 100.84,
+          "maximum": 103.32
+        },
+        "prompt_tps": {
+          "n": 12,
+          "mean": 19927.8,
+          "p50": 19147.84,
+          "p95": 26017.48,
+          "minimum": 3770.97,
+          "maximum": 26017.48
+        },
+        "accuracy_mean": 1.0,
+        "wall_clock_s": 9.75,
+        "throughput_rps": 1.231
+      },
+      {
+        "model": "qwen3:8b",
+        "task": "explain_itinerary",
+        "num_ctx": 8192,
+        "concurrency": 1,
+        "schema_constrained": false,
+        "n_runs": 8,
+        "n_valid": 7,
+        "validity_rate": 0.875,
+        "truncation_rate": 0.0,
+        "all_truncated": false,
+        "outcomes": {
+          "valid": 7,
+          "task_check_failed": 1
+        },
+        "latency_ms": {
+          "n": 7,
+          "mean": 793.69,
+          "p50": 890.43,
+          "p95": 1076.53,
+          "minimum": 387.15,
+          "maximum": 1076.53
+        },
+        "ttft_ms": {
+          "n": 7,
+          "mean": 110.25,
+          "p50": 107.36,
+          "p95": 152.21,
+          "minimum": 89.9,
+          "maximum": 152.21
+        },
+        "gen_tps": {
+          "n": 7,
+          "mean": 102.79,
+          "p50": 102.69,
+          "p95": 103.9,
+          "minimum": 102.27,
+          "maximum": 103.9
+        },
+        "prompt_tps": {
+          "n": 7,
+          "mean": 4714.37,
+          "p50": 4866.84,
+          "p95": 5171.02,
+          "minimum": 3251.27,
+          "maximum": 5171.02
+        },
+        "accuracy_mean": 0.7143,
+        "wall_clock_s": 5.78,
+        "throughput_rps": 1.211
+      },
+      {
+        "model": "qwen3:8b",
+        "task": "rag_answer",
+        "num_ctx": 8192,
+        "concurrency": 1,
+        "schema_constrained": false,
+        "n_runs": 8,
+        "n_valid": 8,
+        "validity_rate": 1.0,
+        "truncation_rate": 0.0,
+        "all_truncated": false,
+        "outcomes": {
+          "valid": 8
+        },
+        "latency_ms": {
+          "n": 8,
+          "mean": 252.41,
+          "p50": 227.66,
+          "p95": 454.58,
+          "minimum": 192.17,
+          "maximum": 454.58
+        },
+        "ttft_ms": {
+          "n": 8,
+          "mean": 69.11,
+          "p50": 67.15,
+          "p95": 93.96,
+          "minimum": 53.03,
+          "maximum": 93.96
+        },
+        "gen_tps": {
+          "n": 8,
+          "mean": 106.77,
+          "p50": 106.34,
+          "p95": 108.87,
+          "minimum": 104.35,
+          "maximum": 108.87
+        },
+        "prompt_tps": {
+          "n": 8,
+          "mean": 4258.38,
+          "p50": 4352.13,
+          "p95": 4841.8,
+          "minimum": 2957.5,
+          "maximum": 4841.8
+        },
+        "accuracy_mean": 1.0,
+        "wall_clock_s": 2.02,
+        "throughput_rps": 3.958
+      },
+      {
+        "model": "qwen3:8b",
+        "task": "reroute_message",
+        "num_ctx": 8192,
+        "concurrency": 1,
+        "schema_constrained": false,
+        "n_runs": 8,
+        "n_valid": 8,
+        "validity_rate": 1.0,
+        "truncation_rate": 0.0,
+        "all_truncated": false,
+        "outcomes": {
+          "valid": 8
+        },
+        "latency_ms": {
+          "n": 8,
+          "mean": 533.78,
+          "p50": 516.38,
+          "p95": 599.1,
+          "minimum": 448.16,
+          "maximum": 599.1
+        },
+        "ttft_ms": {
+          "n": 8,
+          "mean": 68.58,
+          "p50": 68.96,
+          "p95": 78.5,
+          "minimum": 53.2,
+          "maximum": 78.5
+        },
+        "gen_tps": {
+          "n": 8,
+          "mean": 103.97,
+          "p50": 103.97,
+          "p95": 104.34,
+          "minimum": 103.59,
+          "maximum": 104.34
+        },
+        "prompt_tps": {
+          "n": 8,
+          "mean": 4665.22,
+          "p50": 4805.49,
+          "p95": 5146.92,
+          "minimum": 3159.29,
+          "maximum": 5146.92
+        },
+        "accuracy_mean": 1.0,
+        "wall_clock_s": 4.27,
+        "throughput_rps": 1.872
+      },
+      {
+        "model": "qwen3:8b",
+        "task": "clarify_question",
+        "num_ctx": 8192,
+        "concurrency": 1,
+        "schema_constrained": true,
+        "n_runs": 8,
+        "n_valid": 8,
+        "validity_rate": 1.0,
+        "truncation_rate": 0.0,
+        "all_truncated": false,
+        "outcomes": {
+          "valid": 8
+        },
+        "latency_ms": {
+          "n": 8,
+          "mean": 317.6,
+          "p50": 262.46,
+          "p95": 471.35,
+          "minimum": 217.87,
+          "maximum": 471.35
+        },
+        "ttft_ms": {
+          "n": 8,
+          "mean": 53.51,
+          "p50": 49.27,
+          "p95": 79.69,
+          "minimum": 42.5,
+          "maximum": 79.69
+        },
+        "gen_tps": {
+          "n": 8,
+          "mean": 103.88,
+          "p50": 105.15,
+          "p95": 106.68,
+          "minimum": 91.53,
+          "maximum": 106.68
+        },
+        "prompt_tps": {
+          "n": 8,
+          "mean": 5514.68,
+          "p50": 5720.58,
+          "p95": 6074.1,
+          "minimum": 2948.76,
+          "maximum": 6074.1
+        },
+        "accuracy_mean": 0.5762,
+        "wall_clock_s": 2.54,
+        "throughput_rps": 3.146
+      }
+    ],
+    "qwen3.5:9b": [
+      {
+        "model": "qwen3.5:9b",
+        "task": "intent_classify",
+        "num_ctx": 8192,
+        "concurrency": 1,
+        "schema_constrained": true,
+        "n_runs": 14,
+        "n_valid": 14,
+        "validity_rate": 1.0,
+        "truncation_rate": 0.0,
+        "all_truncated": false,
+        "outcomes": {
+          "valid": 14
+        },
+        "latency_ms": {
+          "n": 14,
+          "mean": 305.77,
+          "p50": 304.04,
+          "p95": 343.21,
+          "minimum": 281.81,
+          "maximum": 343.21
+        },
+        "ttft_ms": {
+          "n": 14,
+          "mean": 118.56,
+          "p50": 118.48,
+          "p95": 161.1,
+          "minimum": 99.62,
+          "maximum": 161.1
+        },
+        "gen_tps": {
+          "n": 14,
+          "mean": 89.13,
+          "p50": 89.13,
+          "p95": 89.74,
+          "minimum": 87.66,
+          "maximum": 89.74
+        },
+        "prompt_tps": {
+          "n": 14,
+          "mean": 1777.52,
+          "p50": 1777.76,
+          "p95": 1818.88,
+          "minimum": 1729.78,
+          "maximum": 1818.88
+        },
+        "accuracy_mean": 1.0,
+        "wall_clock_s": 4.28,
+        "throughput_rps": 3.268
+      },
+      {
+        "model": "qwen3.5:9b",
+        "task": "tripspec_extract",
+        "num_ctx": 8192,
+        "concurrency": 1,
+        "schema_constrained": true,
+        "n_runs": 50,
+        "n_valid": 50,
+        "validity_rate": 1.0,
+        "truncation_rate": 0.0,
+        "all_truncated": false,
+        "outcomes": {
+          "valid": 50
+        },
+        "latency_ms": {
+          "n": 50,
+          "mean": 2509.83,
+          "p50": 2289.53,
+          "p95": 3668.25,
+          "minimum": 1981.21,
+          "maximum": 3983.34
+        },
+        "ttft_ms": {
+          "n": 50,
+          "mean": 254.02,
+          "p50": 253.47,
+          "p95": 275.19,
+          "minimum": 215.91,
+          "maximum": 280.94
+        },
+        "gen_tps": {
+          "n": 50,
+          "mean": 74.65,
+          "p50": 76.59,
+          "p95": 78.37,
+          "minimum": 60.44,
+          "maximum": 78.43
+        },
+        "prompt_tps": {
+          "n": 50,
+          "mean": 1783.65,
+          "p50": 1778.95,
+          "p95": 1851.07,
+          "minimum": 1705.25,
+          "maximum": 1872.33
+        },
+        "accuracy_mean": 0.7742,
+        "wall_clock_s": 125.51,
+        "throughput_rps": 0.398
+      },
+      {
+        "model": "qwen3.5:9b",
+        "task": "tripspec_extract",
+        "num_ctx": 8192,
+        "concurrency": 1,
+        "schema_constrained": false,
+        "n_runs": 50,
+        "n_valid": 1,
+        "validity_rate": 0.02,
+        "truncation_rate": 0.0,
+        "all_truncated": false,
+        "outcomes": {
+          "schema_invalid": 49,
+          "valid": 1
+        },
+        "latency_ms": {
+          "n": 1,
+          "mean": 3462.76,
+          "p50": 3462.76,
+          "p95": 3462.76,
+          "minimum": 3462.76,
+          "maximum": 3462.76
+        },
+        "ttft_ms": {
+          "n": 1,
+          "mean": 245.68,
+          "p50": 245.68,
+          "p95": 245.68,
+          "minimum": 245.68,
+          "maximum": 245.68
+        },
+        "gen_tps": {
+          "n": 1,
+          "mean": 87.34,
+          "p50": 87.34,
+          "p95": 87.34,
+          "minimum": 87.34,
+          "maximum": 87.34
+        },
+        "prompt_tps": {
+          "n": 1,
+          "mean": 2449.85,
+          "p50": 2449.85,
+          "p95": 2449.85,
+          "minimum": 2449.85,
+          "maximum": 2449.85
+        },
+        "accuracy_mean": 1.0,
+        "wall_clock_s": 156.41,
+        "throughput_rps": 0.006
+      },
+      {
+        "model": "qwen3.5:9b",
+        "task": "tripspec_modify",
+        "num_ctx": 8192,
+        "concurrency": 1,
+        "schema_constrained": true,
+        "n_runs": 12,
+        "n_valid": 12,
+        "validity_rate": 1.0,
+        "truncation_rate": 0.0,
+        "all_truncated": false,
+        "outcomes": {
+          "valid": 12
+        },
+        "latency_ms": {
+          "n": 12,
+          "mean": 3106.26,
+          "p50": 3107.78,
+          "p95": 3548.65,
+          "minimum": 2499.74,
+          "maximum": 3548.65
+        },
+        "ttft_ms": {
+          "n": 12,
+          "mean": 233.86,
+          "p50": 232.19,
+          "p95": 248.15,
+          "minimum": 222.84,
+          "maximum": 248.15
+        },
+        "gen_tps": {
+          "n": 12,
+          "mean": 76.21,
+          "p50": 75.06,
+          "p95": 83.13,
+          "minimum": 70.63,
+          "maximum": 83.13
+        },
+        "prompt_tps": {
+          "n": 12,
+          "mean": 2389.88,
+          "p50": 2382.44,
+          "p95": 2441.43,
+          "minimum": 2345.57,
+          "maximum": 2441.43
+        },
+        "accuracy_mean": 0.9395,
+        "wall_clock_s": 37.28,
+        "throughput_rps": 0.322
+      },
+      {
+        "model": "qwen3.5:9b",
+        "task": "tripspec_modify",
+        "num_ctx": 8192,
+        "concurrency": 1,
+        "schema_constrained": false,
+        "n_runs": 12,
+        "n_valid": 2,
+        "validity_rate": 0.1667,
+        "truncation_rate": 0.0,
+        "all_truncated": false,
+        "outcomes": {
+          "schema_invalid": 10,
+          "valid": 2
+        },
+        "latency_ms": {
+          "n": 2,
+          "mean": 2563.11,
+          "p50": 2537.2,
+          "p95": 2589.02,
+          "minimum": 2537.2,
+          "maximum": 2589.02
+        },
+        "ttft_ms": {
+          "n": 2,
+          "mean": 296.82,
+          "p50": 284.11,
+          "p95": 309.52,
+          "minimum": 284.11,
+          "maximum": 309.52
+        },
+        "gen_tps": {
+          "n": 2,
+          "mean": 87.58,
+          "p50": 87.52,
+          "p95": 87.63,
+          "minimum": 87.52,
+          "maximum": 87.63
+        },
+        "prompt_tps": {
+          "n": 2,
+          "mean": 2521.2,
+          "p50": 2517.22,
+          "p95": 2525.19,
+          "minimum": 2517.22,
+          "maximum": 2525.19
+        },
+        "accuracy_mean": 1.0,
+        "wall_clock_s": 36.94,
+        "throughput_rps": 0.054
+      },
+      {
+        "model": "qwen3.5:9b",
+        "task": "tool_select",
+        "num_ctx": 8192,
+        "concurrency": 1,
+        "schema_constrained": true,
+        "n_runs": 12,
+        "n_valid": 12,
+        "validity_rate": 1.0,
+        "truncation_rate": 0.0,
+        "all_truncated": false,
+        "outcomes": {
+          "valid": 12
+        },
+        "latency_ms": {
+          "n": 12,
+          "mean": 1167.89,
+          "p50": 1228.04,
+          "p95": 1442.83,
+          "minimum": 663.72,
+          "maximum": 1442.83
+        },
+        "ttft_ms": {
+          "n": 12,
+          "mean": 289.53,
+          "p50": 290.09,
+          "p95": 314.39,
+          "minimum": 272.87,
+          "maximum": 314.39
+        },
+        "gen_tps": {
+          "n": 12,
+          "mean": 86.54,
+          "p50": 86.45,
+          "p95": 86.93,
+          "minimum": 86.1,
+          "maximum": 86.93
+        },
+        "prompt_tps": {
+          "n": 12,
+          "mean": 2720.11,
+          "p50": 2739.11,
+          "p95": 2847.45,
+          "minimum": 2589.73,
+          "maximum": 2847.45
+        },
+        "accuracy_mean": 1.0,
+        "wall_clock_s": 14.02,
+        "throughput_rps": 0.856
+      },
+      {
+        "model": "qwen3.5:9b",
+        "task": "explain_itinerary",
+        "num_ctx": 8192,
+        "concurrency": 1,
+        "schema_constrained": false,
+        "n_runs": 8,
+        "n_valid": 8,
+        "validity_rate": 1.0,
+        "truncation_rate": 0.0,
+        "all_truncated": false,
+        "outcomes": {
+          "valid": 8
+        },
+        "latency_ms": {
+          "n": 8,
+          "mean": 1176.21,
+          "p50": 1110.41,
+          "p95": 1632.08,
+          "minimum": 607.28,
+          "maximum": 1632.08
+        },
+        "ttft_ms": {
+          "n": 8,
+          "mean": 193.81,
+          "p50": 190.79,
+          "p95": 214.12,
+          "minimum": 166.77,
+          "maximum": 214.12
+        },
+        "gen_tps": {
+          "n": 8,
+          "mean": 86.61,
+          "p50": 86.18,
+          "p95": 87.27,
+          "minimum": 86.04,
+          "maximum": 87.27
+        },
+        "prompt_tps": {
+          "n": 8,
+          "mean": 2222.73,
+          "p50": 2211.59,
+          "p95": 2311.77,
+          "minimum": 2153.46,
+          "maximum": 2311.77
+        },
+        "accuracy_mean": 0.9375,
+        "wall_clock_s": 9.41,
+        "throughput_rps": 0.85
+      },
+      {
+        "model": "qwen3.5:9b",
+        "task": "rag_answer",
+        "num_ctx": 8192,
+        "concurrency": 1,
+        "schema_constrained": false,
+        "n_runs": 8,
+        "n_valid": 8,
+        "validity_rate": 1.0,
+        "truncation_rate": 0.0,
+        "all_truncated": false,
+        "outcomes": {
+          "valid": 8
+        },
+        "latency_ms": {
+          "n": 8,
+          "mean": 541.39,
+          "p50": 535.82,
+          "p95": 637.68,
+          "minimum": 448.6,
+          "maximum": 637.68
+        },
+        "ttft_ms": {
+          "n": 8,
+          "mean": 144.48,
+          "p50": 143.2,
+          "p95": 150.82,
+          "minimum": 130.54,
+          "maximum": 150.82
+        },
+        "gen_tps": {
+          "n": 8,
+          "mean": 87.5,
+          "p50": 87.35,
+          "p95": 88.3,
+          "minimum": 86.82,
+          "maximum": 88.3
+        },
+        "prompt_tps": {
+          "n": 8,
+          "mean": 1618.83,
+          "p50": 1592.56,
+          "p95": 1685.31,
+          "minimum": 1574.44,
+          "maximum": 1685.31
+        },
+        "accuracy_mean": 1.0,
+        "wall_clock_s": 4.33,
+        "throughput_rps": 1.846
+      },
+      {
+        "model": "qwen3.5:9b",
+        "task": "reroute_message",
+        "num_ctx": 8192,
+        "concurrency": 1,
+        "schema_constrained": false,
+        "n_runs": 8,
+        "n_valid": 8,
+        "validity_rate": 1.0,
+        "truncation_rate": 0.0,
+        "all_truncated": false,
+        "outcomes": {
+          "valid": 8
+        },
+        "latency_ms": {
+          "n": 8,
+          "mean": 780.7,
+          "p50": 753.83,
+          "p95": 878.68,
+          "minimum": 730.8,
+          "maximum": 878.68
+        },
+        "ttft_ms": {
+          "n": 8,
+          "mean": 157.72,
+          "p50": 158.34,
+          "p95": 168.96,
+          "minimum": 144.66,
+          "maximum": 168.96
+        },
+        "gen_tps": {
+          "n": 8,
+          "mean": 87.24,
+          "p50": 87.22,
+          "p95": 87.62,
+          "minimum": 86.96,
+          "maximum": 87.62
+        },
+        "prompt_tps": {
+          "n": 8,
+          "mean": 1754.89,
+          "p50": 1751.91,
+          "p95": 1814.13,
+          "minimum": 1695.76,
+          "maximum": 1814.13
+        },
+        "accuracy_mean": 1.0,
+        "wall_clock_s": 6.25,
+        "throughput_rps": 1.28
+      },
+      {
+        "model": "qwen3.5:9b",
+        "task": "clarify_question",
+        "num_ctx": 8192,
+        "concurrency": 1,
+        "schema_constrained": true,
+        "n_runs": 8,
+        "n_valid": 8,
+        "validity_rate": 1.0,
+        "truncation_rate": 0.0,
+        "all_truncated": false,
+        "outcomes": {
+          "valid": 8
+        },
+        "latency_ms": {
+          "n": 8,
+          "mean": 458.43,
+          "p50": 423.32,
+          "p95": 705.21,
+          "minimum": 340.92,
+          "maximum": 705.21
+        },
+        "ttft_ms": {
+          "n": 8,
+          "mean": 138.32,
+          "p50": 138.9,
+          "p95": 155.75,
+          "minimum": 110.35,
+          "maximum": 155.75
+        },
+        "gen_tps": {
+          "n": 8,
+          "mean": 85.81,
+          "p50": 87.69,
+          "p95": 88.51,
+          "minimum": 71.7,
+          "maximum": 88.51
+        },
+        "prompt_tps": {
+          "n": 8,
+          "mean": 1215.54,
+          "p50": 1094.94,
+          "p95": 1612.32,
+          "minimum": 1065.22,
+          "maximum": 1612.32
+        },
+        "accuracy_mean": 0.4712,
+        "wall_clock_s": 3.67,
+        "throughput_rps": 2.18
+      }
+    ],
+    "gemma3:12b": [
+      {
+        "model": "gemma3:12b",
+        "task": "intent_classify",
+        "num_ctx": 8192,
+        "concurrency": 1,
+        "schema_constrained": true,
+        "n_runs": 14,
+        "n_valid": 14,
+        "validity_rate": 1.0,
+        "truncation_rate": 0.0,
+        "all_truncated": false,
+        "outcomes": {
+          "valid": 14
+        },
+        "latency_ms": {
+          "n": 14,
+          "mean": 426.91,
+          "p50": 424.39,
+          "p95": 482.94,
+          "minimum": 396.94,
+          "maximum": 482.94
+        },
+        "ttft_ms": {
+          "n": 14,
+          "mean": 155.25,
+          "p50": 148.69,
+          "p95": 217.77,
+          "minimum": 137.39,
+          "maximum": 217.77
+        },
+        "gen_tps": {
+          "n": 14,
+          "mean": 68.28,
+          "p50": 68.34,
+          "p95": 68.75,
+          "minimum": 67.75,
+          "maximum": 68.75
+        },
+        "prompt_tps": {
+          "n": 14,
+          "mean": 1277.15,
+          "p50": 1316.11,
+          "p95": 1385.19,
+          "minimum": 943.08,
+          "maximum": 1385.19
+        },
+        "accuracy_mean": 0.9286,
+        "wall_clock_s": 5.98,
+        "throughput_rps": 2.341
+      },
+      {
+        "model": "gemma3:12b",
+        "task": "tripspec_extract",
+        "num_ctx": 8192,
+        "concurrency": 1,
+        "schema_constrained": true,
+        "n_runs": 50,
+        "n_valid": 49,
+        "validity_rate": 0.98,
+        "truncation_rate": 0.0,
+        "all_truncated": false,
+        "outcomes": {
+          "valid": 49,
+          "schema_invalid": 1
+        },
+        "latency_ms": {
+          "n": 49,
+          "mean": 2797.63,
+          "p50": 2567.1,
+          "p95": 4379.54,
+          "minimum": 1952.13,
+          "maximum": 4762.48
+        },
+        "ttft_ms": {
+          "n": 49,
+          "mean": 282.02,
+          "p50": 268.79,
+          "p95": 351.58,
+          "minimum": 248.47,
+          "maximum": 360.57
+        },
+        "gen_tps": {
+          "n": 49,
+          "mean": 50.6,
+          "p50": 51.23,
+          "p95": 57.37,
+          "minimum": 39.4,
+          "maximum": 57.68
+        },
+        "prompt_tps": {
+          "n": 49,
+          "mean": 1373.18,
+          "p50": 1371.23,
+          "p95": 1409.88,
+          "minimum": 1334.53,
+          "maximum": 1422.07
+        },
+        "accuracy_mean": 0.7811,
+        "wall_clock_s": 140.43,
+        "throughput_rps": 0.349
+      },
+      {
+        "model": "gemma3:12b",
+        "task": "tripspec_extract",
+        "num_ctx": 8192,
+        "concurrency": 1,
+        "schema_constrained": false,
+        "n_runs": 50,
+        "n_valid": 24,
+        "validity_rate": 0.48,
+        "truncation_rate": 0.0,
+        "all_truncated": false,
+        "outcomes": {
+          "schema_invalid": 26,
+          "valid": 24
+        },
+        "latency_ms": {
+          "n": 24,
+          "mean": 2917.54,
+          "p50": 2870.66,
+          "p95": 3216.54,
+          "minimum": 2625.91,
+          "maximum": 3550.18
+        },
+        "ttft_ms": {
+          "n": 24,
+          "mean": 324.61,
+          "p50": 324.56,
+          "p95": 333.25,
+          "minimum": 311.82,
+          "maximum": 336.13
+        },
+        "gen_tps": {
+          "n": 24,
+          "mean": 64.47,
+          "p50": 64.41,
+          "p95": 64.82,
+          "minimum": 64.3,
+          "maximum": 65.09
+        },
+        "prompt_tps": {
+          "n": 24,
+          "mean": 1755.73,
+          "p50": 1747.45,
+          "p95": 1790.42,
+          "minimum": 1725.48,
+          "maximum": 1792.03
+        },
+        "accuracy_mean": 0.9094,
+        "wall_clock_s": 166.59,
+        "throughput_rps": 0.144
+      },
+      {
+        "model": "gemma3:12b",
+        "task": "tripspec_modify",
+        "num_ctx": 8192,
+        "concurrency": 1,
+        "schema_constrained": true,
+        "n_runs": 12,
+        "n_valid": 12,
+        "validity_rate": 1.0,
+        "truncation_rate": 0.0,
+        "all_truncated": false,
+        "outcomes": {
+          "valid": 12
+        },
+        "latency_ms": {
+          "n": 12,
+          "mean": 4475.31,
+          "p50": 4431.26,
+          "p95": 5220.52,
+          "minimum": 3723.76,
+          "maximum": 5220.52
+        },
+        "ttft_ms": {
+          "n": 12,
+          "mean": 403.2,
+          "p50": 402.35,
+          "p95": 441.6,
+          "minimum": 370.63,
+          "maximum": 441.6
+        },
+        "gen_tps": {
+          "n": 12,
+          "mean": 55.4,
+          "p50": 55.23,
+          "p95": 60.09,
+          "minimum": 52.41,
+          "maximum": 60.09
+        },
+        "prompt_tps": {
+          "n": 12,
+          "mean": 1502.07,
+          "p50": 1503.95,
+          "p95": 1563.46,
+          "minimum": 1429.28,
+          "maximum": 1563.46
+        },
+        "accuracy_mean": 0.7629,
+        "wall_clock_s": 53.71,
+        "throughput_rps": 0.223
+      },
+      {
+        "model": "gemma3:12b",
+        "task": "tripspec_modify",
+        "num_ctx": 8192,
+        "concurrency": 1,
+        "schema_constrained": false,
+        "n_runs": 12,
+        "n_valid": 9,
+        "validity_rate": 0.75,
+        "truncation_rate": 0.0,
+        "all_truncated": false,
+        "outcomes": {
+          "valid": 9,
+          "schema_invalid": 3
+        },
+        "latency_ms": {
+          "n": 9,
+          "mean": 3372.65,
+          "p50": 3566.67,
+          "p95": 4008.33,
+          "minimum": 2750.63,
+          "maximum": 4008.33
+        },
+        "ttft_ms": {
+          "n": 9,
+          "mean": 516.93,
+          "p50": 523.82,
+          "p95": 541.14,
+          "minimum": 465.93,
+          "maximum": 541.14
+        },
+        "gen_tps": {
+          "n": 9,
+          "mean": 64.46,
+          "p50": 64.38,
+          "p95": 64.77,
+          "minimum": 64.17,
+          "maximum": 64.77
+        },
+        "prompt_tps": {
+          "n": 9,
+          "mean": 1854.65,
+          "p50": 1856.73,
+          "p95": 1902.87,
+          "minimum": 1795.49,
+          "maximum": 1902.87
+        },
+        "accuracy_mean": 1.0,
+        "wall_clock_s": 43.43,
+        "throughput_rps": 0.207
+      },
+      {
+        "model": "gemma3:12b",
+        "task": "tool_select",
+        "num_ctx": 8192,
+        "concurrency": 1,
+        "schema_constrained": true,
+        "n_runs": 12,
+        "n_valid": 12,
+        "validity_rate": 1.0,
+        "truncation_rate": 0.0,
+        "all_truncated": false,
+        "outcomes": {
+          "valid": 12
+        },
+        "latency_ms": {
+          "n": 12,
+          "mean": 1706.39,
+          "p50": 1808.73,
+          "p95": 2157.11,
+          "minimum": 1088.89,
+          "maximum": 2157.11
+        },
+        "ttft_ms": {
+          "n": 12,
+          "mean": 456.44,
+          "p50": 447.8,
+          "p95": 590.52,
+          "minimum": 401.22,
+          "maximum": 590.52
+        },
+        "gen_tps": {
+          "n": 12,
+          "mean": 64.33,
+          "p50": 63.99,
+          "p95": 65.34,
+          "minimum": 63.84,
+          "maximum": 65.34
+        },
+        "prompt_tps": {
+          "n": 12,
+          "mean": 1781.33,
+          "p50": 1757.73,
+          "p95": 1988.01,
+          "minimum": 1669.67,
+          "maximum": 1988.01
+        },
+        "accuracy_mean": 1.0,
+        "wall_clock_s": 20.48,
+        "throughput_rps": 0.586
+      },
+      {
+        "model": "gemma3:12b",
+        "task": "explain_itinerary",
+        "num_ctx": 8192,
+        "concurrency": 1,
+        "schema_constrained": false,
+        "n_runs": 8,
+        "n_valid": 8,
+        "validity_rate": 1.0,
+        "truncation_rate": 0.0,
+        "all_truncated": false,
+        "outcomes": {
+          "valid": 8
+        },
+        "latency_ms": {
+          "n": 8,
+          "mean": 1495.5,
+          "p50": 1479.59,
+          "p95": 2052.3,
+          "minimum": 1057.18,
+          "maximum": 2052.3
+        },
+        "ttft_ms": {
+          "n": 8,
+          "mean": 310.35,
+          "p50": 297.83,
+          "p95": 456.22,
+          "minimum": 254.17,
+          "maximum": 456.22
+        },
+        "gen_tps": {
+          "n": 8,
+          "mean": 65.39,
+          "p50": 65.37,
+          "p95": 65.58,
+          "minimum": 65.14,
+          "maximum": 65.58
+        },
+        "prompt_tps": {
+          "n": 8,
+          "mean": 1662.35,
+          "p50": 1663.5,
+          "p95": 1706.49,
+          "minimum": 1606.27,
+          "maximum": 1706.49
+        },
+        "accuracy_mean": 0.9688,
+        "wall_clock_s": 11.97,
+        "throughput_rps": 0.669
+      },
+      {
+        "model": "gemma3:12b",
+        "task": "rag_answer",
+        "num_ctx": 8192,
+        "concurrency": 1,
+        "schema_constrained": false,
+        "n_runs": 8,
+        "n_valid": 8,
+        "validity_rate": 1.0,
+        "truncation_rate": 0.0,
+        "all_truncated": false,
+        "outcomes": {
+          "valid": 8
+        },
+        "latency_ms": {
+          "n": 8,
+          "mean": 786.62,
+          "p50": 832.42,
+          "p95": 991.22,
+          "minimum": 530.98,
+          "maximum": 991.22
+        },
+        "ttft_ms": {
+          "n": 8,
+          "mean": 172.1,
+          "p50": 160.77,
+          "p95": 223.91,
+          "minimum": 151.2,
+          "maximum": 223.91
+        },
+        "gen_tps": {
+          "n": 8,
+          "mean": 66.77,
+          "p50": 66.68,
+          "p95": 67.46,
+          "minimum": 66.32,
+          "maximum": 67.46
+        },
+        "prompt_tps": {
+          "n": 8,
+          "mean": 1260.03,
+          "p50": 1255.99,
+          "p95": 1324.26,
+          "minimum": 1174.56,
+          "maximum": 1324.26
+        },
+        "accuracy_mean": 1.0,
+        "wall_clock_s": 6.3,
+        "throughput_rps": 1.271
+      },
+      {
+        "model": "gemma3:12b",
+        "task": "reroute_message",
+        "num_ctx": 8192,
+        "concurrency": 1,
+        "schema_constrained": false,
+        "n_runs": 8,
+        "n_valid": 8,
+        "validity_rate": 1.0,
+        "truncation_rate": 0.0,
+        "all_truncated": false,
+        "outcomes": {
+          "valid": 8
+        },
+        "latency_ms": {
+          "n": 8,
+          "mean": 1127.39,
+          "p50": 1087.69,
+          "p95": 1347.55,
+          "minimum": 994.47,
+          "maximum": 1347.55
+        },
+        "ttft_ms": {
+          "n": 8,
+          "mean": 185.87,
+          "p50": 181.35,
+          "p95": 214.19,
+          "minimum": 172.51,
+          "maximum": 214.19
+        },
+        "gen_tps": {
+          "n": 8,
+          "mean": 66.23,
+          "p50": 66.21,
+          "p95": 66.38,
+          "minimum": 66.08,
+          "maximum": 66.38
+        },
+        "prompt_tps": {
+          "n": 8,
+          "mean": 1347.23,
+          "p50": 1354.78,
+          "p95": 1380.84,
+          "minimum": 1305.9,
+          "maximum": 1380.84
+        },
+        "accuracy_mean": 0.9375,
+        "wall_clock_s": 9.02,
+        "throughput_rps": 0.887
+      },
+      {
+        "model": "gemma3:12b",
+        "task": "clarify_question",
+        "num_ctx": 8192,
+        "concurrency": 1,
+        "schema_constrained": true,
+        "n_runs": 8,
+        "n_valid": 8,
+        "validity_rate": 1.0,
+        "truncation_rate": 0.0,
+        "all_truncated": false,
+        "outcomes": {
+          "valid": 8
+        },
+        "latency_ms": {
+          "n": 8,
+          "mean": 935.65,
+          "p50": 927.84,
+          "p95": 1034.34,
+          "minimum": 852.85,
+          "maximum": 1034.34
+        },
+        "ttft_ms": {
+          "n": 8,
+          "mean": 173.36,
+          "p50": 162.1,
+          "p95": 223.92,
+          "minimum": 149.81,
+          "maximum": 223.92
+        },
+        "gen_tps": {
+          "n": 8,
+          "mean": 56.91,
+          "p50": 56.94,
+          "p95": 57.97,
+          "minimum": 54.13,
+          "maximum": 57.97
+        },
+        "prompt_tps": {
+          "n": 8,
+          "mean": 909.88,
+          "p50": 904.58,
+          "p95": 938.1,
+          "minimum": 865.15,
+          "maximum": 938.1
+        },
+        "accuracy_mean": 0.91,
+        "wall_clock_s": 7.49,
+        "throughput_rps": 1.068
+      }
+    ],
+    "qwen3:14b": [
+      {
+        "model": "qwen3:14b",
+        "task": "intent_classify",
+        "num_ctx": 8192,
+        "concurrency": 1,
+        "schema_constrained": true,
+        "n_runs": 14,
+        "n_valid": 14,
+        "validity_rate": 1.0,
+        "truncation_rate": 0.0,
+        "all_truncated": false,
+        "outcomes": {
+          "valid": 14
+        },
+        "latency_ms": {
+          "n": 14,
+          "mean": 332.46,
+          "p50": 323.73,
+          "p95": 403.09,
+          "minimum": 308.92,
+          "maximum": 403.09
+        },
+        "ttft_ms": {
+          "n": 14,
+          "mean": 63.55,
+          "p50": 58.15,
+          "p95": 137.01,
+          "minimum": 44.28,
+          "maximum": 137.01
+        },
+        "gen_tps": {
+          "n": 14,
+          "mean": 64.26,
+          "p50": 64.28,
+          "p95": 64.57,
+          "minimum": 63.82,
+          "maximum": 64.57
+        },
+        "prompt_tps": {
+          "n": 14,
+          "mean": 5047.65,
+          "p50": 5183.28,
+          "p95": 5631.37,
+          "minimum": 1649.65,
+          "maximum": 5631.37
+        },
+        "accuracy_mean": 1.0,
+        "wall_clock_s": 4.66,
+        "throughput_rps": 3.006
+      },
+      {
+        "model": "qwen3:14b",
+        "task": "tripspec_extract",
+        "num_ctx": 8192,
+        "concurrency": 1,
+        "schema_constrained": true,
+        "n_runs": 50,
+        "n_valid": 50,
+        "validity_rate": 1.0,
+        "truncation_rate": 0.0,
+        "all_truncated": false,
+        "outcomes": {
+          "valid": 50
+        },
+        "latency_ms": {
+          "n": 50,
+          "mean": 2957.33,
+          "p50": 2713.3,
+          "p95": 4131.29,
+          "minimum": 2205.24,
+          "maximum": 4415.69
+        },
+        "ttft_ms": {
+          "n": 50,
+          "mean": 121.76,
+          "p50": 121.46,
+          "p95": 135.17,
+          "minimum": 83.91,
+          "maximum": 215.17
+        },
+        "gen_tps": {
+          "n": 50,
+          "mean": 56.46,
+          "p50": 57.47,
+          "p95": 58.79,
+          "minimum": 50.09,
+          "maximum": 58.88
+        },
+        "prompt_tps": {
+          "n": 50,
+          "mean": 5982.11,
+          "p50": 5458.84,
+          "p95": 8366.65,
+          "minimum": 1996.68,
+          "maximum": 8682.3
+        },
+        "accuracy_mean": 0.8853,
+        "wall_clock_s": 147.89,
+        "throughput_rps": 0.338
+      },
+      {
+        "model": "qwen3:14b",
+        "task": "tripspec_extract",
+        "num_ctx": 8192,
+        "concurrency": 1,
+        "schema_constrained": false,
+        "n_runs": 50,
+        "n_valid": 42,
+        "validity_rate": 0.84,
+        "truncation_rate": 0.0,
+        "all_truncated": false,
+        "outcomes": {
+          "valid": 42,
+          "schema_invalid": 8
+        },
+        "latency_ms": {
+          "n": 42,
+          "mean": 2953.25,
+          "p50": 2765.69,
+          "p95": 3789.17,
+          "minimum": 2245.25,
+          "maximum": 3844.93
+        },
+        "ttft_ms": {
+          "n": 42,
+          "mean": 89.69,
+          "p50": 87.03,
+          "p95": 102.46,
+          "minimum": 70.4,
+          "maximum": 209.16
+        },
+        "gen_tps": {
+          "n": 42,
+          "mean": 60.12,
+          "p50": 60.11,
+          "p95": 60.23,
+          "minimum": 60.0,
+          "maximum": 60.27
+        },
+        "prompt_tps": {
+          "n": 42,
+          "mean": 7807.86,
+          "p50": 7847.57,
+          "p95": 8497.69,
+          "minimum": 3048.62,
+          "maximum": 8532.45
+        },
+        "accuracy_mean": 0.9411,
+        "wall_clock_s": 151.17,
+        "throughput_rps": 0.278
+      },
+      {
+        "model": "qwen3:14b",
+        "task": "tripspec_modify",
+        "num_ctx": 8192,
+        "concurrency": 1,
+        "schema_constrained": true,
+        "n_runs": 12,
+        "n_valid": 12,
+        "validity_rate": 1.0,
+        "truncation_rate": 0.0,
+        "all_truncated": false,
+        "outcomes": {
+          "valid": 12
+        },
+        "latency_ms": {
+          "n": 12,
+          "mean": 3836.7,
+          "p50": 3890.76,
+          "p95": 4550.71,
+          "minimum": 3160.85,
+          "maximum": 4550.71
+        },
+        "ttft_ms": {
+          "n": 12,
+          "mean": 187.04,
+          "p50": 178.5,
+          "p95": 255.87,
+          "minimum": 162.74,
+          "maximum": 255.87
+        },
+        "gen_tps": {
+          "n": 12,
+          "mean": 55.07,
+          "p50": 55.06,
+          "p95": 55.84,
+          "minimum": 54.38,
+          "maximum": 55.84
+        },
+        "prompt_tps": {
+          "n": 12,
+          "mean": 3006.12,
+          "p50": 3063.67,
+          "p95": 3185.67,
+          "minimum": 2037.75,
+          "maximum": 3185.67
+        },
+        "accuracy_mean": 0.9038,
+        "wall_clock_s": 46.05,
+        "throughput_rps": 0.261
+      },
+      {
+        "model": "qwen3:14b",
+        "task": "tripspec_modify",
+        "num_ctx": 8192,
+        "concurrency": 1,
+        "schema_constrained": false,
+        "n_runs": 12,
+        "n_valid": 6,
+        "validity_rate": 0.5,
+        "truncation_rate": 0.0,
+        "all_truncated": false,
+        "outcomes": {
+          "valid": 6,
+          "schema_invalid": 6
+        },
+        "latency_ms": {
+          "n": 6,
+          "mean": 3112.68,
+          "p50": 3123.4,
+          "p95": 3280.79,
+          "minimum": 2846.41,
+          "maximum": 3280.79
+        },
+        "ttft_ms": {
+          "n": 6,
+          "mean": 199.06,
+          "p50": 186.48,
+          "p95": 280.4,
+          "minimum": 167.01,
+          "maximum": 280.4
+        },
+        "gen_tps": {
+          "n": 6,
+          "mean": 60.29,
+          "p50": 60.27,
+          "p95": 60.36,
+          "minimum": 60.24,
+          "maximum": 60.36
+        },
+        "prompt_tps": {
+          "n": 6,
+          "mean": 4182.73,
+          "p50": 4326.53,
+          "p95": 4668.57,
+          "minimum": 2492.67,
+          "maximum": 4668.57
+        },
+        "accuracy_mean": 1.0,
+        "wall_clock_s": 41.7,
+        "throughput_rps": 0.144
+      },
+      {
+        "model": "qwen3:14b",
+        "task": "tool_select",
+        "num_ctx": 8192,
+        "concurrency": 1,
+        "schema_constrained": true,
+        "n_runs": 12,
+        "n_valid": 12,
+        "validity_rate": 1.0,
+        "truncation_rate": 0.0,
+        "all_truncated": false,
+        "outcomes": {
+          "valid": 12
+        },
+        "latency_ms": {
+          "n": 12,
+          "mean": 1387.71,
+          "p50": 1499.52,
+          "p95": 1802.05,
+          "minimum": 688.19,
+          "maximum": 1802.05
+        },
+        "ttft_ms": {
+          "n": 12,
+          "mean": 122.59,
+          "p50": 84.11,
+          "p95": 380.73,
+          "minimum": 51.23,
+          "maximum": 380.73
+        },
+        "gen_tps": {
+          "n": 12,
+          "mean": 60.46,
+          "p50": 60.43,
+          "p95": 61.27,
+          "minimum": 59.55,
+          "maximum": 61.27
+        },
+        "prompt_tps": {
+          "n": 12,
+          "mean": 12326.2,
+          "p50": 11603.58,
+          "p95": 17118.4,
+          "minimum": 2094.58,
+          "maximum": 17118.4
+        },
+        "accuracy_mean": 1.0,
+        "wall_clock_s": 16.66,
+        "throughput_rps": 0.72
+      },
+      {
+        "model": "qwen3:14b",
+        "task": "explain_itinerary",
+        "num_ctx": 8192,
+        "concurrency": 1,
+        "schema_constrained": false,
+        "n_runs": 8,
+        "n_valid": 7,
+        "validity_rate": 0.875,
+        "truncation_rate": 0.0,
+        "all_truncated": false,
+        "outcomes": {
+          "task_check_failed": 1,
+          "valid": 7
+        },
+        "latency_ms": {
+          "n": 7,
+          "mean": 1415.33,
+          "p50": 1327.12,
+          "p95": 1742.18,
+          "minimum": 1122.35,
+          "maximum": 1742.18
+        },
+        "ttft_ms": {
+          "n": 7,
+          "mean": 157.92,
+          "p50": 162.03,
+          "p95": 173.17,
+          "minimum": 140.75,
+          "maximum": 173.17
+        },
+        "gen_tps": {
+          "n": 7,
+          "mean": 60.66,
+          "p50": 60.68,
+          "p95": 60.79,
+          "minimum": 60.52,
+          "maximum": 60.79
+        },
+        "prompt_tps": {
+          "n": 7,
+          "mean": 2572.74,
+          "p50": 2570.14,
+          "p95": 2634.62,
+          "minimum": 2508.77,
+          "maximum": 2634.62
+        },
+        "accuracy_mean": 1.0,
+        "wall_clock_s": 12.05,
+        "throughput_rps": 0.581
+      },
+      {
+        "model": "qwen3:14b",
+        "task": "rag_answer",
+        "num_ctx": 8192,
+        "concurrency": 1,
+        "schema_constrained": false,
+        "n_runs": 8,
+        "n_valid": 8,
+        "validity_rate": 1.0,
+        "truncation_rate": 0.0,
+        "all_truncated": false,
+        "outcomes": {
+          "valid": 8
+        },
+        "latency_ms": {
+          "n": 8,
+          "mean": 464.86,
+          "p50": 388.38,
+          "p95": 1008.58,
+          "minimum": 299.36,
+          "maximum": 1008.58
+        },
+        "ttft_ms": {
+          "n": 8,
+          "mean": 90.65,
+          "p50": 89.45,
+          "p95": 137.58,
+          "minimum": 66.16,
+          "maximum": 137.58
+        },
+        "gen_tps": {
+          "n": 8,
+          "mean": 63.24,
+          "p50": 63.56,
+          "p95": 64.26,
+          "minimum": 61.19,
+          "maximum": 64.26
+        },
+        "prompt_tps": {
+          "n": 8,
+          "mean": 2534.99,
+          "p50": 2610.04,
+          "p95": 2932.15,
+          "minimum": 1518.54,
+          "maximum": 2932.15
+        },
+        "accuracy_mean": 0.875,
+        "wall_clock_s": 3.72,
+        "throughput_rps": 2.15
+      },
+      {
+        "model": "qwen3:14b",
+        "task": "reroute_message",
+        "num_ctx": 8192,
+        "concurrency": 1,
+        "schema_constrained": false,
+        "n_runs": 8,
+        "n_valid": 8,
+        "validity_rate": 1.0,
+        "truncation_rate": 0.0,
+        "all_truncated": false,
+        "outcomes": {
+          "valid": 8
+        },
+        "latency_ms": {
+          "n": 8,
+          "mean": 977.29,
+          "p50": 959.13,
+          "p95": 1218.26,
+          "minimum": 769.0,
+          "maximum": 1218.26
+        },
+        "ttft_ms": {
+          "n": 8,
+          "mean": 96.83,
+          "p50": 90.61,
+          "p95": 133.69,
+          "minimum": 75.14,
+          "maximum": 133.69
+        },
+        "gen_tps": {
+          "n": 8,
+          "mean": 61.37,
+          "p50": 61.11,
+          "p95": 62.05,
+          "minimum": 60.84,
+          "maximum": 62.05
+        },
+        "prompt_tps": {
+          "n": 8,
+          "mean": 2726.54,
+          "p50": 2843.14,
+          "p95": 2936.3,
+          "minimum": 1678.72,
+          "maximum": 2936.3
+        },
+        "accuracy_mean": 1.0,
+        "wall_clock_s": 7.82,
+        "throughput_rps": 1.023
+      },
+      {
+        "model": "qwen3:14b",
+        "task": "clarify_question",
+        "num_ctx": 8192,
+        "concurrency": 1,
+        "schema_constrained": true,
+        "n_runs": 8,
+        "n_valid": 8,
+        "validity_rate": 1.0,
+        "truncation_rate": 0.0,
+        "all_truncated": false,
+        "outcomes": {
+          "valid": 8
+        },
+        "latency_ms": {
+          "n": 8,
+          "mean": 651.56,
+          "p50": 597.61,
+          "p95": 876.63,
+          "minimum": 380.39,
+          "maximum": 876.63
+        },
+        "ttft_ms": {
+          "n": 8,
+          "mean": 56.13,
+          "p50": 51.38,
+          "p95": 90.76,
+          "minimum": 39.92,
+          "maximum": 90.76
+        },
+        "gen_tps": {
+          "n": 8,
+          "mean": 58.96,
+          "p50": 57.48,
+          "p95": 63.22,
+          "minimum": 52.97,
+          "maximum": 63.22
+        },
+        "prompt_tps": {
+          "n": 8,
+          "mean": 3537.14,
+          "p50": 3729.65,
+          "p95": 4072.68,
+          "minimum": 1736.87,
+          "maximum": 4072.68
+        },
+        "accuracy_mean": 0.67,
+        "wall_clock_s": 5.21,
+        "throughput_rps": 1.534
+      }
+    ],
+    "mistral-small3.2:24b": [
+      {
+        "model": "mistral-small3.2:24b",
+        "task": "intent_classify",
+        "num_ctx": 8192,
+        "concurrency": 1,
+        "schema_constrained": true,
+        "n_runs": 14,
+        "n_valid": 14,
+        "validity_rate": 1.0,
+        "truncation_rate": 0.0,
+        "all_truncated": false,
+        "outcomes": {
+          "valid": 14
+        },
+        "latency_ms": {
+          "n": 14,
+          "mean": 495.91,
+          "p50": 483.14,
+          "p95": 602.58,
+          "minimum": 448.94,
+          "maximum": 602.58
+        },
+        "ttft_ms": {
+          "n": 14,
+          "mean": 72.7,
+          "p50": 64.64,
+          "p95": 179.57,
+          "minimum": 52.29,
+          "maximum": 179.57
+        },
+        "gen_tps": {
+          "n": 14,
+          "mean": 42.87,
+          "p50": 42.87,
+          "p95": 43.1,
+          "minimum": 42.5,
+          "maximum": 43.1
+        },
+        "prompt_tps": {
+          "n": 14,
+          "mean": 3565.73,
+          "p50": 3838.34,
+          "p95": 4014.54,
+          "minimum": 1156.17,
+          "maximum": 4014.54
+        },
+        "accuracy_mean": 0.9286,
+        "wall_clock_s": 6.95,
+        "throughput_rps": 2.016
+      },
+      {
+        "model": "mistral-small3.2:24b",
+        "task": "tripspec_extract",
+        "num_ctx": 8192,
+        "concurrency": 1,
+        "schema_constrained": true,
+        "n_runs": 50,
+        "n_valid": 49,
+        "validity_rate": 0.98,
+        "truncation_rate": 0.0,
+        "all_truncated": false,
+        "outcomes": {
+          "valid": 49,
+          "schema_invalid": 1
+        },
+        "latency_ms": {
+          "n": 49,
+          "mean": 4853.1,
+          "p50": 4423.94,
+          "p95": 7006.86,
+          "minimum": 3557.29,
+          "maximum": 9232.11
+        },
+        "ttft_ms": {
+          "n": 49,
+          "mean": 155.75,
+          "p50": 153.29,
+          "p95": 177.83,
+          "minimum": 114.3,
+          "maximum": 325.33
+        },
+        "gen_tps": {
+          "n": 49,
+          "mean": 38.28,
+          "p50": 38.84,
+          "p95": 39.43,
+          "minimum": 35.97,
+          "maximum": 39.57
+        },
+        "prompt_tps": {
+          "n": 49,
+          "mean": 3410.82,
+          "p50": 3076.39,
+          "p95": 4657.7,
+          "minimum": 1187.68,
+          "maximum": 4880.29
+        },
+        "accuracy_mean": 0.9013,
+        "wall_clock_s": 242.63,
+        "throughput_rps": 0.202
+      },
+      {
+        "model": "mistral-small3.2:24b",
+        "task": "tripspec_extract",
+        "num_ctx": 8192,
+        "concurrency": 1,
+        "schema_constrained": false,
+        "n_runs": 50,
+        "n_valid": 50,
+        "validity_rate": 1.0,
+        "truncation_rate": 0.0,
+        "all_truncated": false,
+        "outcomes": {
+          "valid": 50
+        },
+        "latency_ms": {
+          "n": 50,
+          "mean": 3999.27,
+          "p50": 3848.35,
+          "p95": 4943.96,
+          "minimum": 2965.86,
+          "maximum": 5256.26
+        },
+        "ttft_ms": {
+          "n": 50,
+          "mean": 113.99,
+          "p50": 109.99,
+          "p95": 130.17,
+          "minimum": 90.29,
+          "maximum": 322.24
+        },
+        "gen_tps": {
+          "n": 50,
+          "mean": 40.15,
+          "p50": 40.15,
+          "p95": 40.2,
+          "minimum": 40.0,
+          "maximum": 40.28
+        },
+        "prompt_tps": {
+          "n": 50,
+          "mean": 5665.2,
+          "p50": 5795.27,
+          "p95": 6344.38,
+          "minimum": 1996.21,
+          "maximum": 6391.14
+        },
+        "accuracy_mean": 0.9385,
+        "wall_clock_s": 199.98,
+        "throughput_rps": 0.25
+      },
+      {
+        "model": "mistral-small3.2:24b",
+        "task": "tripspec_modify",
+        "num_ctx": 8192,
+        "concurrency": 1,
+        "schema_constrained": true,
+        "n_runs": 12,
+        "n_valid": 12,
+        "validity_rate": 1.0,
+        "truncation_rate": 0.0,
+        "all_truncated": false,
+        "outcomes": {
+          "valid": 12
+        },
+        "latency_ms": {
+          "n": 12,
+          "mean": 5790.61,
+          "p50": 5655.93,
+          "p95": 6669.9,
+          "minimum": 4522.37,
+          "maximum": 6669.9
+        },
+        "ttft_ms": {
+          "n": 12,
+          "mean": 272.53,
+          "p50": 263.27,
+          "p95": 367.08,
+          "minimum": 240.32,
+          "maximum": 367.08
+        },
+        "gen_tps": {
+          "n": 12,
+          "mean": 37.95,
+          "p50": 38.05,
+          "p95": 38.39,
+          "minimum": 37.19,
+          "maximum": 38.39
+        },
+        "prompt_tps": {
+          "n": 12,
+          "mean": 1786.46,
+          "p50": 1813.07,
+          "p95": 1904.44,
+          "minimum": 1242.7,
+          "maximum": 1904.44
+        },
+        "accuracy_mean": 0.9385,
+        "wall_clock_s": 69.49,
+        "throughput_rps": 0.173
+      },
+      {
+        "model": "mistral-small3.2:24b",
+        "task": "tripspec_modify",
+        "num_ctx": 8192,
+        "concurrency": 1,
+        "schema_constrained": false,
+        "n_runs": 12,
+        "n_valid": 12,
+        "validity_rate": 1.0,
+        "truncation_rate": 0.0,
+        "all_truncated": false,
+        "outcomes": {
+          "valid": 12
+        },
+        "latency_ms": {
+          "n": 12,
+          "mean": 4659.98,
+          "p50": 4708.49,
+          "p95": 5499.73,
+          "minimum": 3707.46,
+          "maximum": 5499.73
+        },
+        "ttft_ms": {
+          "n": 12,
+          "mean": 249.45,
+          "p50": 225.74,
+          "p95": 391.52,
+          "minimum": 218.69,
+          "maximum": 391.52
+        },
+        "gen_tps": {
+          "n": 12,
+          "mean": 40.17,
+          "p50": 40.16,
+          "p95": 40.22,
+          "minimum": 40.09,
+          "maximum": 40.22
+        },
+        "prompt_tps": {
+          "n": 12,
+          "mean": 2944.58,
+          "p50": 3069.76,
+          "p95": 3147.01,
+          "minimum": 1638.48,
+          "maximum": 3147.01
+        },
+        "accuracy_mean": 1.0,
+        "wall_clock_s": 55.92,
+        "throughput_rps": 0.215
+      },
+      {
+        "model": "mistral-small3.2:24b",
+        "task": "tool_select",
+        "num_ctx": 8192,
+        "concurrency": 1,
+        "schema_constrained": true,
+        "n_runs": 12,
+        "n_valid": 12,
+        "validity_rate": 1.0,
+        "truncation_rate": 0.0,
+        "all_truncated": false,
+        "outcomes": {
+          "valid": 12
+        },
+        "latency_ms": {
+          "n": 12,
+          "mean": 2049.77,
+          "p50": 2051.61,
+          "p95": 2637.77,
+          "minimum": 1143.67,
+          "maximum": 2637.77
+        },
+        "ttft_ms": {
+          "n": 12,
+          "mean": 152.78,
+          "p50": 120.81,
+          "p95": 602.39,
+          "minimum": 87.92,
+          "maximum": 602.39
+        },
+        "gen_tps": {
+          "n": 12,
+          "mean": 40.41,
+          "p50": 40.35,
+          "p95": 40.74,
+          "minimum": 40.21,
+          "maximum": 40.74
+        },
+        "prompt_tps": {
+          "n": 12,
+          "mean": 7254.37,
+          "p50": 6910.25,
+          "p95": 9729.05,
+          "minimum": 1213.18,
+          "maximum": 9729.05
+        },
+        "accuracy_mean": 1.0,
+        "wall_clock_s": 24.6,
+        "throughput_rps": 0.488
+      },
+      {
+        "model": "mistral-small3.2:24b",
+        "task": "explain_itinerary",
+        "num_ctx": 8192,
+        "concurrency": 1,
+        "schema_constrained": false,
+        "n_runs": 8,
+        "n_valid": 7,
+        "validity_rate": 0.875,
+        "truncation_rate": 0.0,
+        "all_truncated": false,
+        "outcomes": {
+          "task_check_failed": 1,
+          "valid": 7
+        },
+        "latency_ms": {
+          "n": 7,
+          "mean": 2174.7,
+          "p50": 2245.3,
+          "p95": 3623.39,
+          "minimum": 1376.92,
+          "maximum": 3623.39
+        },
+        "ttft_ms": {
+          "n": 7,
+          "mean": 214.21,
+          "p50": 216.56,
+          "p95": 245.61,
+          "minimum": 195.51,
+          "maximum": 245.61
+        },
+        "gen_tps": {
+          "n": 7,
+          "mean": 40.48,
+          "p50": 40.43,
+          "p95": 40.71,
+          "minimum": 40.26,
+          "maximum": 40.71
+        },
+        "prompt_tps": {
+          "n": 7,
+          "mean": 1684.13,
+          "p50": 1650.65,
+          "p95": 1816.11,
+          "minimum": 1622.42,
+          "maximum": 1816.11
+        },
+        "accuracy_mean": 0.8571,
+        "wall_clock_s": 18.44,
+        "throughput_rps": 0.38
+      },
+      {
+        "model": "mistral-small3.2:24b",
+        "task": "rag_answer",
+        "num_ctx": 8192,
+        "concurrency": 1,
+        "schema_constrained": false,
+        "n_runs": 8,
+        "n_valid": 8,
+        "validity_rate": 1.0,
+        "truncation_rate": 0.0,
+        "all_truncated": false,
+        "outcomes": {
+          "valid": 8
+        },
+        "latency_ms": {
+          "n": 8,
+          "mean": 640.94,
+          "p50": 546.65,
+          "p95": 1075.96,
+          "minimum": 403.21,
+          "maximum": 1075.96
+        },
+        "ttft_ms": {
+          "n": 8,
+          "mean": 104.78,
+          "p50": 98.42,
+          "p95": 145.09,
+          "minimum": 79.21,
+          "maximum": 145.09
+        },
+        "gen_tps": {
+          "n": 8,
+          "mean": 42.25,
+          "p50": 42.07,
+          "p95": 43.45,
+          "minimum": 40.98,
+          "maximum": 43.45
+        },
+        "prompt_tps": {
+          "n": 8,
+          "mean": 1730.74,
+          "p50": 1714.08,
+          "p95": 2013.25,
+          "minimum": 1225.03,
+          "maximum": 2013.25
+        },
+        "accuracy_mean": 1.0,
+        "wall_clock_s": 5.13,
+        "throughput_rps": 1.56
+      },
+      {
+        "model": "mistral-small3.2:24b",
+        "task": "reroute_message",
+        "num_ctx": 8192,
+        "concurrency": 1,
+        "schema_constrained": false,
+        "n_runs": 8,
+        "n_valid": 8,
+        "validity_rate": 1.0,
+        "truncation_rate": 0.0,
+        "all_truncated": false,
+        "outcomes": {
+          "valid": 8
+        },
+        "latency_ms": {
+          "n": 8,
+          "mean": 1350.07,
+          "p50": 1260.6,
+          "p95": 1747.65,
+          "minimum": 1042.73,
+          "maximum": 1747.65
+        },
+        "ttft_ms": {
+          "n": 8,
+          "mean": 119.67,
+          "p50": 112.66,
+          "p95": 172.62,
+          "minimum": 97.77,
+          "maximum": 172.62
+        },
+        "gen_tps": {
+          "n": 8,
+          "mean": 40.85,
+          "p50": 40.84,
+          "p95": 40.99,
+          "minimum": 40.7,
+          "maximum": 40.99
+        },
+        "prompt_tps": {
+          "n": 8,
+          "mean": 1834.17,
+          "p50": 1899.71,
+          "p95": 2135.57,
+          "minimum": 1015.73,
+          "maximum": 2135.57
+        },
+        "accuracy_mean": 1.0,
+        "wall_clock_s": 10.8,
+        "throughput_rps": 0.741
+      },
+      {
+        "model": "mistral-small3.2:24b",
+        "task": "clarify_question",
+        "num_ctx": 8192,
+        "concurrency": 1,
+        "schema_constrained": true,
+        "n_runs": 8,
+        "n_valid": 8,
+        "validity_rate": 1.0,
+        "truncation_rate": 0.0,
+        "all_truncated": false,
+        "outcomes": {
+          "valid": 8
+        },
+        "latency_ms": {
+          "n": 8,
+          "mean": 887.57,
+          "p50": 744.63,
+          "p95": 1183.31,
+          "minimum": 582.16,
+          "maximum": 1183.31
+        },
+        "ttft_ms": {
+          "n": 8,
+          "mean": 91.99,
+          "p50": 84.96,
+          "p95": 135.59,
+          "minimum": 71.13,
+          "maximum": 135.59
+        },
+        "gen_tps": {
+          "n": 8,
+          "mean": 41.12,
+          "p50": 41.24,
+          "p95": 42.52,
+          "minimum": 39.23,
+          "maximum": 42.52
+        },
+        "prompt_tps": {
+          "n": 8,
+          "mean": 1725.32,
+          "p50": 1784.14,
+          "p95": 1951.54,
+          "minimum": 1088.23,
+          "maximum": 1951.54
+        },
+        "accuracy_mean": 0.555,
+        "wall_clock_s": 7.1,
+        "throughput_rps": 1.126
+      }
+    ],
+    "llama3:8b": [
+      {
+        "model": "llama3:8b",
+        "task": "intent_classify",
+        "num_ctx": 8192,
+        "concurrency": 1,
+        "schema_constrained": true,
+        "n_runs": 14,
+        "n_valid": 14,
+        "validity_rate": 1.0,
+        "truncation_rate": 0.0,
+        "all_truncated": false,
+        "outcomes": {
+          "valid": 14
+        },
+        "latency_ms": {
+          "n": 14,
+          "mean": 172.72,
+          "p50": 169.79,
+          "p95": 216.02,
+          "minimum": 153.48,
+          "maximum": 216.02
+        },
+        "ttft_ms": {
+          "n": 14,
+          "mean": 42.76,
+          "p50": 42.2,
+          "p95": 85.18,
+          "minimum": 25.6,
+          "maximum": 85.18
+        },
+        "gen_tps": {
+          "n": 14,
+          "mean": 125.31,
+          "p50": 125.62,
+          "p95": 126.1,
+          "minimum": 122.26,
+          "maximum": 126.1
+        },
+        "prompt_tps": {
+          "n": 14,
+          "mean": 8509.85,
+          "p50": 8852.88,
+          "p95": 9455.55,
+          "minimum": 3346.32,
+          "maximum": 9455.55
+        },
+        "accuracy_mean": 0.9286,
+        "wall_clock_s": 2.42,
+        "throughput_rps": 5.782
+      },
+      {
+        "model": "llama3:8b",
+        "task": "tripspec_extract",
+        "num_ctx": 8192,
+        "concurrency": 1,
+        "schema_constrained": true,
+        "n_runs": 50,
+        "n_valid": 50,
+        "validity_rate": 1.0,
+        "truncation_rate": 0.0,
+        "all_truncated": false,
+        "outcomes": {
+          "valid": 50
+        },
+        "latency_ms": {
+          "n": 50,
+          "mean": 1399.54,
+          "p50": 1366.38,
+          "p95": 1916.96,
+          "minimum": 978.21,
+          "maximum": 2272.87
+        },
+        "ttft_ms": {
+          "n": 50,
+          "mean": 74.74,
+          "p50": 71.62,
+          "p95": 99.33,
+          "minimum": 54.8,
+          "maximum": 125.53
+        },
+        "gen_tps": {
+          "n": 50,
+          "mean": 96.59,
+          "p50": 96.17,
+          "p95": 107.77,
+          "minimum": 81.66,
+          "maximum": 110.03
+        },
+        "prompt_tps": {
+          "n": 50,
+          "mean": 6518.87,
+          "p50": 6597.72,
+          "p95": 6855.14,
+          "minimum": 2911.19,
+          "maximum": 7071.81
+        },
+        "accuracy_mean": 0.8312,
+        "wall_clock_s": 70.0,
+        "throughput_rps": 0.714
+      },
+      {
+        "model": "llama3:8b",
+        "task": "tripspec_extract",
+        "num_ctx": 8192,
+        "concurrency": 1,
+        "schema_constrained": false,
+        "n_runs": 50,
+        "n_valid": 31,
+        "validity_rate": 0.62,
+        "truncation_rate": 0.0,
+        "all_truncated": false,
+        "outcomes": {
+          "valid": 31,
+          "schema_invalid": 18,
+          "invalid_json": 1
+        },
+        "latency_ms": {
+          "n": 31,
+          "mean": 1381.34,
+          "p50": 1344.78,
+          "p95": 1497.3,
+          "minimum": 1161.43,
+          "maximum": 1553.14
+        },
+        "ttft_ms": {
+          "n": 31,
+          "mean": 52.08,
+          "p50": 50.85,
+          "p95": 62.8,
+          "minimum": 37.44,
+          "maximum": 128.8
+        },
+        "gen_tps": {
+          "n": 31,
+          "mean": 119.95,
+          "p50": 119.99,
+          "p95": 120.16,
+          "minimum": 119.49,
+          "maximum": 120.19
+        },
+        "prompt_tps": {
+          "n": 31,
+          "mean": 16178.87,
+          "p50": 16787.43,
+          "p95": 17058.35,
+          "minimum": 6352.55,
+          "maximum": 17148.51
+        },
+        "accuracy_mean": 0.895,
+        "wall_clock_s": 69.27,
+        "throughput_rps": 0.448
+      },
+      {
+        "model": "llama3:8b",
+        "task": "tripspec_modify",
+        "num_ctx": 8192,
+        "concurrency": 1,
+        "schema_constrained": true,
+        "n_runs": 12,
+        "n_valid": 12,
+        "validity_rate": 1.0,
+        "truncation_rate": 0.0,
+        "all_truncated": false,
+        "outcomes": {
+          "valid": 12
+        },
+        "latency_ms": {
+          "n": 12,
+          "mean": 1346.24,
+          "p50": 1405.92,
+          "p95": 1536.85,
+          "minimum": 885.3,
+          "maximum": 1536.85
+        },
+        "ttft_ms": {
+          "n": 12,
+          "mean": 121.72,
+          "p50": 118.13,
+          "p95": 174.35,
+          "minimum": 101.61,
+          "maximum": 174.35
+        },
+        "gen_tps": {
+          "n": 12,
+          "mean": 105.83,
+          "p50": 103.83,
+          "p95": 115.75,
+          "minimum": 99.04,
+          "maximum": 115.75
+        },
+        "prompt_tps": {
+          "n": 12,
+          "mean": 4686.57,
+          "p50": 4756.56,
+          "p95": 5003.18,
+          "minimum": 3161.85,
+          "maximum": 5003.18
+        },
+        "accuracy_mean": 0.8046,
+        "wall_clock_s": 16.16,
+        "throughput_rps": 0.743
+      },
+      {
+        "model": "llama3:8b",
+        "task": "tripspec_modify",
+        "num_ctx": 8192,
+        "concurrency": 1,
+        "schema_constrained": false,
+        "n_runs": 12,
+        "n_valid": 5,
+        "validity_rate": 0.4167,
+        "truncation_rate": 0.0,
+        "all_truncated": false,
+        "outcomes": {
+          "valid": 5,
+          "schema_invalid": 7
+        },
+        "latency_ms": {
+          "n": 5,
+          "mean": 1490.18,
+          "p50": 1473.98,
+          "p95": 1579.87,
+          "minimum": 1441.59,
+          "maximum": 1579.87
+        },
+        "ttft_ms": {
+          "n": 5,
+          "mean": 119.28,
+          "p50": 111.41,
+          "p95": 164.67,
+          "minimum": 100.0,
+          "maximum": 164.67
+        },
+        "gen_tps": {
+          "n": 5,
+          "mean": 120.05,
+          "p50": 120.05,
+          "p95": 120.1,
+          "minimum": 119.99,
+          "maximum": 120.1
+        },
+        "prompt_tps": {
+          "n": 5,
+          "mean": 8826.63,
+          "p50": 9457.53,
+          "p95": 10313.61,
+          "minimum": 4991.47,
+          "maximum": 10313.61
+        },
+        "accuracy_mean": 1.0,
+        "wall_clock_s": 20.13,
+        "throughput_rps": 0.248
+      },
+      {
+        "model": "llama3:8b",
+        "task": "tool_select",
+        "num_ctx": 8192,
+        "concurrency": 1,
+        "schema_constrained": true,
+        "n_runs": 12,
+        "n_valid": 12,
+        "validity_rate": 1.0,
+        "truncation_rate": 0.0,
+        "all_truncated": false,
+        "outcomes": {
+          "valid": 12
+        },
+        "latency_ms": {
+          "n": 12,
+          "mean": 563.33,
+          "p50": 611.21,
+          "p95": 738.29,
+          "minimum": 292.37,
+          "maximum": 738.29
+        },
+        "ttft_ms": {
+          "n": 12,
+          "mean": 61.81,
+          "p50": 48.24,
+          "p95": 211.1,
+          "minimum": 30.63,
+          "maximum": 211.1
+        },
+        "gen_tps": {
+          "n": 12,
+          "mean": 120.45,
+          "p50": 120.18,
+          "p95": 121.67,
+          "minimum": 119.68,
+          "maximum": 121.67
+        },
+        "prompt_tps": {
+          "n": 12,
+          "mean": 24405.09,
+          "p50": 25231.78,
+          "p95": 30875.39,
+          "minimum": 4131.23,
+          "maximum": 30875.39
+        },
+        "accuracy_mean": 1.0,
+        "wall_clock_s": 6.76,
+        "throughput_rps": 1.774
+      },
+      {
+        "model": "llama3:8b",
+        "task": "explain_itinerary",
+        "num_ctx": 8192,
+        "concurrency": 1,
+        "schema_constrained": false,
+        "n_runs": 8,
+        "n_valid": 7,
+        "validity_rate": 0.875,
+        "truncation_rate": 0.0,
+        "all_truncated": false,
+        "outcomes": {
+          "valid": 7,
+          "task_check_failed": 1
+        },
+        "latency_ms": {
+          "n": 7,
+          "mean": 646.93,
+          "p50": 574.25,
+          "p95": 1241.33,
+          "minimum": 327.17,
+          "maximum": 1241.33
+        },
+        "ttft_ms": {
+          "n": 7,
+          "mean": 104.51,
+          "p50": 100.56,
+          "p95": 142.56,
+          "minimum": 92.09,
+          "maximum": 142.56
+        },
+        "gen_tps": {
+          "n": 7,
+          "mean": 121.43,
+          "p50": 121.05,
+          "p95": 123.39,
+          "minimum": 120.58,
+          "maximum": 123.39
+        },
+        "prompt_tps": {
+          "n": 7,
+          "mean": 5122.74,
+          "p50": 5400.64,
+          "p95": 5634.03,
+          "minimum": 3644.31,
+          "maximum": 5634.03
+        },
+        "accuracy_mean": 0.7262,
+        "wall_clock_s": 4.7,
+        "throughput_rps": 1.49
+      },
+      {
+        "model": "llama3:8b",
+        "task": "rag_answer",
+        "num_ctx": 8192,
+        "concurrency": 1,
+        "schema_constrained": false,
+        "n_runs": 8,
+        "n_valid": 8,
+        "validity_rate": 1.0,
+        "truncation_rate": 0.0,
+        "all_truncated": false,
+        "outcomes": {
+          "valid": 8
+        },
+        "latency_ms": {
+          "n": 8,
+          "mean": 239.37,
+          "p50": 234.83,
+          "p95": 321.23,
+          "minimum": 193.79,
+          "maximum": 321.23
+        },
+        "ttft_ms": {
+          "n": 8,
+          "mean": 53.87,
+          "p50": 51.15,
+          "p95": 77.87,
+          "minimum": 40.62,
+          "maximum": 77.87
+        },
+        "gen_tps": {
+          "n": 8,
+          "mean": 123.97,
+          "p50": 123.85,
+          "p95": 124.78,
+          "minimum": 123.18,
+          "maximum": 124.78
+        },
+        "prompt_tps": {
+          "n": 8,
+          "mean": 4928.9,
+          "p50": 5053.1,
+          "p95": 5565.39,
+          "minimum": 3651.72,
+          "maximum": 5565.39
+        },
+        "accuracy_mean": 0.875,
+        "wall_clock_s": 1.92,
+        "throughput_rps": 4.173
+      },
+      {
+        "model": "llama3:8b",
+        "task": "reroute_message",
+        "num_ctx": 8192,
+        "concurrency": 1,
+        "schema_constrained": false,
+        "n_runs": 8,
+        "n_valid": 8,
+        "validity_rate": 1.0,
+        "truncation_rate": 0.0,
+        "all_truncated": false,
+        "outcomes": {
+          "valid": 8
+        },
+        "latency_ms": {
+          "n": 8,
+          "mean": 498.62,
+          "p50": 450.86,
+          "p95": 677.08,
+          "minimum": 381.97,
+          "maximum": 677.08
+        },
+        "ttft_ms": {
+          "n": 8,
+          "mean": 67.28,
+          "p50": 65.1,
+          "p95": 82.37,
+          "minimum": 56.22,
+          "maximum": 82.37
+        },
+        "gen_tps": {
+          "n": 8,
+          "mean": 122.31,
+          "p50": 122.06,
+          "p95": 123.03,
+          "minimum": 121.93,
+          "maximum": 123.03
+        },
+        "prompt_tps": {
+          "n": 8,
+          "mean": 5495.4,
+          "p50": 5619.45,
+          "p95": 6046.77,
+          "minimum": 3286.68,
+          "maximum": 6046.77
+        },
+        "accuracy_mean": 1.0,
+        "wall_clock_s": 3.99,
+        "throughput_rps": 2.004
+      },
+      {
+        "model": "llama3:8b",
+        "task": "clarify_question",
+        "num_ctx": 8192,
+        "concurrency": 1,
+        "schema_constrained": true,
+        "n_runs": 8,
+        "n_valid": 8,
+        "validity_rate": 1.0,
+        "truncation_rate": 0.0,
+        "all_truncated": false,
+        "outcomes": {
+          "valid": 8
+        },
+        "latency_ms": {
+          "n": 8,
+          "mean": 360.31,
+          "p50": 343.56,
+          "p95": 422.12,
+          "minimum": 288.59,
+          "maximum": 422.12
+        },
+        "ttft_ms": {
+          "n": 8,
+          "mean": 41.82,
+          "p50": 39.13,
+          "p95": 53.38,
+          "minimum": 27.06,
+          "maximum": 53.38
+        },
+        "gen_tps": {
+          "n": 8,
+          "mean": 113.68,
+          "p50": 105.95,
+          "p95": 122.29,
+          "minimum": 104.1,
+          "maximum": 122.29
+        },
+        "prompt_tps": {
+          "n": 8,
+          "mean": 6086.89,
+          "p50": 6386.77,
+          "p95": 6768.79,
+          "minimum": 3402.9,
+          "maximum": 6768.79
+        },
+        "accuracy_mean": 0.9069,
+        "wall_clock_s": 2.88,
+        "throughput_rps": 2.773
+      }
+    ]
+  },
+  "embeddings": null,
+  "verdicts": [
+    {
+      "model": "qwen3:8b",
+      "eligible": false,
+      "failed_gates": [
+        "gpu_residency",
+        "embedding_headroom"
+      ],
+      "gates": [
+        {
+          "name": "gpu_residency",
+          "status": "unknown",
+          "measured": null,
+          "threshold": "fully resident",
+          "detail": "no probe at ctx=8192"
+        },
+        {
+          "name": "embedding_headroom",
+          "status": "unknown",
+          "measured": null,
+          "threshold": ">= 2560 MiB free",
+          "detail": "no probe at ctx=8192"
+        },
+        {
+          "name": "schema_validity",
+          "status": "pass",
+          "measured": "100.0% (50/50)",
+          "threshold": ">= 95%",
+          "detail": "outcomes={'valid': 50}"
+        },
+        {
+          "name": "no_class_fully_truncated",
+          "status": "pass",
+          "measured": "none",
+          "threshold": "no fully-truncated class",
+          "detail": ""
+        },
+        {
+          "name": "extraction_latency_p95",
+          "status": "pass",
+          "measured": "2713 ms",
+          "threshold": "<= 8000 ms",
+          "detail": "over 50 valid runs"
+        },
+        {
+          "name": "critical_field_accuracy",
+          "status": "pass",
+          "measured": "84.0%",
+          "threshold": ">= 80%",
+          "detail": "mean over 50 valid runs"
+        }
+      ]
+    },
+    {
+      "model": "qwen3.5:9b",
+      "eligible": false,
+      "failed_gates": [
+        "gpu_residency",
+        "embedding_headroom",
+        "critical_field_accuracy"
+      ],
+      "gates": [
+        {
+          "name": "gpu_residency",
+          "status": "unknown",
+          "measured": null,
+          "threshold": "fully resident",
+          "detail": "no probe at ctx=8192"
+        },
+        {
+          "name": "embedding_headroom",
+          "status": "unknown",
+          "measured": null,
+          "threshold": ">= 2560 MiB free",
+          "detail": "no probe at ctx=8192"
+        },
+        {
+          "name": "schema_validity",
+          "status": "pass",
+          "measured": "100.0% (50/50)",
+          "threshold": ">= 95%",
+          "detail": "outcomes={'valid': 50}"
+        },
+        {
+          "name": "no_class_fully_truncated",
+          "status": "pass",
+          "measured": "none",
+          "threshold": "no fully-truncated class",
+          "detail": ""
+        },
+        {
+          "name": "extraction_latency_p95",
+          "status": "pass",
+          "measured": "3668 ms",
+          "threshold": "<= 8000 ms",
+          "detail": "over 50 valid runs"
+        },
+        {
+          "name": "critical_field_accuracy",
+          "status": "fail",
+          "measured": "77.4%",
+          "threshold": ">= 80%",
+          "detail": "mean over 50 valid runs"
+        }
+      ]
+    },
+    {
+      "model": "gemma3:12b",
+      "eligible": false,
+      "failed_gates": [
+        "gpu_residency",
+        "embedding_headroom",
+        "critical_field_accuracy"
+      ],
+      "gates": [
+        {
+          "name": "gpu_residency",
+          "status": "unknown",
+          "measured": null,
+          "threshold": "fully resident",
+          "detail": "no probe at ctx=8192"
+        },
+        {
+          "name": "embedding_headroom",
+          "status": "unknown",
+          "measured": null,
+          "threshold": ">= 2560 MiB free",
+          "detail": "no probe at ctx=8192"
+        },
+        {
+          "name": "schema_validity",
+          "status": "pass",
+          "measured": "98.0% (49/50)",
+          "threshold": ">= 95%",
+          "detail": "outcomes={'valid': 49, 'schema_invalid': 1}"
+        },
+        {
+          "name": "no_class_fully_truncated",
+          "status": "pass",
+          "measured": "none",
+          "threshold": "no fully-truncated class",
+          "detail": ""
+        },
+        {
+          "name": "extraction_latency_p95",
+          "status": "pass",
+          "measured": "4380 ms",
+          "threshold": "<= 8000 ms",
+          "detail": "over 49 valid runs"
+        },
+        {
+          "name": "critical_field_accuracy",
+          "status": "fail",
+          "measured": "78.1%",
+          "threshold": ">= 80%",
+          "detail": "mean over 49 valid runs"
+        }
+      ]
+    },
+    {
+      "model": "qwen3:14b",
+      "eligible": false,
+      "failed_gates": [
+        "gpu_residency",
+        "embedding_headroom"
+      ],
+      "gates": [
+        {
+          "name": "gpu_residency",
+          "status": "unknown",
+          "measured": null,
+          "threshold": "fully resident",
+          "detail": "no probe at ctx=8192"
+        },
+        {
+          "name": "embedding_headroom",
+          "status": "unknown",
+          "measured": null,
+          "threshold": ">= 2560 MiB free",
+          "detail": "no probe at ctx=8192"
+        },
+        {
+          "name": "schema_validity",
+          "status": "pass",
+          "measured": "100.0% (50/50)",
+          "threshold": ">= 95%",
+          "detail": "outcomes={'valid': 50}"
+        },
+        {
+          "name": "no_class_fully_truncated",
+          "status": "pass",
+          "measured": "none",
+          "threshold": "no fully-truncated class",
+          "detail": ""
+        },
+        {
+          "name": "extraction_latency_p95",
+          "status": "pass",
+          "measured": "4131 ms",
+          "threshold": "<= 8000 ms",
+          "detail": "over 50 valid runs"
+        },
+        {
+          "name": "critical_field_accuracy",
+          "status": "pass",
+          "measured": "88.5%",
+          "threshold": ">= 80%",
+          "detail": "mean over 50 valid runs"
+        }
+      ]
+    },
+    {
+      "model": "mistral-small3.2:24b",
+      "eligible": false,
+      "failed_gates": [
+        "gpu_residency",
+        "embedding_headroom"
+      ],
+      "gates": [
+        {
+          "name": "gpu_residency",
+          "status": "unknown",
+          "measured": null,
+          "threshold": "fully resident",
+          "detail": "no probe at ctx=8192"
+        },
+        {
+          "name": "embedding_headroom",
+          "status": "unknown",
+          "measured": null,
+          "threshold": ">= 2560 MiB free",
+          "detail": "no probe at ctx=8192"
+        },
+        {
+          "name": "schema_validity",
+          "status": "pass",
+          "measured": "98.0% (49/50)",
+          "threshold": ">= 95%",
+          "detail": "outcomes={'valid': 49, 'schema_invalid': 1}"
+        },
+        {
+          "name": "no_class_fully_truncated",
+          "status": "pass",
+          "measured": "none",
+          "threshold": "no fully-truncated class",
+          "detail": ""
+        },
+        {
+          "name": "extraction_latency_p95",
+          "status": "pass",
+          "measured": "7007 ms",
+          "threshold": "<= 8000 ms",
+          "detail": "over 49 valid runs"
+        },
+        {
+          "name": "critical_field_accuracy",
+          "status": "pass",
+          "measured": "90.1%",
+          "threshold": ">= 80%",
+          "detail": "mean over 49 valid runs"
+        }
+      ]
+    },
+    {
+      "model": "llama3:8b",
+      "eligible": false,
+      "failed_gates": [
+        "gpu_residency",
+        "embedding_headroom"
+      ],
+      "gates": [
+        {
+          "name": "gpu_residency",
+          "status": "unknown",
+          "measured": null,
+          "threshold": "fully resident",
+          "detail": "no probe at ctx=8192"
+        },
+        {
+          "name": "embedding_headroom",
+          "status": "unknown",
+          "measured": null,
+          "threshold": ">= 2560 MiB free",
+          "detail": "no probe at ctx=8192"
+        },
+        {
+          "name": "schema_validity",
+          "status": "pass",
+          "measured": "100.0% (50/50)",
+          "threshold": ">= 95%",
+          "detail": "outcomes={'valid': 50}"
+        },
+        {
+          "name": "no_class_fully_truncated",
+          "status": "pass",
+          "measured": "none",
+          "threshold": "no fully-truncated class",
+          "detail": ""
+        },
+        {
+          "name": "extraction_latency_p95",
+          "status": "pass",
+          "measured": "1917 ms",
+          "threshold": "<= 8000 ms",
+          "detail": "over 50 valid runs"
+        },
+        {
+          "name": "critical_field_accuracy",
+          "status": "pass",
+          "measured": "83.1%",
+          "threshold": ">= 80%",
+          "detail": "mean over 50 valid runs"
+        }
+      ]
+    }
+  ],
+  "ranking": [
+    {
+      "model": "mistral-small3.2:24b",
+      "eligible": false,
+      "failed_gates": [
+        "gpu_residency",
+        "embedding_headroom"
+      ],
+      "critical_field_accuracy": 0.9013,
+      "schema_validity": 0.98,
+      "extract_p95_ms": 7006.86
+    },
+    {
+      "model": "qwen3:14b",
+      "eligible": false,
+      "failed_gates": [
+        "gpu_residency",
+        "embedding_headroom"
+      ],
+      "critical_field_accuracy": 0.8853,
+      "schema_validity": 1.0,
+      "extract_p95_ms": 4131.29
+    },
+    {
+      "model": "qwen3:8b",
+      "eligible": false,
+      "failed_gates": [
+        "gpu_residency",
+        "embedding_headroom"
+      ],
+      "critical_field_accuracy": 0.8402,
+      "schema_validity": 1.0,
+      "extract_p95_ms": 2712.99
+    },
+    {
+      "model": "llama3:8b",
+      "eligible": false,
+      "failed_gates": [
+        "gpu_residency",
+        "embedding_headroom"
+      ],
+      "critical_field_accuracy": 0.8312,
+      "schema_validity": 1.0,
+      "extract_p95_ms": 1916.96
+    },
+    {
+      "model": "gemma3:12b",
+      "eligible": false,
+      "failed_gates": [
+        "gpu_residency",
+        "embedding_headroom",
+        "critical_field_accuracy"
+      ],
+      "critical_field_accuracy": 0.7811,
+      "schema_validity": 0.98,
+      "extract_p95_ms": 4379.54
+    },
+    {
+      "model": "qwen3.5:9b",
+      "eligible": false,
+      "failed_gates": [
+        "gpu_residency",
+        "embedding_headroom",
+        "critical_field_accuracy"
+      ],
+      "critical_field_accuracy": 0.7742,
+      "schema_validity": 1.0,
+      "extract_p95_ms": 3668.25
+    }
+  ],
+  "elapsed_s": 2438.0
+}

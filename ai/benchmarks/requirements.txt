@@ -1,0 +1,12 @@
+# NQ-027 benchmark harness.
+#
+# Deliberately small. The harness talks to Ollama over plain HTTP and
+# validates against the backend's own Pydantic models, so it needs no
+# inference framework, no model runtime and no evaluation library.
+#
+# Install into the same environment as backend/requirements.txt - the
+# benchmark imports app.schemas.tripspec from there rather than copying it.
+
+requests>=2.32.0      # HTTP, including streamed generation for TTFT
+pydantic>=2.6.0       # same major version as the backend contract
+pytest>=8.0.0         # the validity ladder is regression-tested

@@ -1,0 +1,49 @@
+[
+  {"id": "exp-001",
+   "utterance": "Walk me through the plan.",
+   "facts": {"stops": [{"order": 1, "name": "Cubbon Park", "category": "park", "arrive": "10:00", "depart": "11:30", "cost_inr": 0}, {"order": 2, "name": "Bangalore Palace", "category": "historical", "arrive": "12:10", "depart": "13:40", "cost_inr": 460}, {"order": 3, "name": "Koshys", "category": "restaurant", "arrive": "14:05", "depart": "15:05", "cost_inr": 200}], "total_cost_inr": 660, "total_duration_minutes": 167, "total_duration_hours": 2.8, "total_distance_km": 8.4, "transport": "auto"},
+   "allowed_numbers": [],
+   "gold": {"must_mention": ["Cubbon Park", "Bangalore Palace", "Koshys", "660"]}},
+
+  {"id": "exp-002",
+   "utterance": "Why does the plan start with the park?",
+   "facts": {"stops": [{"order": 1, "name": "Lalbagh", "category": "park", "arrive": "06:30", "depart": "08:00", "cost_inr": 30}, {"order": 2, "name": "Vidyarthi Bhavan", "category": "restaurant", "arrive": "08:25", "depart": "09:15", "cost_inr": 180}], "reason_first_stop": "Lalbagh opens at 06:00 and is coolest before 08:00", "total_cost_inr": 210, "total_duration_minutes": 165, "total_duration_hours": 2.75, "transport": "walking"},
+   "allowed_numbers": [],
+   "gold": {"must_mention": ["Lalbagh", "Vidyarthi Bhavan"]}},
+
+  {"id": "exp-003",
+   "utterance": "Is this plan going to fit our budget?",
+   "facts": {"budget_inr": 1500, "total_cost_inr": 1180, "remaining_inr": 320, "party_size": 2, "stops": [{"order": 1, "name": "Toit", "category": "bar", "cost_inr": 900}, {"order": 2, "name": "Corner House", "category": "dessert", "cost_inr": 280}], "transport_cost_inr": 0},
+   "allowed_numbers": [],
+   "gold": {"must_mention": ["1500", "1180", "320"]}},
+
+  {"id": "exp-004",
+   "utterance": "Summarise the day for my friend who is joining us.",
+   "facts": {"date": "2026-10-03", "start_time": "10:00", "end_time": "18:00", "stops": [{"order": 1, "name": "Bangalore Fort", "category": "historical", "cost_inr": 25}, {"order": 2, "name": "KR Market", "category": "market", "cost_inr": 0}, {"order": 3, "name": "MTR", "category": "restaurant", "cost_inr": 350}], "total_cost_inr": 375, "total_distance_km": 5.2, "total_duration_minutes": 480, "total_duration_hours": 8, "transport": "auto", "party_size": 3},
+   "allowed_numbers": [2026],
+   "gold": {"must_mention": ["Bangalore Fort", "KR Market", "MTR"]}},
+
+  {"id": "exp-005",
+   "utterance": "How much walking is in this plan?",
+   "facts": {"walking_distance_km": 2.3, "max_walking_km": 3.0, "stops": [{"order": 1, "name": "Church Street", "category": "shopping"}, {"order": 2, "name": "Blossom Book House", "category": "bookstore"}, {"order": 3, "name": "Third Wave Coffee", "category": "cafe"}], "total_duration_minutes": 240, "total_duration_hours": 4},
+   "allowed_numbers": [],
+   "gold": {"must_mention": ["2.3", "Blossom Book House"]}},
+
+  {"id": "exp-006",
+   "utterance": "Explain the order of the stops.",
+   "facts": {"stops": [{"order": 1, "name": "Nandi Hills", "category": "viewpoint", "arrive": "15:30", "depart": "18:30", "cost_inr": 250}, {"order": 2, "name": "Sunset Point", "category": "sunset", "arrive": "18:35", "depart": "19:10", "cost_inr": 0}], "reason_order": "the sunset stop must come last because sunset is at 18:12", "total_cost_inr": 250, "total_duration_minutes": 220, "total_duration_hours": 3.7, "transport": "own_car"},
+   "allowed_numbers": [18, 12],
+   "gold": {"must_mention": ["Nandi Hills", "Sunset Point"]}},
+
+  {"id": "exp-007",
+   "utterance": "Tell me about the food stops.",
+   "facts": {"stops": [{"order": 1, "name": "CTR", "category": "restaurant", "arrive": "08:30", "cost_inr": 150, "vegetarian": true}, {"order": 2, "name": "Malleshwaram Market", "category": "market", "arrive": "10:00", "cost_inr": 0}, {"order": 3, "name": "Asha Sweet Centre", "category": "dessert", "arrive": "11:30", "cost_inr": 220}], "total_cost_inr": 370, "vegetarian_only": true, "total_duration_minutes": 300, "total_duration_hours": 5},
+   "allowed_numbers": [],
+   "gold": {"must_mention": ["CTR", "Asha Sweet Centre", "370"]}},
+
+  {"id": "exp-008",
+   "utterance": "What does the plan cost per person?",
+   "facts": {"total_cost_inr": 2400, "party_size": 4, "cost_per_person_inr": 600, "stops": [{"order": 1, "name": "Wonderla", "category": "entertainment", "cost_inr": 2000}, {"order": 2, "name": "Empire", "category": "restaurant", "cost_inr": 400}], "total_duration_minutes": 420, "total_duration_hours": 7},
+   "allowed_numbers": [],
+   "gold": {"must_mention": ["600", "2400"]}}
+]

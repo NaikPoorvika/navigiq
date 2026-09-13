@@ -38,7 +38,33 @@ Legend:
 - [ ] NQ-026 — Plan form + Leaflet map + timeline + cost breakdown
 
 ## Phase 2 — LLM + RAG
-(Tasks TBD upon entering phase)
+- [~] NQ-027 — Model install + benchmark on the A5000 + selection decision
+  - [x] Candidate models present locally: qwen3:8b, qwen3.5:9b, gemma3:12b,
+        qwen3:14b, mistral-small3.2:24b, llama3:8b, bge-m3, nomic-embed-text
+  - [x] Benchmark harness built and unit-tested (`ai/benchmarks/`, 137 tests
+        green, no GPU required to run them)
+  - [x] Residency probe, performance sweep (task x context x concurrency) and
+        the full 50-case TripSpec quality evaluation executed on the A5000
+  - [x] Embedding sweep executed (bge-m3 vs nomic-embed-text), dimension
+        measured from real vectors, not read from documentation
+  - [x] ADR-012 drafted with measured numbers at
+        `docs/adr/ADR-012-model-selection.md`
+  - [ ] **ADR-012 Accepted** by a human reading the draft — this is the
+        task's real deliverable, and is not this agent's call to make
+  - [ ] `vector(N)` dimension fixed in a migration once ADR-012 is Accepted
+        (blocks NQ-034)
+  - NOTE: the 2026-09-04 result files referenced in earlier planning notes
+    were superseded before this run started (truncated generations recorded
+    as successes) and were not read, reused, or cited for any number here.
+    This evidence is a from-scratch measurement against current `develop`.
+- [ ] NQ-028 — LLM Gateway + FakeLLM — blocked on ADR-012 Accepted
+- [ ] NQ-029 — TripSpec extraction + deterministic post-processing
+- [ ] NQ-030 — Eval datasets + scorer + baseline report (supersedes the
+      authored NQ-027 benchmark cases as the ongoing quality measure)
+- [ ] NQ-031 — Clarification flow
+- [ ] NQ-032 — Grounded explanation + numeric entailment
+- [ ] NQ-033 — NL input UI with editable chips
+- [ ] NQ-034 — travel-tips corpus + pgvector migration (dimension from ADR-012)
 
 ## Phase 3 — AGENTIC AI
 (Tasks TBD upon entering phase)

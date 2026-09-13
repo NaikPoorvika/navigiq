@@ -1,0 +1,41 @@
+[
+  {"id": "rrm-001",
+   "facts": {"reason": "road closure on Old Airport Road", "original_next_stop": "Bangalore Palace", "new_next_stop": "Bangalore Palace", "added_minutes": 14, "new_eta": "13:20", "new_distance_km": 7.1},
+   "allowed_numbers": [],
+   "gold": {"must_mention": ["Bangalore Palace", "13:20"]}},
+
+  {"id": "rrm-002",
+   "facts": {"reason": "heavy traffic near Silk Board", "original_next_stop": "Wonderla", "new_next_stop": "Wonderla", "added_minutes": 25, "new_eta": "15:45", "new_distance_km": 22.4},
+   "allowed_numbers": [],
+   "gold": {"must_mention": ["Wonderla", "15:45"]}},
+
+  {"id": "rrm-003",
+   "facts": {"reason": "the museum closed early today", "original_next_stop": "Government Museum", "new_next_stop": "Venkatappa Art Gallery", "added_minutes": 0, "new_eta": "14:10", "new_distance_km": 0.3},
+   "allowed_numbers": [],
+   "gold": {"must_mention": ["Venkatappa Art Gallery", "14:10"]}},
+
+  {"id": "rrm-004",
+   "facts": {"reason": "rain forecast at the viewpoint", "original_next_stop": "Nandi Hills viewpoint", "new_next_stop": "Bangalore Fort", "added_minutes": 18, "new_eta": "16:30", "new_distance_km": 11.6},
+   "allowed_numbers": [],
+   "gold": {"must_mention": ["Bangalore Fort", "16:30"]}},
+
+  {"id": "rrm-005",
+   "facts": {"reason": "the restaurant is full until 21:00", "original_next_stop": "MTR", "new_next_stop": "Vidyarthi Bhavan", "added_minutes": 9, "new_eta": "19:40", "new_distance_km": 2.2},
+   "allowed_numbers": [],
+   "gold": {"must_mention": ["Vidyarthi Bhavan", "19:40"]}},
+
+  {"id": "rrm-006",
+   "facts": {"reason": "metro station exit blocked", "original_next_stop": "Commercial Street", "new_next_stop": "Commercial Street", "added_minutes": 6, "new_eta": "11:15", "new_distance_km": 1.4},
+   "allowed_numbers": [],
+   "gold": {"must_mention": ["Commercial Street", "11:15"]}},
+
+  {"id": "rrm-007",
+   "facts": {"reason": "a protest march has closed Kasturba Road", "original_next_stop": "Cubbon Park", "new_next_stop": "Lalbagh", "added_minutes": 21, "new_eta": "10:50", "new_distance_km": 5.8},
+   "allowed_numbers": [],
+   "gold": {"must_mention": ["Lalbagh", "10:50"]}},
+
+  {"id": "rrm-008",
+   "facts": {"reason": "your previous stop ran over by half an hour", "original_next_stop": "Blossom Book House", "new_next_stop": "Blossom Book House", "added_minutes": 30, "new_eta": "17:25", "new_distance_km": 0.9},
+   "allowed_numbers": [],
+   "gold": {"must_mention": ["Blossom Book House", "17:25"]}}
+]

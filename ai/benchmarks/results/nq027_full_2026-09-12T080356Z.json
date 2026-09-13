@@ -1,0 +1,640 @@
+{
+  "run_id": "nq027_full_2026-09-12T080356Z",
+  "seed": 20270927,
+  "environment": {
+    "captured_at_utc": "2026-09-12T08:03:56+00:00",
+    "ollama_version": "0.33.3",
+    "ollama_host": "http://localhost:11434",
+    "ollama_env": {
+      "OLLAMA_MODELS": "E:\\Ollama\\Models"
+    },
+    "python_version": "3.13.2",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "processor": "Intel64 Family 6 Model 85 Stepping 7, GenuineIntel",
+    "cpu_count": 36,
+    "gpu": {
+      "name": "NVIDIA RTX A5000",
+      "memory_total_mib": 24564,
+      "memory_used_mib": 711,
+      "memory_free_mib": 23539,
+      "driver_version": "596.51",
+      "temperature_c": 80,
+      "utilization_pct": 16,
+      "error": null
+    },
+    "git_commit": "8c6e6be1929dae98c5b3b33816a2e1d2d0743dd6",
+    "git_dirty": true
+  },
+  "config": {
+    "models": [
+      "qwen3:8b",
+      "qwen3.5:9b",
+      "gemma3:12b",
+      "qwen3:14b",
+      "mistral-small3.2:24b",
+      "llama3:8b"
+    ],
+    "embed_models": [
+      "bge-m3",
+      "nomic-embed-text"
+    ],
+    "contexts": [
+      4096,
+      8192,
+      16384
+    ],
+    "concurrencies": [
+      1,
+      2,
+      4
+    ],
+    "tasks": [
+      "intent_classify",
+      "tripspec_extract",
+      "tripspec_modify",
+      "tool_select",
+      "explain_itinerary",
+      "rag_answer",
+      "reroute_message",
+      "clarify_question"
+    ],
+    "runs_per_cell": 6,
+    "quality_context": 8192,
+    "quality_concurrency": 1,
+    "sweep_cases_per_task": 3,
+    "stage": "embed"
+  },
+  "probes": {},
+  "sweep": {},
+  "quality": {},
+  "embeddings": {
+    "gpu_at_comparison": {
+      "name": "NVIDIA RTX A5000",
+      "memory_total_mib": 24564,
+      "memory_used_mib": 711,
+      "memory_free_mib": 23539,
+      "driver_version": "596.51",
+      "temperature_c": 74,
+      "utilization_pct": 7,
+      "error": null
+    },
+    "candidates": [
+      {
+        "model": "bge-m3",
+        "identity": {
+          "model": "bge-m3",
+          "digest": null,
+          "parameter_size": "566.70M",
+          "quantization_level": "F16",
+          "family": "bert",
+          "format": "gguf",
+          "max_context_length": 8192,
+          "embedding_length": 1024,
+          "capabilities": [
+            "embedding"
+          ],
+          "size_bytes": null,
+          "error": null
+        },
+        "ok": true,
+        "dimension": 1024,
+        "dimension_consistent": true,
+        "declared_embedding_length": 1024,
+        "vram_mib": 633.2,
+        "fully_resident": true,
+        "single_latency_ms": {
+          "n": 5,
+          "mean": 56.59,
+          "p50": 58.38,
+          "min": 44.45,
+          "max": 75.02
+        },
+        "batch_latency_ms": 568.97,
+        "batch_size": 48,
+        "texts_per_second": 84.36,
+        "normalised": true,
+        "similarity_checks": [
+          {
+            "anchor": "quiet cafe with good coffee in Indiranagar",
+            "cos_closer": 0.8937,
+            "cos_further": 0.3182,
+            "margin": 0.5755,
+            "ordered_correctly": true
+          },
+          {
+            "anchor": "temple architecture and history",
+            "cos_closer": 0.6493,
+            "cos_further": 0.3726,
+            "margin": 0.2768,
+            "ordered_correctly": true
+          },
+          {
+            "anchor": "how long does it take to reach the airport",
+            "cos_closer": 0.6875,
+            "cos_further": 0.3271,
+            "margin": 0.3604,
+            "ordered_correctly": true
+          }
+        ],
+        "similarity_score": "3/3",
+        "error": null
+      },
+      {
+        "model": "nomic-embed-text",
+        "identity": {
+          "model": "nomic-embed-text",
+          "digest": null,
+          "parameter_size": "137M",
+          "quantization_level": "F16",
+          "family": "nomic-bert",
+          "format": "gguf",
+          "max_context_length": 2048,
+          "embedding_length": 768,
+          "capabilities": [
+            "embedding"
+          ],
+          "size_bytes": null,
+          "error": null
+        },
+        "ok": true,
+        "dimension": 768,
+        "dimension_consistent": true,
+        "declared_embedding_length": 768,
+        "vram_mib": 308.2,
+        "fully_resident": true,
+        "single_latency_ms": {
+          "n": 5,
+          "mean": 20.26,
+          "p50": 15.38,
+          "min": 13.65,
+          "max": 30.41
+        },
+        "batch_latency_ms": 280.16,
+        "batch_size": 48,
+        "texts_per_second": 171.33,
+        "normalised": true,
+        "similarity_checks": [
+          {
+            "anchor": "quiet cafe with good coffee in Indiranagar",
+            "cos_closer": 0.8623,
+            "cos_further": 0.3924,
+            "margin": 0.47,
+            "ordered_correctly": true
+          },
+          {
+            "anchor": "temple architecture and history",
+            "cos_closer": 0.6784,
+            "cos_further": 0.4089,
+            "margin": 0.2694,
+            "ordered_correctly": true
+          },
+          {
+            "anchor": "how long does it take to reach the airport",
+            "cos_closer": 0.6528,
+            "cos_further": 0.3116,
+            "margin": 0.3412,
+            "ordered_correctly": true
+          }
+        ],
+        "similarity_score": "3/3",
+        "error": null
+      }
+    ],
+    "dimensions_measured": {
+      "bge-m3": 1024,
+      "nomic-embed-text": 768
+    },
+    "note": "dimension is the length of a vector this machine returned, not a figure taken from documentation. It fixes vector(N) in NQ-034 and cannot be changed later without re-embedding the corpus."
+  },
+  "verdicts": [
+    {
+      "model": "qwen3:8b",
+      "eligible": false,
+      "failed_gates": [
+        "gpu_residency",
+        "embedding_headroom",
+        "schema_validity",
+        "no_class_fully_truncated",
+        "extraction_latency_p95",
+        "critical_field_accuracy"
+      ],
+      "gates": [
+        {
+          "name": "gpu_residency",
+          "status": "unknown",
+          "measured": null,
+          "threshold": "fully resident",
+          "detail": "no probe at ctx=8192"
+        },
+        {
+          "name": "embedding_headroom",
+          "status": "unknown",
+          "measured": null,
+          "threshold": ">= 2560 MiB free",
+          "detail": "no probe at ctx=8192"
+        },
+        {
+          "name": "schema_validity",
+          "status": "unknown",
+          "measured": null,
+          "threshold": ">= 95%",
+          "detail": "no constrained tripspec_extract quality cell"
+        },
+        {
+          "name": "no_class_fully_truncated",
+          "status": "unknown",
+          "measured": null,
+          "threshold": "no fully-truncated class",
+          "detail": "no cells measured"
+        },
+        {
+          "name": "extraction_latency_p95",
+          "status": "unknown",
+          "measured": null,
+          "threshold": "<= 8000 ms",
+          "detail": "no valid runs at ctx=8192 conc=1"
+        },
+        {
+          "name": "critical_field_accuracy",
+          "status": "unknown",
+          "measured": null,
+          "threshold": ">= 80%",
+          "detail": "no scored valid runs"
+        }
+      ]
+    },
+    {
+      "model": "qwen3.5:9b",
+      "eligible": false,
+      "failed_gates": [
+        "gpu_residency",
+        "embedding_headroom",
+        "schema_validity",
+        "no_class_fully_truncated",
+        "extraction_latency_p95",
+        "critical_field_accuracy"
+      ],
+      "gates": [
+        {
+          "name": "gpu_residency",
+          "status": "unknown",
+          "measured": null,
+          "threshold": "fully resident",
+          "detail": "no probe at ctx=8192"
+        },
+        {
+          "name": "embedding_headroom",
+          "status": "unknown",
+          "measured": null,
+          "threshold": ">= 2560 MiB free",
+          "detail": "no probe at ctx=8192"
+        },
+        {
+          "name": "schema_validity",
+          "status": "unknown",
+          "measured": null,
+          "threshold": ">= 95%",
+          "detail": "no constrained tripspec_extract quality cell"
+        },
+        {
+          "name": "no_class_fully_truncated",
+          "status": "unknown",
+          "measured": null,
+          "threshold": "no fully-truncated class",
+          "detail": "no cells measured"
+        },
+        {
+          "name": "extraction_latency_p95",
+          "status": "unknown",
+          "measured": null,
+          "threshold": "<= 8000 ms",
+          "detail": "no valid runs at ctx=8192 conc=1"
+        },
+        {
+          "name": "critical_field_accuracy",
+          "status": "unknown",
+          "measured": null,
+          "threshold": ">= 80%",
+          "detail": "no scored valid runs"
+        }
+      ]
+    },
+    {
+      "model": "gemma3:12b",
+      "eligible": false,
+      "failed_gates": [
+        "gpu_residency",
+        "embedding_headroom",
+        "schema_validity",
+        "no_class_fully_truncated",
+        "extraction_latency_p95",
+        "critical_field_accuracy"
+      ],
+      "gates": [
+        {
+          "name": "gpu_residency",
+          "status": "unknown",
+          "measured": null,
+          "threshold": "fully resident",
+          "detail": "no probe at ctx=8192"
+        },
+        {
+          "name": "embedding_headroom",
+          "status": "unknown",
+          "measured": null,
+          "threshold": ">= 2560 MiB free",
+          "detail": "no probe at ctx=8192"
+        },
+        {
+          "name": "schema_validity",
+          "status": "unknown",
+          "measured": null,
+          "threshold": ">= 95%",
+          "detail": "no constrained tripspec_extract quality cell"
+        },
+        {
+          "name": "no_class_fully_truncated",
+          "status": "unknown",
+          "measured": null,
+          "threshold": "no fully-truncated class",
+          "detail": "no cells measured"
+        },
+        {
+          "name": "extraction_latency_p95",
+          "status": "unknown",
+          "measured": null,
+          "threshold": "<= 8000 ms",
+          "detail": "no valid runs at ctx=8192 conc=1"
+        },
+        {
+          "name": "critical_field_accuracy",
+          "status": "unknown",
+          "measured": null,
+          "threshold": ">= 80%",
+          "detail": "no scored valid runs"
+        }
+      ]
+    },
+    {
+      "model": "qwen3:14b",
+      "eligible": false,
+      "failed_gates": [
+        "gpu_residency",
+        "embedding_headroom",
+        "schema_validity",
+        "no_class_fully_truncated",
+        "extraction_latency_p95",
+        "critical_field_accuracy"
+      ],
+      "gates": [
+        {
+          "name": "gpu_residency",
+          "status": "unknown",
+          "measured": null,
+          "threshold": "fully resident",
+          "detail": "no probe at ctx=8192"
+        },
+        {
+          "name": "embedding_headroom",
+          "status": "unknown",
+          "measured": null,
+          "threshold": ">= 2560 MiB free",
+          "detail": "no probe at ctx=8192"
+        },
+        {
+          "name": "schema_validity",
+          "status": "unknown",
+          "measured": null,
+          "threshold": ">= 95%",
+          "detail": "no constrained tripspec_extract quality cell"
+        },
+        {
+          "name": "no_class_fully_truncated",
+          "status": "unknown",
+          "measured": null,
+          "threshold": "no fully-truncated class",
+          "detail": "no cells measured"
+        },
+        {
+          "name": "extraction_latency_p95",
+          "status": "unknown",
+          "measured": null,
+          "threshold": "<= 8000 ms",
+          "detail": "no valid runs at ctx=8192 conc=1"
+        },
+        {
+          "name": "critical_field_accuracy",
+          "status": "unknown",
+          "measured": null,
+          "threshold": ">= 80%",
+          "detail": "no scored valid runs"
+        }
+      ]
+    },
+    {
+      "model": "mistral-small3.2:24b",
+      "eligible": false,
+      "failed_gates": [
+        "gpu_residency",
+        "embedding_headroom",
+        "schema_validity",
+        "no_class_fully_truncated",
+        "extraction_latency_p95",
+        "critical_field_accuracy"
+      ],
+      "gates": [
+        {
+          "name": "gpu_residency",
+          "status": "unknown",
+          "measured": null,
+          "threshold": "fully resident",
+          "detail": "no probe at ctx=8192"
+        },
+        {
+          "name": "embedding_headroom",
+          "status": "unknown",
+          "measured": null,
+          "threshold": ">= 2560 MiB free",
+          "detail": "no probe at ctx=8192"
+        },
+        {
+          "name": "schema_validity",
+          "status": "unknown",
+          "measured": null,
+          "threshold": ">= 95%",
+          "detail": "no constrained tripspec_extract quality cell"
+        },
+        {
+          "name": "no_class_fully_truncated",
+          "status": "unknown",
+          "measured": null,
+          "threshold": "no fully-truncated class",
+          "detail": "no cells measured"
+        },
+        {
+          "name": "extraction_latency_p95",
+          "status": "unknown",
+          "measured": null,
+          "threshold": "<= 8000 ms",
+          "detail": "no valid runs at ctx=8192 conc=1"
+        },
+        {
+          "name": "critical_field_accuracy",
+          "status": "unknown",
+          "measured": null,
+          "threshold": ">= 80%",
+          "detail": "no scored valid runs"
+        }
+      ]
+    },
+    {
+      "model": "llama3:8b",
+      "eligible": false,
+      "failed_gates": [
+        "gpu_residency",
+        "embedding_headroom",
+        "schema_validity",
+        "no_class_fully_truncated",
+        "extraction_latency_p95",
+        "critical_field_accuracy"
+      ],
+      "gates": [
+        {
+          "name": "gpu_residency",
+          "status": "unknown",
+          "measured": null,
+          "threshold": "fully resident",
+          "detail": "no probe at ctx=8192"
+        },
+        {
+          "name": "embedding_headroom",
+          "status": "unknown",
+          "measured": null,
+          "threshold": ">= 2560 MiB free",
+          "detail": "no probe at ctx=8192"
+        },
+        {
+          "name": "schema_validity",
+          "status": "unknown",
+          "measured": null,
+          "threshold": ">= 95%",
+          "detail": "no constrained tripspec_extract quality cell"
+        },
+        {
+          "name": "no_class_fully_truncated",
+          "status": "unknown",
+          "measured": null,
+          "threshold": "no fully-truncated class",
+          "detail": "no cells measured"
+        },
+        {
+          "name": "extraction_latency_p95",
+          "status": "unknown",
+          "measured": null,
+          "threshold": "<= 8000 ms",
+          "detail": "no valid runs at ctx=8192 conc=1"
+        },
+        {
+          "name": "critical_field_accuracy",
+          "status": "unknown",
+          "measured": null,
+          "threshold": ">= 80%",
+          "detail": "no scored valid runs"
+        }
+      ]
+    }
+  ],
+  "ranking": [
+    {
+      "model": "qwen3:8b",
+      "eligible": false,
+      "failed_gates": [
+        "gpu_residency",
+        "embedding_headroom",
+        "schema_validity",
+        "no_class_fully_truncated",
+        "extraction_latency_p95",
+        "critical_field_accuracy"
+      ],
+      "critical_field_accuracy": null,
+      "schema_validity": null,
+      "extract_p95_ms": null
+    },
+    {
+      "model": "qwen3.5:9b",
+      "eligible": false,
+      "failed_gates": [
+        "gpu_residency",
+        "embedding_headroom",
+        "schema_validity",
+        "no_class_fully_truncated",
+        "extraction_latency_p95",
+        "critical_field_accuracy"
+      ],
+      "critical_field_accuracy": null,
+      "schema_validity": null,
+      "extract_p95_ms": null
+    },
+    {
+      "model": "gemma3:12b",
+      "eligible": false,
+      "failed_gates": [
+        "gpu_residency",
+        "embedding_headroom",
+        "schema_validity",
+        "no_class_fully_truncated",
+        "extraction_latency_p95",
+        "critical_field_accuracy"
+      ],
+      "critical_field_accuracy": null,
+      "schema_validity": null,
+      "extract_p95_ms": null
+    },
+    {
+      "model": "qwen3:14b",
+      "eligible": false,
+      "failed_gates": [
+        "gpu_residency",
+        "embedding_headroom",
+        "schema_validity",
+        "no_class_fully_truncated",
+        "extraction_latency_p95",
+        "critical_field_accuracy"
+      ],
+      "critical_field_accuracy": null,
+      "schema_validity": null,
+      "extract_p95_ms": null
+    },
+    {
+      "model": "mistral-small3.2:24b",
+      "eligible": false,
+      "failed_gates": [
+        "gpu_residency",
+        "embedding_headroom",
+        "schema_validity",
+        "no_class_fully_truncated",
+        "extraction_latency_p95",
+        "critical_field_accuracy"
+      ],
+      "critical_field_accuracy": null,
+      "schema_validity": null,
+      "extract_p95_ms": null
+    },
+    {
+      "model": "llama3:8b",
+      "eligible": false,
+      "failed_gates": [
+        "gpu_residency",
+        "embedding_headroom",
+        "schema_validity",
+        "no_class_fully_truncated",
+        "extraction_latency_p95",
+        "critical_field_accuracy"
+      ],
+      "critical_field_accuracy": null,
+      "schema_validity": null,
+      "extract_p95_ms": null
+    }
+  ],
+  "elapsed_s": 7.8
+}
