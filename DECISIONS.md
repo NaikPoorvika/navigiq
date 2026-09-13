@@ -103,6 +103,43 @@ candidate set. The optimizer chooses from the 20 best-ranked POIs rather than
 50. If the cap is ever raised, the time limit must rise with it and
 determinism must be re-verified.
 
+## ADR-012: Local model selection
+**Status:** Accepted
+**Date:** 2026-09-13
+
+**Context:** NQ-027 benchmarked eight locally-available models (six
+generation, two embedding) against a from-scratch harness after the
+2026-09-04 results were found superseded (truncated generations recorded as
+successes). Full evidence, methodology and gate thresholds:
+`docs/adr/ADR-012-model-selection.md`, `ai/benchmarks/results/nq027_final.json`.
+
+**Decision:** Generation model **`qwen3:14b`** (Q4_K_M). Embedding model
+**`nomic-embed-text`**, dimension **768** - this fixes `vector(N)` for the
+NQ-034 migration.
+
+`qwen3:14b` was chosen over `mistral-small3.2:24b`, which scored 1.6 points
+higher on `tripspec_extract` alone (90.1% vs 88.5%), because NQ-028 routes
+all eight task classes through one resident model, not just extraction:
+`qwen3:14b` wins five of eight task classes, posts the higher all-task
+average (91.7% vs 89.8%) and the higher near-term-weighted average (89.2% vs
+83.6%, weighted toward NQ-029/031/032/045 which ship before Phase 3/4's
+tool_select/rag_answer/reroute), uses 52% of the ASSUMPTION-002 latency
+budget against `mistral`'s 88% (3.9 s of margin vs 1.0 s, before NQ-032/034
+lengthen prompts with itinerary facts and retrieved passages), and leaves
+13.3 GiB of VRAM headroom against `mistral`'s 7.3 GiB. `nomic-embed-text` was
+chosen over `bge-m3` on resource cost alone (smaller, faster, equally
+correct on the sanity checks run) - the benchmark has no evidence
+distinguishing their retrieval *quality*, so this half of the decision rests
+on weaker evidence than the generation model choice and should be revisited
+if NQ-034's corpus benchmark says otherwise.
+
+**Consequences:** NQ-028's gateway resolves to `qwen3:14b` by default.
+NQ-034's migration is written against `vector(768)`. Neither is free to
+change without re-running the affected halves of this benchmark:
+re-embedding the corpus and rebuilding the HNSW index for a dimension
+change, or re-validating every LLM task class against the new model for a
+generation-model change.
+
 ## ASSUMPTION-002: Interactive latency budget for LLM stages
 
 **Status:** Assumed, not measured against users
