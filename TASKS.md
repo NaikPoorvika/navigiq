@@ -55,7 +55,22 @@ Legend:
     were superseded before this run started (truncated generations recorded
     as successes) and were not read, reused, or cited for any number here.
     This evidence is a from-scratch measurement against current `develop`.
-- [ ] NQ-028 — LLM Gateway + FakeLLM — unblocked, routes to `qwen3:14b`
+- [x] NQ-028 — LLM Gateway + FakeLLM
+  - [x] Typed internal gateway at `backend/app/llm/` — the single chokepoint
+        for model access; generation (`qwen3:14b`) and embedding
+        (`nomic-embed-text`, 768 dimensions validated on every vector)
+  - [x] `OllamaGateway` over existing httpx; `FakeLLM` deterministic test
+        double on the same `LLMGateway` interface
+  - [x] Typed failures (`LLMError` subclasses) for connection failure,
+        timeout, rejected request, malformed / empty / truncated response and
+        wrong embedding dimension — none returned as a success
+  - [x] Bounded retries for transient failures only; timeouts and
+        deterministic failures raised on first occurrence
+  - [x] `OLLAMA_*` settings in `backend/app/config.py` (ADR-012 values)
+  - [x] 110 unit tests with no GPU or live Ollama; 4 live integration tests
+        that skip cleanly when Ollama is unavailable
+  - Out of scope, left to their tasks: prompts (NQ-029/031/032), retrieval
+    (NQ-034+), tool registry (NQ-040/041)
 - [ ] NQ-029 — TripSpec extraction + deterministic post-processing
 - [ ] NQ-030 — Eval datasets + scorer + baseline report (supersedes the
       authored NQ-027 benchmark cases as the ongoing quality measure)
