@@ -1,15 +1,15 @@
 # NavigIQ POI data-quality report
 
-Generated 2026-09-21T08:59:58+00:00 from the loaded database by `python -m app.ingestion.run --report-only`. Regenerate after every ingestion.
+Generated 2026-09-21T13:31:57+00:00 from the loaded database by `python -m app.ingestion.run --report-only`. Regenerate after every ingestion.
 
 Scores are documentation/notability measures, never ratings (ADR-008).
 
 ## Totals
 
-- Active POIs: **12,255**
-- Recommendable (quality-gated discovery pool): **4,013**
+- Active POIs: **12,252**
+- Recommendable (quality-gated discovery pool): **4,011**
 - Curated by NavigIQ: **55**
-- Inactive (kept for history, never served): 0
+- Inactive (kept for history, never served): 3
 - Chain branches: 2,120
 - Duplicate candidates (same name within 150 m): 2
 - Missing coordinates: 0 · outside 90 km: 0
@@ -20,7 +20,7 @@ Scores are documentation/notability measures, never ratings (ADR-008).
 | Field | Coverage |
 |---|---|
 | description | 2.0% |
-| wikipedia description | 2.0% |
+| wikipedia description | 1.9% |
 | opening hours reliable | 8.2% |
 | opening hours any source tag | 8.6% |
 | cost non default | 8.6% |
@@ -38,21 +38,21 @@ Scores are documentation/notability measures, never ratings (ADR-008).
 | Region | POIs | Recommendable | With description |
 |---|---|---|---|
 | CITY | 1,219 | 414 | 15 |
-| CITY_CORE | 9,924 | 3,021 | 171 |
-| NEARBY_ESCAPE | 592 | 314 | 27 |
+| CITY_CORE | 9,922 | 3,020 | 170 |
+| NEARBY_ESCAPE | 591 | 313 | 27 |
 | OUTSKIRTS | 520 | 264 | 36 |
 
 ## By distance band (km from centre)
 
 | Band | POIs |
 |---|---|
-| 0-10 | 7,485 |
+| 0-10 | 7,483 |
 | 10-20 | 3,290 |
 | 20-30 | 368 |
 | 30-40 | 211 |
 | 40-50 | 151 |
 | 50-60 | 158 |
-| 60-70 | 224 |
+| 60-70 | 223 |
 | 70-80 | 189 |
 | 80-90 | 179 |
 
@@ -63,7 +63,7 @@ Scores are documentation/notability measures, never ratings (ADR-008).
 | restaurant | 3,544 |
 | street_food | 1,761 |
 | cafe | 1,276 |
-| temple | 1,228 |
+| temple | 1,226 |
 | dessert | 1,055 |
 | park | 637 |
 | nightlife | 450 |
@@ -75,7 +75,7 @@ Scores are documentation/notability measures, never ratings (ADR-008).
 | monument | 138 |
 | shopping | 123 |
 | religious_site | 118 |
-| hill | 84 |
+| hill | 83 |
 | forest | 69 |
 | reservoir | 66 |
 | market | 63 |
@@ -103,8 +103,8 @@ Scores are documentation/notability measures, never ratings (ADR-008).
 
 | District | POIs |
 |---|---|
-| Bengaluru Urban | 11,032 |
-| Tumakuru | 239 |
+| Bengaluru Urban | 11,030 |
+| Tumakuru | 238 |
 | Bengaluru North | 233 |
 | Krishnagiri | 217 |
 | Bengaluru South | 189 |
@@ -132,7 +132,7 @@ Scores are documentation/notability measures, never ratings (ADR-008).
 | Bellanduru | 232 |
 | Malleswaram | 228 |
 | EPIP Zone | 219 |
-| Basavanagudi | 211 |
+| Basavanagudi | 209 |
 | Vijaya Nagar | 197 |
 | Banashankari | 196 |
 | Sahakaranagara | 188 |
@@ -149,7 +149,7 @@ Scores are documentation/notability measures, never ratings (ADR-008).
 
 | Confidence | POIs |
 |---|---|
-| 0.30 | 11,247 |
+| 0.30 | 11,244 |
 | 0.60 | 9 |
 | 0.90 | 999 |
 
@@ -157,7 +157,7 @@ Scores are documentation/notability measures, never ratings (ADR-008).
 
 | Basis | POIs |
 |---|---|
-| category_default | 11,197 |
+| category_default | 11,194 |
 | free | 1,022 |
 | curated_estimate | 26 |
 | source_tag | 10 |
@@ -251,18 +251,21 @@ Scores are documentation/notability measures, never ratings (ADR-008).
       "unmatched_keys": [],
       "applied": 55
     },
+    "absorb_curated_duplicates": {
+      "absorbed": 3
+    },
     "score": {
-      "records": 12255,
-      "recommendable": 4013
+      "records": 12252,
+      "recommendable": 4011
     },
     "validate": {
-      "input": 12255,
-      "kept": 12255
+      "input": 12252,
+      "kept": 12252
     },
     "load": {
-      "unchanged": 12155,
-      "updated": 100,
-      "deactivated": 0
+      "unchanged": 12250,
+      "updated": 2,
+      "deactivated": 3
     },
     "load_places": {
       "unchanged": 6725

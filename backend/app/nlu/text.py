@@ -29,7 +29,12 @@ def normalize_utterance(text: str) -> str:
     return _WS.sub(" ", s).strip()
 
 
-def phrase_pattern(phrase: str) -> re.Pattern:
-    """Whole-word(s) match that also works for non-Latin scripts."""
+def phrase_pattern(phrase: str, *, plural: bool = False) -> re.Pattern:
+    """Whole-word(s) match that also works for non-Latin scripts. With
+    `plural`, a Latin-script phrase also matches its regular plural
+    ("bookshop" -> "bookshops", "church" -> "churches")."""
     escaped = r"\s+".join(re.escape(p) for p in phrase.split())
+    last = phrase.split()[-1] if phrase.split() else ""
+    if plural and re.fullmatch(r"[a-z]{3,}", last) and not last.endswith("s"):
+        escaped += "(?:es|s)?"
     return re.compile(rf"(?<![\w]){escaped}(?![\w])", re.UNICODE)

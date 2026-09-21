@@ -152,11 +152,15 @@ entries:
     experience_tags: [spiritual, historic, cultural, offbeat]
     editorial_score: 0.8
     visit_duration: [20, 40, 60]
-  - key: dodda-ganeshana-gudi
+  # Q1531614 is labelled "Dodda Ganeshana Gudi" on Wikidata but its English
+  # Wikipedia article, aliases and coordinates are the Bull Temple next door;
+  # everything NavigIQ shows for it (description, knowledge) is the Bull Temple.
+  - key: dodda-basavana-gudi
     match: {wikidata: Q1531614}
-    display_name: Dodda Ganeshana Gudi
+    display_name: Dodda Basavana Gudi (Bull Temple)
     category: temple
-    short_description: A popular temple in Basavanagudi known for its large Ganesha idol.
+    aliases: [Bull Temple, Nandi Temple, Dodda Basavana Gudi]
+    short_description: The Bull Temple on Bull Temple Road in Basavanagudi, dedicated to Nandi, the sacred bull.
     experience_tags: [spiritual, cultural, historic]
     editorial_score: 0.7
     visit_duration: [15, 30, 45]

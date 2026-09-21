@@ -1,0 +1,620 @@
+{"id": "i001", "split": "dev", "lang": "en", "text": "I'm bored", "intent": "MOOD_DISCOVERY"}
+{"id": "i002", "split": "dev", "lang": "en", "text": "surprise me", "intent": "SURPRISE_ME"}
+{"id": "i003", "split": "dev", "lang": "en", "text": "what should I do this evening?", "intent": "DISCOVER"}
+{"id": "i004", "split": "dev", "lang": "en", "text": "quiet cafes near Jayanagar", "intent": "PLACE_SEARCH"}
+{"id": "i005", "split": "dev", "lang": "en", "text": "is Lalbagh open today?", "intent": "PLACE_DETAILS"}
+{"id": "i006", "split": "dev", "lang": "en", "text": "why is Cubbon Park famous?", "intent": "LOCAL_KNOWLEDGE"}
+{"id": "i007", "split": "dev", "lang": "en", "text": "Lalbagh vs Cubbon Park for a morning walk", "intent": "COMPARE_PLACES"}
+{"id": "i008", "split": "dev", "lang": "en", "text": "plan my Saturday from 10 to 6", "intent": "CREATE_ITINERARY"}
+{"id": "i009", "split": "dev", "lang": "en", "text": "remove the second stop", "intent": "MODIFY_ITINERARY", "ctx": "plan"}
+{"id": "i010", "split": "dev", "lang": "en", "text": "what if my budget was 800?", "intent": "WHAT_IF_ITINERARY", "ctx": "plan"}
+{"id": "i011", "split": "dev", "lang": "en", "text": "why did you put the museum first?", "intent": "PLAN_EXPLANATION", "ctx": "plan"}
+{"id": "i012", "split": "dev", "lang": "en", "text": "show me something different", "intent": "SHOW_DIFFERENT", "ctx": "results"}
+{"id": "i013", "split": "dev", "lang": "en", "text": "more places like the first one", "intent": "SHOW_SIMILAR", "ctx": "results"}
+{"id": "i014", "split": "dev", "lang": "en", "text": "save this place", "intent": "SAVE_PLACE", "ctx": "results"}
+{"id": "i015", "split": "dev", "lang": "en", "text": "write me a poem about the ocean", "intent": "OUT_OF_SCOPE"}
+{"id": "i016", "split": "dev", "lang": "en", "text": "what's the weather like in Bengaluru tomorrow?", "intent": "GENERAL_BENGALURU"}
+{"id": "i017", "split": "dev", "lang": "en", "text": "10 AM to 6 PM", "intent": "CLARIFICATION_RESPONSE", "ctx": "pending"}
+{"id": "i018", "split": "dev", "lang": "en", "text": "hi", "intent": "MOOD_DISCOVERY"}
+{"id": "i019", "split": "dev", "lang": "en", "text": "cheap date ideas", "intent": "DISCOVER"}
+{"id": "i020", "split": "dev", "lang": "en", "text": "any hidden gems in the city?", "intent": "DISCOVER"}
+{"id": "i021", "split": "dev", "lang": "en", "text": "nature escapes within 90 km", "intent": "DISCOVER"}
+{"id": "i022", "split": "dev", "lang": "en", "text": "where can we take the kids this weekend", "intent": "DISCOVER"}
+{"id": "i023", "split": "dev", "lang": "en", "text": "pubs in Indiranagar", "intent": "PLACE_SEARCH"}
+{"id": "i024", "split": "dev", "lang": "en", "text": "good breakfast places around Basavanagudi", "intent": "PLACE_SEARCH"}
+{"id": "i025", "split": "dev", "lang": "en", "text": "what time does Bangalore Palace close?", "intent": "PLACE_DETAILS"}
+{"id": "i026", "split": "dev", "lang": "en", "text": "how much is the entry fee for the Bangalore Palace", "intent": "PLACE_DETAILS"}
+{"id": "i027", "split": "dev", "lang": "en", "text": "tell me more about the second one", "intent": "PLACE_DETAILS", "ctx": "results"}
+{"id": "i028", "split": "dev", "lang": "en", "text": "who built Tipu Sultan's Summer Palace?", "intent": "LOCAL_KNOWLEDGE"}
+{"id": "i029", "split": "dev", "lang": "en", "text": "history of Vidhana Soudha", "intent": "LOCAL_KNOWLEDGE"}
+{"id": "i030", "split": "dev", "lang": "en", "text": "when was the Bull Temple built", "intent": "LOCAL_KNOWLEDGE"}
+{"id": "i031", "split": "dev", "lang": "en", "text": "which is better for photography, Nandi Hills or Skandagiri?", "intent": "COMPARE_PLACES"}
+{"id": "i032", "split": "dev", "lang": "en", "text": "compare Commercial Street and Chickpet for shopping", "intent": "COMPARE_PLACES"}
+{"id": "i033", "split": "dev", "lang": "en", "text": "make me an itinerary for tomorrow with temples and street food", "intent": "CREATE_ITINERARY"}
+{"id": "i034", "split": "dev", "lang": "en", "text": "I have 4 hours and 1000 rupees, what can I do?", "intent": "CREATE_ITINERARY"}
+{"id": "i035", "split": "dev", "lang": "en", "text": "organise a relaxed day around Malleshwaram", "intent": "CREATE_ITINERARY"}
+{"id": "i036", "split": "dev", "lang": "en", "text": "make it cheaper", "intent": "MODIFY_ITINERARY", "ctx": "plan"}
+{"id": "i037", "split": "dev", "lang": "en", "text": "I'm tired, reduce the plan", "intent": "MODIFY_ITINERARY", "ctx": "plan"}
+{"id": "i038", "split": "dev", "lang": "en", "text": "replace the museum with a park", "intent": "MODIFY_ITINERARY", "ctx": "plan"}
+{"id": "i039", "split": "dev", "lang": "en", "text": "start an hour later", "intent": "MODIFY_ITINERARY", "ctx": "plan"}
+{"id": "i040", "split": "dev", "lang": "en", "text": "add somewhere for dinner", "intent": "MODIFY_ITINERARY", "ctx": "plan"}
+{"id": "i041", "split": "dev", "lang": "en", "text": "undo that", "intent": "MODIFY_ITINERARY", "ctx": "plan"}
+{"id": "i042", "split": "dev", "lang": "en", "text": "what if we skip the temple?", "intent": "WHAT_IF_ITINERARY", "ctx": "plan"}
+{"id": "i043", "split": "dev", "lang": "en", "text": "suppose it rains, what would change?", "intent": "WHAT_IF_ITINERARY", "ctx": "plan"}
+{"id": "i044", "split": "dev", "lang": "en", "text": "explain the plan", "intent": "PLAN_EXPLANATION", "ctx": "plan"}
+{"id": "i045", "split": "dev", "lang": "en", "text": "why these places?", "intent": "PLAN_EXPLANATION", "ctx": "plan"}
+{"id": "i046", "split": "dev", "lang": "en", "text": "none of these, something else", "intent": "SHOW_DIFFERENT", "ctx": "results"}
+{"id": "i047", "split": "dev", "lang": "en", "text": "other options please", "intent": "SHOW_DIFFERENT", "ctx": "results"}
+{"id": "i048", "split": "dev", "lang": "en", "text": "places with the same vibe", "intent": "SHOW_SIMILAR", "ctx": "results"}
+{"id": "i049", "split": "dev", "lang": "en", "text": "anything similar to Cubbon Park?", "intent": "SHOW_SIMILAR"}
+{"id": "i050", "split": "dev", "lang": "en", "text": "bookmark Lalbagh for me", "intent": "SAVE_PLACE"}
+{"id": "i051", "split": "dev", "lang": "en", "text": "add it to my favourites", "intent": "SAVE_PLACE", "ctx": "results"}
+{"id": "i052", "split": "dev", "lang": "en", "text": "pick something random for me", "intent": "SURPRISE_ME"}
+{"id": "i053", "split": "dev", "lang": "en", "text": "I'm feeling lucky", "intent": "SURPRISE_ME"}
+{"id": "i054", "split": "dev", "lang": "en", "text": "feeling a bit low today", "intent": "MOOD_DISCOVERY"}
+{"id": "i055", "split": "dev", "lang": "en", "text": "nothing to do on a Sunday", "intent": "MOOD_DISCOVERY"}
+{"id": "i056", "split": "dev", "lang": "en", "text": "hello!", "intent": "MOOD_DISCOVERY"}
+{"id": "i057", "split": "dev", "lang": "en", "text": "what language do people speak in Bangalore?", "intent": "GENERAL_BENGALURU"}
+{"id": "i058", "split": "dev", "lang": "en", "text": "why is bengaluru called the garden city", "intent": "GENERAL_BENGALURU", "also": ["LOCAL_KNOWLEDGE"]}
+{"id": "i059", "split": "dev", "lang": "en", "text": "will it rain this evening?", "intent": "GENERAL_BENGALURU"}
+{"id": "i060", "split": "dev", "lang": "en", "text": "what is the best time of year to visit Bangalore", "intent": "GENERAL_BENGALURU"}
+{"id": "i061", "split": "dev", "lang": "en", "text": "book me a flight to Delhi", "intent": "OUT_OF_SCOPE"}
+{"id": "i062", "split": "dev", "lang": "en", "text": "help me with my python homework", "intent": "OUT_OF_SCOPE"}
+{"id": "i063", "split": "dev", "lang": "en", "text": "what are the best places in Goa", "intent": "OUT_OF_SCOPE"}
+{"id": "i064", "split": "dev", "lang": "en", "text": "you decide", "intent": "CLARIFICATION_RESPONSE", "ctx": "pending"}
+{"id": "i065", "split": "dev", "lang": "en", "text": "around 1500 total", "intent": "CLARIFICATION_RESPONSE", "ctx": "pending"}
+{"id": "i066", "split": "dev", "lang": "en", "text": "evening", "intent": "CLARIFICATION_RESPONSE", "ctx": "pending"}
+{"id": "i067", "split": "dev", "lang": "en", "text": "something peaceful with nature", "intent": "DISCOVER"}
+{"id": "i068", "split": "dev", "lang": "en", "text": "best street food spots", "intent": "DISCOVER"}
+{"id": "i069", "split": "dev", "lang": "en", "text": "rainy day indoor activities", "intent": "DISCOVER"}
+{"id": "i070", "split": "dev", "lang": "en", "text": "a romantic dinner place", "intent": "DISCOVER"}
+{"id": "i071", "split": "dev", "lang": "en", "text": "things to do near Whitefield", "intent": "PLACE_SEARCH"}
+{"id": "i072", "split": "dev", "lang": "en", "text": "museums around MG Road", "intent": "PLACE_SEARCH"}
+{"id": "i073", "split": "dev", "lang": "en", "text": "veg restaurants in Malleswaram", "intent": "PLACE_SEARCH"}
+{"id": "i074", "split": "dev", "lang": "en", "text": "Nandi Hills", "intent": "PLACE_DETAILS"}
+{"id": "i075", "split": "dev", "lang": "en", "text": "is Nandi Hills worth visiting?", "intent": "PLACE_DETAILS"}
+{"id": "i076", "split": "dev", "lang": "en", "text": "is the aquarium good for kids?", "intent": "PLACE_DETAILS"}
+{"id": "i077", "split": "dev", "lang": "en", "text": "what's special about Chickpet", "intent": "LOCAL_KNOWLEDGE", "also": ["PLACE_DETAILS"]}
+{"id": "i078", "split": "dev", "lang": "en", "text": "plan a day trip to Nandi Hills", "intent": "CREATE_ITINERARY"}
+{"id": "i079", "split": "dev", "lang": "en", "text": "can you schedule an evening out for two of us in Koramangala", "intent": "CREATE_ITINERARY"}
+{"id": "i080", "split": "dev", "lang": "en", "text": "full day with the family, budget 3000", "intent": "CREATE_ITINERARY"}
+{"id": "i081", "split": "dev", "lang": "en", "text": "fewer stops please", "intent": "MODIFY_ITINERARY", "ctx": "plan"}
+{"id": "i082", "split": "dev", "lang": "en", "text": "swap the cafe for a bakery", "intent": "MODIFY_ITINERARY", "ctx": "plan"}
+{"id": "i083", "split": "dev", "lang": "en", "text": "finish by 5", "intent": "MODIFY_ITINERARY", "ctx": "plan"}
+{"id": "i084", "split": "dev", "lang": "en", "text": "make it more romantic", "intent": "MODIFY_ITINERARY", "ctx": "plan"}
+{"id": "i085", "split": "dev", "lang": "en", "text": "go back to the original plan", "intent": "MODIFY_ITINERARY", "ctx": "plan"}
+{"id": "i086", "split": "dev", "lang": "en", "text": "what if we start at 2 pm instead", "intent": "WHAT_IF_ITINERARY", "ctx": "plan"}
+{"id": "i087", "split": "dev", "lang": "en", "text": "hypothetically, with 3 people how would it look", "intent": "WHAT_IF_ITINERARY", "ctx": "plan"}
+{"id": "i088", "split": "dev", "lang": "en", "text": "how did you choose the order?", "intent": "PLAN_EXPLANATION", "ctx": "plan"}
+{"id": "i089", "split": "dev", "lang": "en", "text": "give me different ones", "intent": "SHOW_DIFFERENT", "ctx": "results"}
+{"id": "i090", "split": "dev", "lang": "en", "text": "not these, completely different", "intent": "SHOW_DIFFERENT", "ctx": "results"}
+{"id": "i091", "split": "dev", "lang": "en", "text": "something like that but quieter", "intent": "SHOW_SIMILAR", "ctx": "results"}
+{"id": "i092", "split": "dev", "lang": "en", "text": "remember this one", "intent": "SAVE_PLACE", "ctx": "results"}
+{"id": "i093", "split": "dev", "lang": "en", "text": "you pick", "intent": "SURPRISE_ME"}
+{"id": "i094", "split": "dev", "lang": "en", "text": "I feel restless", "intent": "MOOD_DISCOVERY"}
+{"id": "i095", "split": "dev", "lang": "en", "text": "what festivals does Bengaluru celebrate?", "intent": "GENERAL_BENGALURU"}
+{"id": "i096", "split": "dev", "lang": "en", "text": "what is bengaluru's food culture like", "intent": "GENERAL_BENGALURU"}
+{"id": "i097", "split": "dev", "lang": "en", "text": "what's the stock price of Infosys", "intent": "OUT_OF_SCOPE"}
+{"id": "i098", "split": "dev", "lang": "en", "text": "translate this to French", "intent": "OUT_OF_SCOPE"}
+{"id": "i099", "split": "dev", "lang": "en", "text": "yes", "intent": "CLARIFICATION_RESPONSE", "ctx": "pending"}
+{"id": "i100", "split": "dev", "lang": "en", "text": "the first one", "intent": "CLARIFICATION_RESPONSE", "ctx": "pending"}
+{"id": "i101", "split": "dev", "lang": "hinglish", "text": "bore ho raha hai yaar", "intent": "MOOD_DISCOVERY"}
+{"id": "i102", "split": "dev", "lang": "hinglish", "text": "kal shaam ko kuch chill karna hai", "intent": "DISCOVER"}
+{"id": "i103", "split": "dev", "lang": "hinglish", "text": "Jayanagar ke paas acche cafe batao", "intent": "PLACE_SEARCH"}
+{"id": "i104", "split": "dev", "lang": "hinglish", "text": "kal ka plan bana do, 10 se 6", "intent": "CREATE_ITINERARY"}
+{"id": "i105", "split": "dev", "lang": "hinglish", "text": "kuch aur dikhao", "intent": "SHOW_DIFFERENT", "ctx": "results"}
+{"id": "i106", "split": "dev", "lang": "hinglish", "text": "isko sasta kar do", "intent": "MODIFY_ITINERARY", "ctx": "plan"}
+{"id": "i107", "split": "dev", "lang": "hinglish", "text": "agar budget 500 ho toh?", "intent": "WHAT_IF_ITINERARY", "ctx": "plan"}
+{"id": "i108", "split": "dev", "lang": "hinglish", "text": "Lalbagh kab khulta hai?", "intent": "PLACE_DETAILS"}
+{"id": "i109", "split": "dev", "lang": "kn-roman", "text": "naale yelli hogbahudu?", "intent": "DISCOVER"}
+{"id": "i110", "split": "dev", "lang": "kn-roman", "text": "tumba bejaar aagide", "intent": "MOOD_DISCOVERY"}
+{"id": "i111", "split": "dev", "lang": "kn-roman", "text": "Malleshwaram hatthira oota maadakke olle jaaga", "intent": "PLACE_SEARCH"}
+{"id": "i112", "split": "dev", "lang": "kn-roman", "text": "bere enadru thorisi", "intent": "SHOW_DIFFERENT", "ctx": "results"}
+{"id": "i113", "split": "dev", "lang": "kn", "text": "ನನಗೆ ತುಂಬಾ ಬೇಜಾರು", "intent": "MOOD_DISCOVERY"}
+{"id": "i114", "split": "dev", "lang": "kn", "text": "ನಾಳೆ ಒಂದು ದಿನದ ಪ್ಲಾನ್ ಮಾಡಿ", "intent": "CREATE_ITINERARY"}
+{"id": "i115", "split": "dev", "lang": "en", "text": "places to visit outside the city this weekend", "intent": "DISCOVER"}
+{"id": "i116", "split": "dev", "lang": "en", "text": "somewhere to work from with good wifi near HSR Layout", "intent": "PLACE_SEARCH"}
+{"id": "i117", "split": "dev", "lang": "en", "text": "free things to do", "intent": "DISCOVER"}
+{"id": "i118", "split": "dev", "lang": "en", "text": "I want to see some art", "intent": "DISCOVER"}
+{"id": "i119", "split": "dev", "lang": "en", "text": "lakes for a sunrise walk", "intent": "DISCOVER"}
+{"id": "i120", "split": "dev", "lang": "en", "text": "where do locals hang out on weekends?", "intent": "DISCOVER"}
+{"id": "i121", "split": "dev", "lang": "en", "text": "is Cubbon Park safe at night?", "intent": "PLACE_DETAILS"}
+{"id": "i122", "split": "dev", "lang": "en", "text": "timings of ISKCON temple", "intent": "PLACE_DETAILS"}
+{"id": "i123", "split": "dev", "lang": "en", "text": "what is the story behind Karaga", "intent": "LOCAL_KNOWLEDGE", "also": ["GENERAL_BENGALURU"]}
+{"id": "i124", "split": "dev", "lang": "en", "text": "which one is closer to the centre, the first or the second?", "intent": "COMPARE_PLACES", "ctx": "results"}
+{"id": "i125", "split": "dev", "lang": "en", "text": "chalk out a plan for my parents visiting next Sunday", "intent": "CREATE_ITINERARY"}
+{"id": "i126", "split": "dev", "lang": "en", "text": "too many stops", "intent": "MODIFY_ITINERARY", "ctx": "plan"}
+{"id": "i127", "split": "dev", "lang": "en", "text": "no temples in the plan please", "intent": "MODIFY_ITINERARY", "ctx": "plan"}
+{"id": "i128", "split": "dev", "lang": "en", "text": "restore version 1", "intent": "MODIFY_ITINERARY", "ctx": "plan"}
+{"id": "i129", "split": "dev", "lang": "en", "text": "tell me about Bangalore's traffic", "intent": "GENERAL_BENGALURU"}
+{"id": "i130", "split": "dev", "lang": "en", "text": "recommend a good biryani place", "intent": "DISCOVER"}
+{"id": "i131", "split": "dev", "lang": "en", "text": "something adventurous for a group of friends", "intent": "DISCOVER"}
+{"id": "i132", "split": "dev", "lang": "en", "text": "Is Wonderla open on Mondays?", "intent": "PLACE_DETAILS"}
+{"id": "i133", "split": "dev", "lang": "en", "text": "who designed Vidhana Soudha", "intent": "LOCAL_KNOWLEDGE"}
+{"id": "i134", "split": "dev", "lang": "en", "text": "plan something for tonight", "intent": "CREATE_ITINERARY"}
+{"id": "i135", "split": "dev", "lang": "en", "text": "okay", "intent": "CLARIFICATION_RESPONSE", "ctx": "pending"}
+{"id": "i136", "split": "dev", "lang": "en", "text": "diagnose my headache", "intent": "OUT_OF_SCOPE"}
+{"id": "i137", "split": "dev", "lang": "en", "text": "can you recommend a lawyer", "intent": "OUT_OF_SCOPE"}
+{"id": "i138", "split": "dev", "lang": "en", "text": "hang out spots for college students", "intent": "DISCOVER"}
+{"id": "i139", "split": "dev", "lang": "en", "text": "breweries near Sarjapur Road", "intent": "PLACE_SEARCH"}
+{"id": "i140", "split": "dev", "lang": "en", "text": "what can I do with 500 rupees?", "intent": "DISCOVER"}
+{"id": "t001", "split": "dev", "lang": "en", "text": "ugh so bored right now", "intent": "MOOD_DISCOVERY"}
+{"id": "t002", "split": "dev", "lang": "en", "text": "surprise me with something outdoorsy", "intent": "SURPRISE_ME"}
+{"id": "t003", "split": "dev", "lang": "en", "text": "any ideas for a rainy afternoon?", "intent": "DISCOVER"}
+{"id": "t004", "split": "dev", "lang": "en", "text": "coffee places close to Koramangala", "intent": "PLACE_SEARCH"}
+{"id": "t005", "split": "dev", "lang": "en", "text": "does Bangalore Palace have an entry ticket?", "intent": "PLACE_DETAILS"}
+{"id": "t006", "split": "dev", "lang": "en", "text": "why was Lalbagh built?", "intent": "LOCAL_KNOWLEDGE"}
+{"id": "t007", "split": "dev", "lang": "en", "text": "Cubbon Park or Lalbagh, which is better with kids?", "intent": "COMPARE_PLACES"}
+{"id": "t008", "split": "dev", "lang": "en", "text": "put together a Sunday plan with a lake and brunch", "intent": "CREATE_ITINERARY"}
+{"id": "t009", "split": "dev", "lang": "en", "text": "drop the last stop", "intent": "MODIFY_ITINERARY", "ctx": "plan"}
+{"id": "t010", "split": "dev", "lang": "en", "text": "what if we only had 3 hours?", "intent": "WHAT_IF_ITINERARY", "ctx": "plan"}
+{"id": "t011", "split": "dev", "lang": "en", "text": "why did you pick that cafe?", "intent": "PLAN_EXPLANATION", "ctx": "plan"}
+{"id": "t012", "split": "dev", "lang": "en", "text": "show me other ideas", "intent": "SHOW_DIFFERENT", "ctx": "results"}
+{"id": "t013", "split": "dev", "lang": "en", "text": "more like the third one", "intent": "SHOW_SIMILAR", "ctx": "results"}
+{"id": "t014", "split": "dev", "lang": "en", "text": "save the second one", "intent": "SAVE_PLACE", "ctx": "results"}
+{"id": "t015", "split": "dev", "lang": "en", "text": "solve this equation for x", "intent": "OUT_OF_SCOPE"}
+{"id": "t016", "split": "dev", "lang": "en", "text": "how hot does bangalore get in april?", "intent": "GENERAL_BENGALURU"}
+{"id": "t017", "split": "dev", "lang": "en", "text": "afternoon", "intent": "CLARIFICATION_RESPONSE", "ctx": "pending"}
+{"id": "t018", "split": "dev", "lang": "en", "text": "hey there", "intent": "MOOD_DISCOVERY"}
+{"id": "t019", "split": "dev", "lang": "en", "text": "budget friendly things to do with friends", "intent": "DISCOVER"}
+{"id": "t020", "split": "dev", "lang": "en", "text": "offbeat spots most tourists miss", "intent": "DISCOVER"}
+{"id": "t021", "split": "dev", "lang": "en", "text": "weekend getaways near Bangalore", "intent": "DISCOVER"}
+{"id": "t022", "split": "dev", "lang": "en", "text": "places for toddlers to play indoors", "intent": "DISCOVER"}
+{"id": "t023", "split": "dev", "lang": "en", "text": "rooftop bars around Church Street", "intent": "PLACE_SEARCH"}
+{"id": "t024", "split": "dev", "lang": "en", "text": "dosa places near Gandhi Bazaar", "intent": "PLACE_SEARCH"}
+{"id": "t025", "split": "dev", "lang": "en", "text": "when does the Government Museum open?", "intent": "PLACE_DETAILS"}
+{"id": "t026", "split": "dev", "lang": "en", "text": "is Lalbagh free to enter?", "intent": "PLACE_DETAILS"}
+{"id": "t027", "split": "dev", "lang": "en", "text": "tell me more about it", "intent": "PLACE_DETAILS", "ctx": "results"}
+{"id": "t028", "split": "dev", "lang": "en", "text": "who made the Bangalore Palace?", "intent": "LOCAL_KNOWLEDGE"}
+{"id": "t029", "split": "dev", "lang": "en", "text": "origin of the name Bengaluru", "intent": "LOCAL_KNOWLEDGE", "also": ["GENERAL_BENGALURU"]}
+{"id": "t030", "split": "dev", "lang": "en", "text": "how old is the Bull Temple?", "intent": "LOCAL_KNOWLEDGE"}
+{"id": "t031", "split": "dev", "lang": "en", "text": "Wonderla versus Snow City for teenagers", "intent": "COMPARE_PLACES"}
+{"id": "t032", "split": "dev", "lang": "en", "text": "difference between Ulsoor Lake and Sankey Tank", "intent": "COMPARE_PLACES"}
+{"id": "t033", "split": "dev", "lang": "en", "text": "create an itinerary for a heritage walk tomorrow morning", "intent": "CREATE_ITINERARY"}
+{"id": "t034", "split": "dev", "lang": "en", "text": "I've got 3 hours and 600 bucks, plan something", "intent": "CREATE_ITINERARY"}
+{"id": "t035", "split": "dev", "lang": "en", "text": "map out an evening in Jayanagar for us", "intent": "CREATE_ITINERARY"}
+{"id": "t036", "split": "dev", "lang": "en", "text": "it's too expensive", "intent": "MODIFY_ITINERARY", "ctx": "plan"}
+{"id": "t037", "split": "dev", "lang": "en", "text": "we're tired, make it lighter", "intent": "MODIFY_ITINERARY", "ctx": "plan"}
+{"id": "t038", "split": "dev", "lang": "en", "text": "switch the temple for a museum", "intent": "MODIFY_ITINERARY", "ctx": "plan"}
+{"id": "t039", "split": "dev", "lang": "en", "text": "let's begin at 11 instead", "intent": "MODIFY_ITINERARY", "ctx": "plan"}
+{"id": "t040", "split": "dev", "lang": "en", "text": "add a coffee break", "intent": "MODIFY_ITINERARY", "ctx": "plan"}
+{"id": "t041", "split": "dev", "lang": "en", "text": "undo", "intent": "MODIFY_ITINERARY", "ctx": "plan"}
+{"id": "t042", "split": "dev", "lang": "en", "text": "what if we avoided malls entirely?", "intent": "WHAT_IF_ITINERARY", "ctx": "plan"}
+{"id": "t043", "split": "dev", "lang": "en", "text": "imagine if it was just me, how would it change", "intent": "WHAT_IF_ITINERARY", "ctx": "plan"}
+{"id": "t044", "split": "dev", "lang": "en", "text": "explain this itinerary to me", "intent": "PLAN_EXPLANATION", "ctx": "plan"}
+{"id": "t045", "split": "dev", "lang": "en", "text": "why is the park so early in the day?", "intent": "PLAN_EXPLANATION", "ctx": "plan"}
+{"id": "t046", "split": "dev", "lang": "en", "text": "another suggestion please", "intent": "SHOW_DIFFERENT", "ctx": "results"}
+{"id": "t047", "split": "dev", "lang": "en", "text": "anything else?", "intent": "SHOW_DIFFERENT", "ctx": "results"}
+{"id": "t048", "split": "dev", "lang": "en", "text": "similar places but cheaper", "intent": "SHOW_SIMILAR", "ctx": "results"}
+{"id": "t049", "split": "dev", "lang": "en", "text": "alternatives to Wonderla", "intent": "SHOW_SIMILAR"}
+{"id": "t050", "split": "dev", "lang": "en", "text": "add Cubbon Park to my saved list", "intent": "SAVE_PLACE"}
+{"id": "t051", "split": "dev", "lang": "en", "text": "keep that place for later", "intent": "SAVE_PLACE", "ctx": "results"}
+{"id": "t052", "split": "dev", "lang": "en", "text": "just choose something random", "intent": "SURPRISE_ME"}
+{"id": "t053", "split": "dev", "lang": "en", "text": "decide for me", "intent": "SURPRISE_ME"}
+{"id": "t054", "split": "dev", "lang": "en", "text": "I am feeling kinda down", "intent": "MOOD_DISCOVERY"}
+{"id": "t055", "split": "dev", "lang": "en", "text": "such a boring day", "intent": "MOOD_DISCOVERY"}
+{"id": "t056", "split": "dev", "lang": "en", "text": "good evening", "intent": "MOOD_DISCOVERY"}
+{"id": "t057", "split": "dev", "lang": "en", "text": "is kannada hard to learn for visitors in bengaluru?", "intent": "GENERAL_BENGALURU"}
+{"id": "t058", "split": "dev", "lang": "en", "text": "what is bangalore famous for?", "intent": "GENERAL_BENGALURU", "also": ["LOCAL_KNOWLEDGE"]}
+{"id": "t059", "split": "dev", "lang": "en", "text": "is it raining in the city now?", "intent": "GENERAL_BENGALURU"}
+{"id": "t060", "split": "dev", "lang": "en", "text": "is Bengaluru safe for solo women travellers", "intent": "GENERAL_BENGALURU"}
+{"id": "t061", "split": "dev", "lang": "en", "text": "find me hotels in Mumbai", "intent": "OUT_OF_SCOPE"}
+{"id": "t062", "split": "dev", "lang": "en", "text": "write javascript to sort an array", "intent": "OUT_OF_SCOPE"}
+{"id": "t063", "split": "dev", "lang": "en", "text": "things to do in Ooty", "intent": "OUT_OF_SCOPE"}
+{"id": "t064", "split": "dev", "lang": "en", "text": "up to you", "intent": "CLARIFICATION_RESPONSE", "ctx": "pending"}
+{"id": "t065", "split": "dev", "lang": "en", "text": "under 2000", "intent": "CLARIFICATION_RESPONSE", "ctx": "pending"}
+{"id": "t066", "split": "dev", "lang": "en", "text": "from 4 to 9 pm", "intent": "CLARIFICATION_RESPONSE", "ctx": "pending"}
+{"id": "t067", "split": "dev", "lang": "en", "text": "somewhere calm to read a book", "intent": "DISCOVER"}
+{"id": "t068", "split": "dev", "lang": "en", "text": "best dessert places", "intent": "DISCOVER"}
+{"id": "t069", "split": "dev", "lang": "en", "text": "indoor stuff for a hot afternoon", "intent": "DISCOVER"}
+{"id": "t070", "split": "dev", "lang": "en", "text": "anniversary ideas for a couple", "intent": "DISCOVER"}
+{"id": "t071", "split": "dev", "lang": "en", "text": "what's there to see around Yelahanka", "intent": "PLACE_SEARCH"}
+{"id": "t072", "split": "dev", "lang": "en", "text": "art galleries near Cunningham Road", "intent": "PLACE_SEARCH"}
+{"id": "t073", "split": "dev", "lang": "en", "text": "pure veg food around Chickpet", "intent": "PLACE_SEARCH"}
+{"id": "t074", "split": "dev", "lang": "en", "text": "Bannerghatta National Park", "intent": "PLACE_DETAILS"}
+{"id": "t075", "split": "dev", "lang": "en", "text": "is Skandagiri good for beginners?", "intent": "PLACE_DETAILS"}
+{"id": "t076", "split": "dev", "lang": "en", "text": "is the planetarium crowded on weekends?", "intent": "PLACE_DETAILS"}
+{"id": "t077", "split": "dev", "lang": "en", "text": "what is the significance of the Nandi statue at Basavanagudi", "intent": "LOCAL_KNOWLEDGE"}
+{"id": "t078", "split": "dev", "lang": "en", "text": "plan a trip to Shivanasamudra falls on Saturday", "intent": "CREATE_ITINERARY"}
+{"id": "t079", "split": "dev", "lang": "en", "text": "schedule a food crawl in VV Puram for 4 friends", "intent": "CREATE_ITINERARY"}
+{"id": "t080", "split": "dev", "lang": "en", "text": "full day plan for my grandparents, nothing strenuous", "intent": "CREATE_ITINERARY"}
+{"id": "t081", "split": "dev", "lang": "en", "text": "shorter please", "intent": "MODIFY_ITINERARY", "ctx": "plan"}
+{"id": "t082", "split": "dev", "lang": "en", "text": "replace stop 2 with something outdoors", "intent": "MODIFY_ITINERARY", "ctx": "plan"}
+{"id": "t083", "split": "dev", "lang": "en", "text": "we need to be back by 7", "intent": "MODIFY_ITINERARY", "ctx": "plan"}
+{"id": "t084", "split": "dev", "lang": "en", "text": "make the plan more cultural", "intent": "MODIFY_ITINERARY", "ctx": "plan"}
+{"id": "t085", "split": "dev", "lang": "en", "text": "go back to version 2", "intent": "MODIFY_ITINERARY", "ctx": "plan"}
+{"id": "t086", "split": "dev", "lang": "en", "text": "what if we left at noon", "intent": "WHAT_IF_ITINERARY", "ctx": "plan"}
+{"id": "t087", "split": "dev", "lang": "en", "text": "what would happen if we added lunch?", "intent": "WHAT_IF_ITINERARY", "ctx": "plan"}
+{"id": "t088", "split": "dev", "lang": "en", "text": "why did you choose these stops", "intent": "PLAN_EXPLANATION", "ctx": "plan"}
+{"id": "t089", "split": "dev", "lang": "en", "text": "more options", "intent": "SHOW_DIFFERENT", "ctx": "results"}
+{"id": "t090", "split": "dev", "lang": "en", "text": "none of these work for me", "intent": "SHOW_DIFFERENT", "ctx": "results"}
+{"id": "t091", "split": "dev", "lang": "en", "text": "places like Lalbagh", "intent": "SHOW_SIMILAR"}
+{"id": "t092", "split": "dev", "lang": "en", "text": "favourite this", "intent": "SAVE_PLACE", "ctx": "results"}
+{"id": "t093", "split": "dev", "lang": "en", "text": "dealer's choice", "intent": "SURPRISE_ME"}
+{"id": "t094", "split": "dev", "lang": "en", "text": "feeling lazy but want to get out", "intent": "MOOD_DISCOVERY"}
+{"id": "t095", "split": "dev", "lang": "en", "text": "what is the nickname of bangalore", "intent": "GENERAL_BENGALURU"}
+{"id": "t096", "split": "dev", "lang": "en", "text": "what cuisine is bengaluru known for?", "intent": "GENERAL_BENGALURU"}
+{"id": "t097", "split": "dev", "lang": "en", "text": "should I buy bitcoin", "intent": "OUT_OF_SCOPE"}
+{"id": "t098", "split": "dev", "lang": "en", "text": "give me a recipe for sambar", "intent": "OUT_OF_SCOPE"}
+{"id": "t099", "split": "dev", "lang": "en", "text": "sure", "intent": "CLARIFICATION_RESPONSE", "ctx": "pending"}
+{"id": "t100", "split": "dev", "lang": "en", "text": "whatever works", "intent": "CLARIFICATION_RESPONSE", "ctx": "pending"}
+{"id": "t101", "split": "dev", "lang": "hinglish", "text": "yaar kuch karne ko nahi hai", "intent": "MOOD_DISCOVERY"}
+{"id": "t102", "split": "dev", "lang": "hinglish", "text": "weekend pe kahan ghoomne jaaye?", "intent": "DISCOVER"}
+{"id": "t103", "split": "dev", "lang": "hinglish", "text": "Indiranagar ke paas pubs batao", "intent": "PLACE_SEARCH"}
+{"id": "t104", "split": "dev", "lang": "hinglish", "text": "Saturday ka pura din plan kar do", "intent": "CREATE_ITINERARY"}
+{"id": "t105", "split": "dev", "lang": "hinglish", "text": "kuch alag dikhao", "intent": "SHOW_DIFFERENT", "ctx": "results"}
+{"id": "t106", "split": "dev", "lang": "hinglish", "text": "doosra stop hata do", "intent": "MODIFY_ITINERARY", "ctx": "plan"}
+{"id": "t107", "split": "dev", "lang": "hinglish", "text": "agar hum 2 baje shuru kare toh?", "intent": "WHAT_IF_ITINERARY", "ctx": "plan"}
+{"id": "t108", "split": "dev", "lang": "hinglish", "text": "Cubbon Park me entry free hai kya?", "intent": "PLACE_DETAILS"}
+{"id": "t109", "split": "dev", "lang": "kn-roman", "text": "ivattu sanje yenu maadbahudu?", "intent": "DISCOVER"}
+{"id": "t110", "split": "dev", "lang": "kn-roman", "text": "bejaar aagtide, yenadru heli", "intent": "MOOD_DISCOVERY"}
+{"id": "t111", "split": "dev", "lang": "kn-roman", "text": "Jayanagar hatthira cafe", "intent": "PLACE_SEARCH"}
+{"id": "t112", "split": "dev", "lang": "kn-roman", "text": "naale plan maadi", "intent": "CREATE_ITINERARY"}
+{"id": "t113", "split": "dev", "lang": "kn", "text": "ಲಾಲ್‌ಬಾಗ್ ಯಾಕೆ ಪ್ರಸಿದ್ಧ?", "intent": "LOCAL_KNOWLEDGE"}
+{"id": "t114", "split": "dev", "lang": "kn", "text": "ಬೇರೆ ಏನಾದರೂ ತೋರಿಸಿ", "intent": "SHOW_DIFFERENT", "ctx": "results"}
+{"id": "t115", "split": "dev", "lang": "en", "text": "camping spots within a couple of hours", "intent": "DISCOVER"}
+{"id": "t116", "split": "dev", "lang": "en", "text": "live music venues in Koramangala", "intent": "PLACE_SEARCH"}
+{"id": "t117", "split": "dev", "lang": "en", "text": "where can I watch the sunset", "intent": "DISCOVER"}
+{"id": "t118", "split": "dev", "lang": "en", "text": "I want to go trekking", "intent": "DISCOVER"}
+{"id": "t119", "split": "dev", "lang": "en", "text": "good bookshops", "intent": "DISCOVER"}
+{"id": "t120", "split": "dev", "lang": "en", "text": "what's fun for a big group of colleagues", "intent": "DISCOVER"}
+{"id": "h001", "split": "dev", "lang": "en", "text": "I've got nothing planned today and I'm bored stiff", "intent": "MOOD_DISCOVERY"}
+{"id": "h002", "split": "dev", "lang": "en", "text": "hit me with a random place", "intent": "SURPRISE_ME"}
+{"id": "h003", "split": "dev", "lang": "en", "text": "what are some fun things to do on a Friday night?", "intent": "DISCOVER"}
+{"id": "h004", "split": "dev", "lang": "en", "text": "bakeries near Frazer Town", "intent": "PLACE_SEARCH"}
+{"id": "h005", "split": "dev", "lang": "en", "text": "what are the visiting hours at the Government Museum?", "intent": "PLACE_DETAILS"}
+{"id": "h006", "split": "dev", "lang": "en", "text": "why was Vidhana Soudha built?", "intent": "LOCAL_KNOWLEDGE"}
+{"id": "h007", "split": "dev", "lang": "en", "text": "Sankey Tank vs Ulsoor Lake for an evening stroll", "intent": "COMPARE_PLACES"}
+{"id": "h008", "split": "dev", "lang": "en", "text": "plan a lazy Sunday for me and my partner", "intent": "CREATE_ITINERARY"}
+{"id": "h009", "split": "dev", "lang": "en", "text": "get rid of the mall", "intent": "MODIFY_ITINERARY", "ctx": "plan"}
+{"id": "h010", "split": "dev", "lang": "en", "text": "what if we went on Saturday instead?", "intent": "WHAT_IF_ITINERARY", "ctx": "plan"}
+{"id": "h011", "split": "dev", "lang": "en", "text": "why did you include the temple?", "intent": "PLAN_EXPLANATION", "ctx": "plan"}
+{"id": "h012", "split": "dev", "lang": "en", "text": "hmm not really, show me different stuff", "intent": "SHOW_DIFFERENT", "ctx": "results"}
+{"id": "h013", "split": "dev", "lang": "en", "text": "got anything similar?", "intent": "SHOW_SIMILAR", "ctx": "results"}
+{"id": "h014", "split": "dev", "lang": "en", "text": "please save the first one", "intent": "SAVE_PLACE", "ctx": "results"}
+{"id": "h015", "split": "dev", "lang": "en", "text": "who won the cricket match yesterday", "intent": "OUT_OF_SCOPE"}
+{"id": "h016", "split": "dev", "lang": "en", "text": "is it going to rain in Bangalore this weekend?", "intent": "GENERAL_BENGALURU"}
+{"id": "h017", "split": "dev", "lang": "en", "text": "morning", "intent": "CLARIFICATION_RESPONSE", "ctx": "pending"}
+{"id": "h018", "split": "dev", "lang": "en", "text": "namaskara", "intent": "MOOD_DISCOVERY"}
+{"id": "h019", "split": "dev", "lang": "en", "text": "somewhere to take my dog", "intent": "DISCOVER"}
+{"id": "h020", "split": "dev", "lang": "en", "text": "lesser known heritage spots", "intent": "DISCOVER"}
+{"id": "h021", "split": "dev", "lang": "en", "text": "hills to climb for sunrise near the city", "intent": "DISCOVER"}
+{"id": "h022", "split": "dev", "lang": "en", "text": "kid friendly places for a birthday outing", "intent": "DISCOVER"}
+{"id": "h023", "split": "dev", "lang": "en", "text": "craft beer places around Whitefield", "intent": "PLACE_SEARCH"}
+{"id": "h024", "split": "dev", "lang": "en", "text": "filter coffee spots in Basavanagudi", "intent": "PLACE_SEARCH"}
+{"id": "h025", "split": "dev", "lang": "en", "text": "does Cubbon Park close at night?", "intent": "PLACE_DETAILS"}
+{"id": "h026", "split": "dev", "lang": "en", "text": "how much does Wonderla cost", "intent": "PLACE_DETAILS"}
+{"id": "h027", "split": "dev", "lang": "en", "text": "more details on the last one", "intent": "PLACE_DETAILS", "ctx": "results"}
+{"id": "h028", "split": "dev", "lang": "en", "text": "who designed Bangalore Palace?", "intent": "LOCAL_KNOWLEDGE"}
+{"id": "h029", "split": "dev", "lang": "en", "text": "what's the history behind Tipu's summer palace", "intent": "LOCAL_KNOWLEDGE"}
+{"id": "h030", "split": "dev", "lang": "en", "text": "when was Lalbagh's glass house built?", "intent": "LOCAL_KNOWLEDGE"}
+{"id": "h031", "split": "dev", "lang": "en", "text": "Nandi Hills or Savandurga, which is better for a first trek?", "intent": "COMPARE_PLACES"}
+{"id": "h032", "split": "dev", "lang": "en", "text": "compare the two museums", "intent": "COMPARE_PLACES", "ctx": "results"}
+{"id": "h033", "split": "dev", "lang": "en", "text": "can you plan my day off next Tuesday? I like art and coffee", "intent": "CREATE_ITINERARY"}
+{"id": "h034", "split": "dev", "lang": "en", "text": "we have the whole day and about 2000, make a schedule", "intent": "CREATE_ITINERARY"}
+{"id": "h035", "split": "dev", "lang": "en", "text": "itinerary for a first-time visitor", "intent": "CREATE_ITINERARY"}
+{"id": "h036", "split": "dev", "lang": "en", "text": "can it be a bit cheaper?", "intent": "MODIFY_ITINERARY", "ctx": "plan"}
+{"id": "h037", "split": "dev", "lang": "en", "text": "that's too packed, fewer places", "intent": "MODIFY_ITINERARY", "ctx": "plan"}
+{"id": "h038", "split": "dev", "lang": "en", "text": "swap the second stop for a lake", "intent": "MODIFY_ITINERARY", "ctx": "plan"}
+{"id": "h039", "split": "dev", "lang": "en", "text": "let's start earlier, around 8", "intent": "MODIFY_ITINERARY", "ctx": "plan"}
+{"id": "h040", "split": "dev", "lang": "en", "text": "add lunch somewhere in the middle", "intent": "MODIFY_ITINERARY", "ctx": "plan"}
+{"id": "h041", "split": "dev", "lang": "en", "text": "restore the previous version", "intent": "MODIFY_ITINERARY", "ctx": "plan"}
+{"id": "h042", "split": "dev", "lang": "en", "text": "what if it's just the two of us?", "intent": "WHAT_IF_ITINERARY", "ctx": "plan"}
+{"id": "h043", "split": "dev", "lang": "en", "text": "what would it look like with a 1000 rupee budget", "intent": "WHAT_IF_ITINERARY", "ctx": "plan"}
+{"id": "h044", "split": "dev", "lang": "en", "text": "walk me through why you chose this order", "intent": "PLAN_EXPLANATION", "ctx": "plan"}
+{"id": "h045", "split": "dev", "lang": "en", "text": "why is the museum last?", "intent": "PLAN_EXPLANATION", "ctx": "plan"}
+{"id": "h046", "split": "dev", "lang": "en", "text": "nah, something else", "intent": "SHOW_DIFFERENT", "ctx": "results"}
+{"id": "h047", "split": "dev", "lang": "en", "text": "different options please, less touristy", "intent": "SHOW_DIFFERENT", "ctx": "results"}
+{"id": "h048", "split": "dev", "lang": "en", "text": "more places like Cubbon Park", "intent": "SHOW_SIMILAR"}
+{"id": "h049", "split": "dev", "lang": "en", "text": "anything with a similar feel to the second one?", "intent": "SHOW_SIMILAR", "ctx": "results"}
+{"id": "h050", "split": "dev", "lang": "en", "text": "save Bangalore Palace", "intent": "SAVE_PLACE"}
+{"id": "h051", "split": "dev", "lang": "en", "text": "bookmark it", "intent": "SAVE_PLACE", "ctx": "results"}
+{"id": "h052", "split": "dev", "lang": "en", "text": "you choose, I trust you", "intent": "SURPRISE_ME"}
+{"id": "h053", "split": "dev", "lang": "en", "text": "surprise us, we're a family of four", "intent": "SURPRISE_ME"}
+{"id": "h054", "split": "dev", "lang": "en", "text": "feeling stuck at home", "intent": "MOOD_DISCOVERY"}
+{"id": "h055", "split": "dev", "lang": "en", "text": "I'm sad, cheer me up", "intent": "MOOD_DISCOVERY"}
+{"id": "h056", "split": "dev", "lang": "en", "text": "good morning!", "intent": "MOOD_DISCOVERY"}
+{"id": "h057", "split": "dev", "lang": "en", "text": "what festivals happen in Bangalore in October", "intent": "GENERAL_BENGALURU"}
+{"id": "h058", "split": "dev", "lang": "en", "text": "why is Bengaluru called the Silicon Valley of India?", "intent": "GENERAL_BENGALURU", "also": ["LOCAL_KNOWLEDGE"]}
+{"id": "h059", "split": "dev", "lang": "en", "text": "how's the weather today?", "intent": "GENERAL_BENGALURU"}
+{"id": "h060", "split": "dev", "lang": "en", "text": "what is the traffic like in Bengaluru on weekends?", "intent": "GENERAL_BENGALURU"}
+{"id": "h061", "split": "dev", "lang": "en", "text": "plan my trip to Paris", "intent": "OUT_OF_SCOPE"}
+{"id": "h062", "split": "dev", "lang": "en", "text": "what's a good crypto to invest in", "intent": "OUT_OF_SCOPE"}
+{"id": "h063", "split": "dev", "lang": "en", "text": "best beaches in Chennai", "intent": "OUT_OF_SCOPE"}
+{"id": "h064", "split": "dev", "lang": "en", "text": "doesn't matter", "intent": "CLARIFICATION_RESPONSE", "ctx": "pending"}
+{"id": "h065", "split": "dev", "lang": "en", "text": "1000 each", "intent": "CLARIFICATION_RESPONSE", "ctx": "pending"}
+{"id": "h066", "split": "dev", "lang": "en", "text": "noon to 5", "intent": "CLARIFICATION_RESPONSE", "ctx": "pending"}
+{"id": "h067", "split": "dev", "lang": "en", "text": "a quiet spot to journal", "intent": "DISCOVER"}
+{"id": "h068", "split": "dev", "lang": "en", "text": "top ice cream places", "intent": "DISCOVER"}
+{"id": "h069", "split": "dev", "lang": "en", "text": "places to go when it's pouring", "intent": "DISCOVER"}
+{"id": "h070", "split": "dev", "lang": "en", "text": "what can a couple do on a budget", "intent": "DISCOVER"}
+{"id": "h071", "split": "dev", "lang": "en", "text": "things to see in Malleshwaram", "intent": "PLACE_SEARCH"}
+{"id": "h072", "split": "dev", "lang": "en", "text": "temples around Basavanagudi", "intent": "PLACE_SEARCH"}
+{"id": "h073", "split": "dev", "lang": "en", "text": "South Indian breakfast close to Jayanagar 4th Block", "intent": "PLACE_SEARCH"}
+{"id": "h074", "split": "dev", "lang": "en", "text": "Vidhana Soudha", "intent": "PLACE_DETAILS"}
+{"id": "h075", "split": "dev", "lang": "en", "text": "is the Bangalore Palace worth it?", "intent": "PLACE_DETAILS"}
+{"id": "h076", "split": "dev", "lang": "en", "text": "is Lalbagh wheelchair accessible?", "intent": "PLACE_DETAILS"}
+{"id": "h077", "split": "dev", "lang": "en", "text": "what is the legend of Kempegowda's towers", "intent": "LOCAL_KNOWLEDGE"}
+{"id": "h078", "split": "dev", "lang": "en", "text": "plan an evening in Church Street for friends", "intent": "CREATE_ITINERARY"}
+{"id": "h079", "split": "dev", "lang": "en", "text": "organize a day out to Bannerghatta with kids", "intent": "CREATE_ITINERARY"}
+{"id": "h080", "split": "dev", "lang": "en", "text": "schedule 3 stops around MG Road after work", "intent": "CREATE_ITINERARY"}
+{"id": "h081", "split": "dev", "lang": "en", "text": "less walking please", "intent": "MODIFY_ITINERARY", "ctx": "plan"}
+{"id": "h082", "split": "dev", "lang": "en", "text": "replace the cafe with a dessert place", "intent": "MODIFY_ITINERARY", "ctx": "plan"}
+{"id": "h083", "split": "dev", "lang": "en", "text": "end by 6 pm", "intent": "MODIFY_ITINERARY", "ctx": "plan"}
+{"id": "h084", "split": "dev", "lang": "en", "text": "make it more relaxed", "intent": "MODIFY_ITINERARY", "ctx": "plan"}
+{"id": "h085", "split": "dev", "lang": "en", "text": "undo the last change", "intent": "MODIFY_ITINERARY", "ctx": "plan"}
+{"id": "h086", "split": "dev", "lang": "en", "text": "suppose we had a car, would it change?", "intent": "WHAT_IF_ITINERARY", "ctx": "plan"}
+{"id": "h087", "split": "dev", "lang": "en", "text": "what if we added a museum", "intent": "WHAT_IF_ITINERARY", "ctx": "plan"}
+{"id": "h088", "split": "dev", "lang": "en", "text": "why so early?", "intent": "PLAN_EXPLANATION", "ctx": "plan"}
+{"id": "h089", "split": "dev", "lang": "en", "text": "show me more options", "intent": "SHOW_DIFFERENT", "ctx": "results"}
+{"id": "h090", "split": "dev", "lang": "en", "text": "I don't like any of these", "intent": "SHOW_DIFFERENT", "ctx": "results"}
+{"id": "h091", "split": "dev", "lang": "en", "text": "something like Nandi Hills but closer", "intent": "SHOW_SIMILAR"}
+{"id": "h092", "split": "dev", "lang": "en", "text": "add this to my wishlist", "intent": "SAVE_PLACE", "ctx": "results"}
+{"id": "h093", "split": "dev", "lang": "en", "text": "roll the dice", "intent": "SURPRISE_ME"}
+{"id": "h094", "split": "dev", "lang": "en", "text": "meh, feeling low", "intent": "MOOD_DISCOVERY"}
+{"id": "h095", "split": "dev", "lang": "en", "text": "what do people in Bangalore eat for breakfast", "intent": "GENERAL_BENGALURU"}
+{"id": "h096", "split": "dev", "lang": "en", "text": "what's Bengaluru's climate like in December", "intent": "GENERAL_BENGALURU"}
+{"id": "h097", "split": "dev", "lang": "en", "text": "who is the prime minister", "intent": "OUT_OF_SCOPE"}
+{"id": "h098", "split": "dev", "lang": "en", "text": "write a cover letter for me", "intent": "OUT_OF_SCOPE"}
+{"id": "h099", "split": "dev", "lang": "en", "text": "no preference", "intent": "CLARIFICATION_RESPONSE", "ctx": "pending"}
+{"id": "h100", "split": "dev", "lang": "en", "text": "yeah that works", "intent": "CLARIFICATION_RESPONSE", "ctx": "pending"}
+{"id": "h101", "split": "dev", "lang": "hinglish", "text": "bahut bore ho rahi hoon", "intent": "MOOD_DISCOVERY"}
+{"id": "h102", "split": "dev", "lang": "hinglish", "text": "aaj raat kahan chale?", "intent": "DISCOVER"}
+{"id": "h103", "split": "dev", "lang": "hinglish", "text": "Koramangala mein achha khana kahan milega", "intent": "PLACE_SEARCH"}
+{"id": "h104", "split": "dev", "lang": "hinglish", "text": "Sunday ka plan bana do family ke liye", "intent": "CREATE_ITINERARY"}
+{"id": "h105", "split": "dev", "lang": "hinglish", "text": "ye sab nahi, kuch aur batao", "intent": "SHOW_DIFFERENT", "ctx": "results"}
+{"id": "h106", "split": "dev", "lang": "hinglish", "text": "mall wala stop hata do", "intent": "MODIFY_ITINERARY", "ctx": "plan"}
+{"id": "h107", "split": "dev", "lang": "hinglish", "text": "agar hum sirf 3 ghante ke liye jaaye toh?", "intent": "WHAT_IF_ITINERARY", "ctx": "plan"}
+{"id": "h108", "split": "dev", "lang": "hinglish", "text": "Bangalore Palace ki ticket kitni hai?", "intent": "PLACE_DETAILS"}
+{"id": "h109", "split": "dev", "lang": "kn-roman", "text": "weekend-alli elli hogbahudu?", "intent": "DISCOVER"}
+{"id": "h110", "split": "dev", "lang": "kn-roman", "text": "tumba bejaar", "intent": "MOOD_DISCOVERY"}
+{"id": "h111", "split": "dev", "lang": "kn-roman", "text": "Basavanagudi hatthira dose sigo jaaga", "intent": "PLACE_SEARCH"}
+{"id": "h112", "split": "dev", "lang": "kn-roman", "text": "naale ondu plan maadi kodi", "intent": "CREATE_ITINERARY"}
+{"id": "h113", "split": "dev", "lang": "kn", "text": "ಕಬ್ಬನ್ ಪಾರ್ಕ್ ಇತಿಹಾಸ ಏನು?", "intent": "LOCAL_KNOWLEDGE"}
+{"id": "h114", "split": "dev", "lang": "kn", "text": "ನಾಳೆ ಎಲ್ಲಿಗೆ ಹೋಗಬಹುದು?", "intent": "DISCOVER"}
+{"id": "h115", "split": "dev", "lang": "en", "text": "waterfalls within driving distance", "intent": "DISCOVER"}
+{"id": "h116", "split": "dev", "lang": "en", "text": "board game cafes in HSR Layout", "intent": "PLACE_SEARCH"}
+{"id": "h117", "split": "dev", "lang": "en", "text": "where's good for a picnic", "intent": "DISCOVER"}
+{"id": "h118", "split": "dev", "lang": "en", "text": "I want to try local street food", "intent": "DISCOVER"}
+{"id": "h119", "split": "dev", "lang": "en", "text": "pottery workshops", "intent": "DISCOVER"}
+{"id": "h120", "split": "dev", "lang": "en", "text": "what's happening this weekend for families", "intent": "DISCOVER"}
+{"id": "k001", "split": "dev", "lang": "en", "text": "weekend's here and I have zero plans", "intent": "MOOD_DISCOVERY", "also": ["DISCOVER"]}
+{"id": "k002", "split": "dev", "lang": "en", "text": "just pick one place for me", "intent": "SURPRISE_ME"}
+{"id": "k003", "split": "dev", "lang": "en", "text": "where should we go for a long drive?", "intent": "DISCOVER"}
+{"id": "k004", "split": "dev", "lang": "en", "text": "momos near BTM Layout", "intent": "PLACE_SEARCH"}
+{"id": "k005", "split": "dev", "lang": "en", "text": "is there parking at Bangalore Palace?", "intent": "PLACE_DETAILS"}
+{"id": "k006", "split": "dev", "lang": "en", "text": "who was Kempegowda?", "intent": "LOCAL_KNOWLEDGE", "also": ["GENERAL_BENGALURU"]}
+{"id": "k007", "split": "dev", "lang": "en", "text": "which is quieter, Cubbon Park or Lalbagh?", "intent": "COMPARE_PLACES"}
+{"id": "k008", "split": "dev", "lang": "en", "text": "help me plan a birthday day for my wife", "intent": "CREATE_ITINERARY"}
+{"id": "k009", "split": "dev", "lang": "en", "text": "take out the lake", "intent": "MODIFY_ITINERARY", "ctx": "plan"}
+{"id": "k010", "split": "dev", "lang": "en", "text": "what if my parents join us?", "intent": "WHAT_IF_ITINERARY", "ctx": "plan"}
+{"id": "k011", "split": "dev", "lang": "en", "text": "why is there a gap after lunch?", "intent": "PLAN_EXPLANATION", "ctx": "plan"}
+{"id": "k012", "split": "dev", "lang": "en", "text": "these aren't my vibe, got anything else?", "intent": "SHOW_DIFFERENT", "ctx": "results"}
+{"id": "k013", "split": "dev", "lang": "en", "text": "find me more places like that garden", "intent": "SHOW_SIMILAR", "ctx": "results"}
+{"id": "k014", "split": "dev", "lang": "en", "text": "save that museum for later", "intent": "SAVE_PLACE", "ctx": "results"}
+{"id": "k015", "split": "dev", "lang": "en", "text": "how do I renew my passport", "intent": "OUT_OF_SCOPE"}
+{"id": "k016", "split": "dev", "lang": "en", "text": "how humid is Bengaluru in the monsoon?", "intent": "GENERAL_BENGALURU"}
+{"id": "k017", "split": "dev", "lang": "en", "text": "late evening", "intent": "CLARIFICATION_RESPONSE", "ctx": "pending"}
+{"id": "k018", "split": "dev", "lang": "en", "text": "hey NavigIQ", "intent": "MOOD_DISCOVERY"}
+{"id": "k019", "split": "dev", "lang": "en", "text": "best rooftop places for a sundowner", "intent": "DISCOVER"}
+{"id": "k020", "split": "dev", "lang": "en", "text": "offbeat things to do in the city", "intent": "DISCOVER"}
+{"id": "k021", "split": "dev", "lang": "en", "text": "a one-day escape from the city with some hiking", "intent": "DISCOVER", "also": ["CREATE_ITINERARY"]}
+{"id": "k022", "split": "dev", "lang": "en", "text": "what can seniors enjoy that isn't tiring", "intent": "DISCOVER"}
+{"id": "k023", "split": "dev", "lang": "en", "text": "vegan cafes around Indiranagar", "intent": "PLACE_SEARCH"}
+{"id": "k024", "split": "dev", "lang": "en", "text": "parks near Rajajinagar", "intent": "PLACE_SEARCH"}
+{"id": "k025", "split": "dev", "lang": "en", "text": "what days is the Visvesvaraya museum closed?", "intent": "PLACE_DETAILS"}
+{"id": "k026", "split": "dev", "lang": "en", "text": "Lalbagh entry ticket price", "intent": "PLACE_DETAILS"}
+{"id": "k027", "split": "dev", "lang": "en", "text": "what's the second one like?", "intent": "PLACE_DETAILS", "ctx": "results"}
+{"id": "k028", "split": "dev", "lang": "en", "text": "when did Bangalore Fort come up?", "intent": "LOCAL_KNOWLEDGE"}
+{"id": "k029", "split": "dev", "lang": "en", "text": "what is the significance of Cubbon Park", "intent": "LOCAL_KNOWLEDGE"}
+{"id": "k030", "split": "dev", "lang": "en", "text": "how old is Lalbagh?", "intent": "LOCAL_KNOWLEDGE"}
+{"id": "k031", "split": "dev", "lang": "en", "text": "UB City versus Phoenix Marketcity for shopping", "intent": "COMPARE_PLACES"}
+{"id": "k032", "split": "dev", "lang": "en", "text": "which of these two is better for kids", "intent": "COMPARE_PLACES", "ctx": "results"}
+{"id": "k033", "split": "dev", "lang": "en", "text": "put together an itinerary for my Saturday, I love old buildings", "intent": "CREATE_ITINERARY"}
+{"id": "k034", "split": "dev", "lang": "en", "text": "4 of us, 5 hours, around 3000 total. what's the plan?", "intent": "CREATE_ITINERARY"}
+{"id": "k035", "split": "dev", "lang": "en", "text": "plan an art-focused afternoon", "intent": "CREATE_ITINERARY"}
+{"id": "k036", "split": "dev", "lang": "en", "text": "it's over our budget", "intent": "MODIFY_ITINERARY", "ctx": "plan"}
+{"id": "k037", "split": "dev", "lang": "en", "text": "cut it down to three places", "intent": "MODIFY_ITINERARY", "ctx": "plan"}
+{"id": "k038", "split": "dev", "lang": "en", "text": "change the first stop to a temple", "intent": "MODIFY_ITINERARY", "ctx": "plan"}
+{"id": "k039", "split": "dev", "lang": "en", "text": "push everything by an hour", "intent": "MODIFY_ITINERARY", "ctx": "plan"}
+{"id": "k040", "split": "dev", "lang": "en", "text": "add a dessert stop at the end", "intent": "MODIFY_ITINERARY", "ctx": "plan"}
+{"id": "k041", "split": "dev", "lang": "en", "text": "go back to version one", "intent": "MODIFY_ITINERARY", "ctx": "plan"}
+{"id": "k042", "split": "dev", "lang": "en", "text": "what if we skipped lunch?", "intent": "WHAT_IF_ITINERARY", "ctx": "plan"}
+{"id": "k043", "split": "dev", "lang": "en", "text": "suppose we finish by 4, what changes?", "intent": "WHAT_IF_ITINERARY", "ctx": "plan"}
+{"id": "k044", "split": "dev", "lang": "en", "text": "explain the schedule", "intent": "PLAN_EXPLANATION", "ctx": "plan"}
+{"id": "k045", "split": "dev", "lang": "en", "text": "why did you pick a mall?", "intent": "PLAN_EXPLANATION", "ctx": "plan"}
+{"id": "k046", "split": "dev", "lang": "en", "text": "give me something totally different", "intent": "SHOW_DIFFERENT", "ctx": "results"}
+{"id": "k047", "split": "dev", "lang": "en", "text": "other suggestions?", "intent": "SHOW_DIFFERENT", "ctx": "results"}
+{"id": "k048", "split": "dev", "lang": "en", "text": "places similar to Bangalore Palace", "intent": "SHOW_SIMILAR"}
+{"id": "k049", "split": "dev", "lang": "en", "text": "more of those", "intent": "SHOW_SIMILAR", "ctx": "results"}
+{"id": "k050", "split": "dev", "lang": "en", "text": "favorite Nandi Hills", "intent": "SAVE_PLACE"}
+{"id": "k051", "split": "dev", "lang": "en", "text": "keep this one", "intent": "SAVE_PLACE", "ctx": "results"}
+{"id": "k052", "split": "dev", "lang": "en", "text": "you pick, I'm easy", "intent": "SURPRISE_ME"}
+{"id": "k053", "split": "dev", "lang": "en", "text": "surprise me with food", "intent": "SURPRISE_ME"}
+{"id": "k054", "split": "dev", "lang": "en", "text": "I'm feeling meh", "intent": "MOOD_DISCOVERY"}
+{"id": "k055", "split": "dev", "lang": "en", "text": "I'm so bored of the same malls", "intent": "MOOD_DISCOVERY", "also": ["DISCOVER"]}
+{"id": "k056", "split": "dev", "lang": "en", "text": "hello there", "intent": "MOOD_DISCOVERY"}
+{"id": "k057", "split": "dev", "lang": "en", "text": "which languages are spoken in Bengaluru", "intent": "GENERAL_BENGALURU"}
+{"id": "k058", "split": "dev", "lang": "en", "text": "why is Bangalore called the pub capital", "intent": "GENERAL_BENGALURU", "also": ["LOCAL_KNOWLEDGE"]}
+{"id": "k059", "split": "dev", "lang": "en", "text": "will it be sunny tomorrow?", "intent": "GENERAL_BENGALURU"}
+{"id": "k060", "split": "dev", "lang": "en", "text": "is Bengaluru expensive for tourists?", "intent": "GENERAL_BENGALURU"}
+{"id": "k061", "split": "dev", "lang": "en", "text": "things to do in Hyderabad", "intent": "OUT_OF_SCOPE"}
+{"id": "k062", "split": "dev", "lang": "en", "text": "explain quantum computing", "intent": "OUT_OF_SCOPE"}
+{"id": "k063", "split": "dev", "lang": "en", "text": "plan a honeymoon in Munnar", "intent": "OUT_OF_SCOPE"}
+{"id": "k064", "split": "dev", "lang": "en", "text": "any time works", "intent": "CLARIFICATION_RESPONSE", "ctx": "pending"}
+{"id": "k065", "split": "dev", "lang": "en", "text": "max 700 per head", "intent": "CLARIFICATION_RESPONSE", "ctx": "pending"}
+{"id": "k066", "split": "dev", "lang": "en", "text": "11 am till 7", "intent": "CLARIFICATION_RESPONSE", "ctx": "pending"}
+{"id": "k067", "split": "dev", "lang": "en", "text": "a calm place to sit by the water", "intent": "DISCOVER"}
+{"id": "k068", "split": "dev", "lang": "en", "text": "best filter coffee in town", "intent": "DISCOVER"}
+{"id": "k069", "split": "dev", "lang": "en", "text": "indoor games for a rainy evening", "intent": "DISCOVER"}
+{"id": "k070", "split": "dev", "lang": "en", "text": "cheap dates that aren't boring", "intent": "DISCOVER"}
+{"id": "k071", "split": "dev", "lang": "en", "text": "stuff to do around Electronic City", "intent": "PLACE_SEARCH"}
+{"id": "k072", "split": "dev", "lang": "en", "text": "libraries near Jayanagar", "intent": "PLACE_SEARCH"}
+{"id": "k073", "split": "dev", "lang": "en", "text": "chaat stalls close to VV Puram", "intent": "PLACE_SEARCH"}
+{"id": "k074", "split": "dev", "lang": "en", "text": "Cubbon Park", "intent": "PLACE_DETAILS"}
+{"id": "k075", "split": "dev", "lang": "en", "text": "is Wonderla good for toddlers?", "intent": "PLACE_DETAILS"}
+{"id": "k076", "split": "dev", "lang": "en", "text": "is Bannerghatta open on Tuesdays?", "intent": "PLACE_DETAILS"}
+{"id": "k077", "split": "dev", "lang": "en", "text": "why is Karaga important to Bengaluru", "intent": "GENERAL_BENGALURU", "also": ["LOCAL_KNOWLEDGE"]}
+{"id": "k078", "split": "dev", "lang": "en", "text": "plan a morning at Nandi Hills with breakfast after", "intent": "CREATE_ITINERARY"}
+{"id": "k079", "split": "dev", "lang": "en", "text": "make a day plan for two college friends visiting", "intent": "CREATE_ITINERARY"}
+{"id": "k080", "split": "dev", "lang": "en", "text": "evening itinerary around Koramangala with food", "intent": "CREATE_ITINERARY"}
+{"id": "k081", "split": "dev", "lang": "en", "text": "we're exhausted, lighten it up", "intent": "MODIFY_ITINERARY", "ctx": "plan"}
+{"id": "k082", "split": "dev", "lang": "en", "text": "swap the museum", "intent": "MODIFY_ITINERARY", "ctx": "plan"}
+{"id": "k083", "split": "dev", "lang": "en", "text": "we must be done by 5:30", "intent": "MODIFY_ITINERARY", "ctx": "plan"}
+{"id": "k084", "split": "dev", "lang": "en", "text": "make it more kid friendly", "intent": "MODIFY_ITINERARY", "ctx": "plan"}
+{"id": "k085", "split": "dev", "lang": "en", "text": "revert that change", "intent": "MODIFY_ITINERARY", "ctx": "plan"}
+{"id": "k086", "split": "dev", "lang": "en", "text": "hypothetically, if it rains all day?", "intent": "WHAT_IF_ITINERARY", "ctx": "plan"}
+{"id": "k087", "split": "dev", "lang": "en", "text": "what about if we add a lake?", "intent": "WHAT_IF_ITINERARY", "ctx": "plan"}
+{"id": "k088", "split": "dev", "lang": "en", "text": "how did you decide on this route?", "intent": "PLAN_EXPLANATION", "ctx": "plan"}
+{"id": "k089", "split": "dev", "lang": "en", "text": "not feeling these, show others", "intent": "SHOW_DIFFERENT", "ctx": "results"}
+{"id": "k090", "split": "dev", "lang": "en", "text": "different ideas please", "intent": "SHOW_DIFFERENT", "ctx": "results"}
+{"id": "k091", "split": "dev", "lang": "en", "text": "anything like Wonderla but smaller?", "intent": "SHOW_SIMILAR"}
+{"id": "k092", "split": "dev", "lang": "en", "text": "add the first one to my favourites", "intent": "SAVE_PLACE", "ctx": "results"}
+{"id": "k093", "split": "dev", "lang": "en", "text": "random pick please", "intent": "SURPRISE_ME"}
+{"id": "k094", "split": "dev", "lang": "en", "text": "feeling down, need to get out", "intent": "MOOD_DISCOVERY"}
+{"id": "k095", "split": "dev", "lang": "en", "text": "what is Bengaluru's famous street food", "intent": "GENERAL_BENGALURU", "also": ["DISCOVER"]}
+{"id": "k096", "split": "dev", "lang": "en", "text": "how safe is Bangalore at night", "intent": "GENERAL_BENGALURU"}
+{"id": "k097", "split": "dev", "lang": "en", "text": "what's the capital of France", "intent": "OUT_OF_SCOPE"}
+{"id": "k098", "split": "dev", "lang": "en", "text": "fix my laptop wifi", "intent": "OUT_OF_SCOPE"}
+{"id": "k099", "split": "dev", "lang": "en", "text": "either is fine", "intent": "CLARIFICATION_RESPONSE", "ctx": "pending"}
+{"id": "k100", "split": "dev", "lang": "en", "text": "ok go ahead", "intent": "CLARIFICATION_RESPONSE", "ctx": "pending"}
+{"id": "k101", "split": "dev", "lang": "hinglish", "text": "boring lag raha hai, kuch batao", "intent": "MOOD_DISCOVERY"}
+{"id": "k102", "split": "dev", "lang": "hinglish", "text": "dosto ke saath kahan jaaye?", "intent": "DISCOVER"}
+{"id": "k103", "split": "dev", "lang": "hinglish", "text": "Indiranagar mein koi accha cafe", "intent": "PLACE_SEARCH"}
+{"id": "k104", "split": "dev", "lang": "hinglish", "text": "kal subah ka plan banao", "intent": "CREATE_ITINERARY"}
+{"id": "k105", "split": "dev", "lang": "hinglish", "text": "kuch naya dikhao", "intent": "SHOW_DIFFERENT", "ctx": "results"}
+{"id": "k106", "split": "dev", "lang": "hinglish", "text": "thoda sasta karo", "intent": "MODIFY_ITINERARY", "ctx": "plan"}
+{"id": "k107", "split": "dev", "lang": "hinglish", "text": "agar baarish hui toh kya karein?", "intent": "WHAT_IF_ITINERARY", "ctx": "plan"}
+{"id": "k108", "split": "dev", "lang": "hinglish", "text": "Cubbon Park kab tak khula rehta hai?", "intent": "PLACE_DETAILS"}
+{"id": "k109", "split": "dev", "lang": "kn-roman", "text": "sanje yelli hogona?", "intent": "DISCOVER"}
+{"id": "k110", "split": "dev", "lang": "kn-roman", "text": "bejaar aagide guru", "intent": "MOOD_DISCOVERY"}
+{"id": "k111", "split": "dev", "lang": "kn-roman", "text": "Jayanagar hatthira park", "intent": "PLACE_SEARCH"}
+{"id": "k112", "split": "dev", "lang": "kn-roman", "text": "bere yenadru heli", "intent": "SHOW_DIFFERENT", "ctx": "results"}
+{"id": "k113", "split": "dev", "lang": "kn", "text": "ಬೆಂಗಳೂರು ಅರಮನೆ ಯಾರು ಕಟ್ಟಿದರು?", "intent": "LOCAL_KNOWLEDGE"}
+{"id": "k114", "split": "dev", "lang": "kn", "text": "ಏನಾದರೂ ಸರ್ಪ್ರೈಸ್ ಮಾಡಿ", "intent": "SURPRISE_ME"}
+{"id": "k115", "split": "dev", "lang": "en", "text": "night markets", "intent": "DISCOVER"}
+{"id": "k116", "split": "dev", "lang": "en", "text": "karaoke bars in Koramangala", "intent": "PLACE_SEARCH"}
+{"id": "k117", "split": "dev", "lang": "en", "text": "somewhere scenic for photos", "intent": "DISCOVER"}
+{"id": "k118", "split": "dev", "lang": "en", "text": "I want something adventurous this Sunday", "intent": "DISCOVER"}
+{"id": "k119", "split": "dev", "lang": "en", "text": "heritage walks", "intent": "DISCOVER"}
+{"id": "k120", "split": "dev", "lang": "en", "text": "where do families go on Sundays?", "intent": "DISCOVER"}
+{"id": "m001", "split": "test", "lang": "en", "text": "so bored, entertain me", "intent": "MOOD_DISCOVERY"}
+{"id": "m002", "split": "test", "lang": "en", "text": "throw a random suggestion at me", "intent": "SURPRISE_ME"}
+{"id": "m003", "split": "test", "lang": "en", "text": "what's worth doing this Saturday?", "intent": "DISCOVER"}
+{"id": "m004", "split": "test", "lang": "en", "text": "biryani joints near Shivajinagar", "intent": "PLACE_SEARCH"}
+{"id": "m005", "split": "test", "lang": "en", "text": "can I bring food into Lalbagh?", "intent": "PLACE_DETAILS"}
+{"id": "m006", "split": "test", "lang": "en", "text": "what's the story of the Bangalore Fort?", "intent": "LOCAL_KNOWLEDGE"}
+{"id": "m007", "split": "test", "lang": "en", "text": "Bannerghatta or the zoo in Mysore road side, which one for kids?", "intent": "COMPARE_PLACES"}
+{"id": "m008", "split": "test", "lang": "en", "text": "I need a plan for Diwali weekend with my cousins", "intent": "CREATE_ITINERARY"}
+{"id": "m009", "split": "test", "lang": "en", "text": "delete the museum from it", "intent": "MODIFY_ITINERARY", "ctx": "plan"}
+{"id": "m010", "split": "test", "lang": "en", "text": "what if we started from Indiranagar instead?", "intent": "WHAT_IF_ITINERARY", "ctx": "plan"}
+{"id": "m011", "split": "test", "lang": "en", "text": "why'd you put the lake before lunch?", "intent": "PLAN_EXPLANATION", "ctx": "plan"}
+{"id": "m012", "split": "test", "lang": "en", "text": "meh, show me a different set", "intent": "SHOW_DIFFERENT", "ctx": "results"}
+{"id": "m013", "split": "test", "lang": "en", "text": "find more like the first", "intent": "SHOW_SIMILAR", "ctx": "results"}
+{"id": "m014", "split": "test", "lang": "en", "text": "save the third place", "intent": "SAVE_PLACE", "ctx": "results"}
+{"id": "m015", "split": "test", "lang": "en", "text": "what's the best phone under 20000", "intent": "OUT_OF_SCOPE"}
+{"id": "m016", "split": "test", "lang": "en", "text": "is Bengaluru cold in January?", "intent": "GENERAL_BENGALURU"}
+{"id": "m017", "split": "test", "lang": "en", "text": "after lunch", "intent": "CLARIFICATION_RESPONSE", "ctx": "pending"}
+{"id": "m018", "split": "test", "lang": "en", "text": "hiya", "intent": "MOOD_DISCOVERY"}
+{"id": "m019", "split": "test", "lang": "en", "text": "places with live jazz", "intent": "DISCOVER"}
+{"id": "m020", "split": "test", "lang": "en", "text": "underrated cafes", "intent": "DISCOVER"}
+{"id": "m021", "split": "test", "lang": "en", "text": "a relaxing getaway two hours out", "intent": "DISCOVER"}
+{"id": "m022", "split": "test", "lang": "en", "text": "something educational for a 10 year old", "intent": "DISCOVER"}
+{"id": "m023", "split": "test", "lang": "en", "text": "sushi places in Indiranagar", "intent": "PLACE_SEARCH"}
+{"id": "m024", "split": "test", "lang": "en", "text": "anything interesting near Hebbal?", "intent": "PLACE_SEARCH"}
+{"id": "m025", "split": "test", "lang": "en", "text": "what are the timings for the Tipu palace?", "intent": "PLACE_DETAILS"}
+{"id": "m026", "split": "test", "lang": "en", "text": "is photography allowed inside Bangalore Palace?", "intent": "PLACE_DETAILS"}
+{"id": "m027", "split": "test", "lang": "en", "text": "tell me about the first place", "intent": "PLACE_DETAILS", "ctx": "results"}
+{"id": "m028", "split": "test", "lang": "en", "text": "who founded Bengaluru?", "intent": "GENERAL_BENGALURU", "also": ["LOCAL_KNOWLEDGE"]}
+{"id": "m029", "split": "test", "lang": "en", "text": "why was Cubbon Park named that?", "intent": "LOCAL_KNOWLEDGE"}
+{"id": "m030", "split": "test", "lang": "en", "text": "when did Vidhana Soudha get built", "intent": "LOCAL_KNOWLEDGE"}
+{"id": "m031", "split": "test", "lang": "en", "text": "is Nandi Hills better than Skandagiri for sunrise", "intent": "COMPARE_PLACES"}
+{"id": "m032", "split": "test", "lang": "en", "text": "how do the first two compare on cost?", "intent": "COMPARE_PLACES", "ctx": "results"}
+{"id": "m033", "split": "test", "lang": "en", "text": "set up a food trail for Sunday morning", "intent": "CREATE_ITINERARY"}
+{"id": "m034", "split": "test", "lang": "en", "text": "we're 3 people with a car, 6 hours, plan it", "intent": "CREATE_ITINERARY"}
+{"id": "m035", "split": "test", "lang": "en", "text": "draft an itinerary for tomorrow evening", "intent": "CREATE_ITINERARY"}
+{"id": "m036", "split": "test", "lang": "en", "text": "bring the cost down", "intent": "MODIFY_ITINERARY", "ctx": "plan"}
+{"id": "m037", "split": "test", "lang": "en", "text": "just keep two stops", "intent": "MODIFY_ITINERARY", "ctx": "plan"}
+{"id": "m038", "split": "test", "lang": "en", "text": "replace stop three with a cafe", "intent": "MODIFY_ITINERARY", "ctx": "plan"}
+{"id": "m039", "split": "test", "lang": "en", "text": "can we start at 9 instead", "intent": "MODIFY_ITINERARY", "ctx": "plan"}
+{"id": "m040", "split": "test", "lang": "en", "text": "add a stop for snacks", "intent": "MODIFY_ITINERARY", "ctx": "plan"}
+{"id": "m041", "split": "test", "lang": "en", "text": "undo please", "intent": "MODIFY_ITINERARY", "ctx": "plan"}
+{"id": "m042", "split": "test", "lang": "en", "text": "what if the budget doubled?", "intent": "WHAT_IF_ITINERARY", "ctx": "plan"}
+{"id": "m043", "split": "test", "lang": "en", "text": "suppose we skip the temple, how does it look", "intent": "WHAT_IF_ITINERARY", "ctx": "plan"}
+{"id": "m044", "split": "test", "lang": "en", "text": "why this plan?", "intent": "PLAN_EXPLANATION", "ctx": "plan"}
+{"id": "m045", "split": "test", "lang": "en", "text": "why did you end with a market?", "intent": "PLAN_EXPLANATION", "ctx": "plan"}
+{"id": "m046", "split": "test", "lang": "en", "text": "something new please", "intent": "SHOW_DIFFERENT", "ctx": "results"}
+{"id": "m047", "split": "test", "lang": "en", "text": "any other options nearby?", "intent": "SHOW_DIFFERENT", "ctx": "results"}
+{"id": "m048", "split": "test", "lang": "en", "text": "more parks like Cubbon", "intent": "SHOW_SIMILAR"}
+{"id": "m049", "split": "test", "lang": "en", "text": "similar vibe to the second one please", "intent": "SHOW_SIMILAR", "ctx": "results"}
+{"id": "m050", "split": "test", "lang": "en", "text": "save Cubbon Park to my list", "intent": "SAVE_PLACE"}
+{"id": "m051", "split": "test", "lang": "en", "text": "save it", "intent": "SAVE_PLACE", "ctx": "results"}
+{"id": "m052", "split": "test", "lang": "en", "text": "dealer's choice tonight", "intent": "SURPRISE_ME"}
+{"id": "m053", "split": "test", "lang": "en", "text": "surprise me, something outside the city", "intent": "SURPRISE_ME"}
+{"id": "m054", "split": "test", "lang": "en", "text": "feeling restless on a Sunday", "intent": "MOOD_DISCOVERY"}
+{"id": "m055", "split": "test", "lang": "en", "text": "I'm in a bad mood", "intent": "MOOD_DISCOVERY"}
+{"id": "m056", "split": "test", "lang": "en", "text": "hey!", "intent": "MOOD_DISCOVERY"}
+{"id": "m057", "split": "test", "lang": "en", "text": "what is Bengaluru's population", "intent": "GENERAL_BENGALURU"}
+{"id": "m058", "split": "test", "lang": "en", "text": "what makes Bangalore's food scene special", "intent": "GENERAL_BENGALURU"}
+{"id": "m059", "split": "test", "lang": "en", "text": "will it rain tonight?", "intent": "GENERAL_BENGALURU"}
+{"id": "m060", "split": "test", "lang": "en", "text": "how's Bangalore in the summer", "intent": "GENERAL_BENGALURU"}
+{"id": "m061", "split": "test", "lang": "en", "text": "weekend trip to Coorg ideas", "intent": "OUT_OF_SCOPE"}
+{"id": "m062", "split": "test", "lang": "en", "text": "summarise this pdf", "intent": "OUT_OF_SCOPE"}
+{"id": "m063", "split": "test", "lang": "en", "text": "flights from Bangalore to Delhi", "intent": "OUT_OF_SCOPE"}
+{"id": "m064", "split": "test", "lang": "en", "text": "surprise me on timing", "intent": "CLARIFICATION_RESPONSE", "ctx": "pending", "also": ["SURPRISE_ME"]}
+{"id": "m065", "split": "test", "lang": "en", "text": "500 per person", "intent": "CLARIFICATION_RESPONSE", "ctx": "pending"}
+{"id": "m066", "split": "test", "lang": "en", "text": "10 to 2", "intent": "CLARIFICATION_RESPONSE", "ctx": "pending"}
+{"id": "m067", "split": "test", "lang": "en", "text": "a place to watch planes", "intent": "DISCOVER"}
+{"id": "m068", "split": "test", "lang": "en", "text": "good places for dosa", "intent": "DISCOVER"}
+{"id": "m069", "split": "test", "lang": "en", "text": "air-conditioned places for a hot day", "intent": "DISCOVER"}
+{"id": "m070", "split": "test", "lang": "en", "text": "romantic spots for a proposal", "intent": "DISCOVER"}
+{"id": "m071", "split": "test", "lang": "en", "text": "what to do near Yeshwanthpur", "intent": "PLACE_SEARCH"}
+{"id": "m072", "split": "test", "lang": "en", "text": "gyms and parks in Sadashivanagar", "intent": "PLACE_SEARCH"}
+{"id": "m073", "split": "test", "lang": "en", "text": "desserts around Lavelle Road", "intent": "PLACE_SEARCH"}
+{"id": "m074", "split": "test", "lang": "en", "text": "Lalbagh", "intent": "PLACE_DETAILS"}
+{"id": "m075", "split": "test", "lang": "en", "text": "is ISKCON temple worth a visit?", "intent": "PLACE_DETAILS"}
+{"id": "m076", "split": "test", "lang": "en", "text": "does Wonderla have lockers?", "intent": "PLACE_DETAILS"}
+{"id": "m077", "split": "test", "lang": "en", "text": "why is Lalbagh's glasshouse famous", "intent": "LOCAL_KNOWLEDGE"}
+{"id": "m078", "split": "test", "lang": "en", "text": "plan a date night in Indiranagar", "intent": "CREATE_ITINERARY"}
+{"id": "m079", "split": "test", "lang": "en", "text": "arrange a half day around Cubbon Park and museums", "intent": "CREATE_ITINERARY"}
+{"id": "m080", "split": "test", "lang": "en", "text": "make an itinerary with 4 stops", "intent": "CREATE_ITINERARY"}
+{"id": "m081", "split": "test", "lang": "en", "text": "shorten it", "intent": "MODIFY_ITINERARY", "ctx": "plan"}
+{"id": "m082", "split": "test", "lang": "en", "text": "switch the mall for a park", "intent": "MODIFY_ITINERARY", "ctx": "plan"}
+{"id": "m083", "split": "test", "lang": "en", "text": "finish an hour earlier", "intent": "MODIFY_ITINERARY", "ctx": "plan"}
+{"id": "m084", "split": "test", "lang": "en", "text": "more nature in the plan please", "intent": "MODIFY_ITINERARY", "ctx": "plan"}
+{"id": "m085", "split": "test", "lang": "en", "text": "restore the earlier version", "intent": "MODIFY_ITINERARY", "ctx": "plan"}
+{"id": "m086", "split": "test", "lang": "en", "text": "what if we went on a weekday", "intent": "WHAT_IF_ITINERARY", "ctx": "plan"}
+{"id": "m087", "split": "test", "lang": "en", "text": "imagine if we had only 500 rupees", "intent": "WHAT_IF_ITINERARY", "ctx": "plan"}
+{"id": "m088", "split": "test", "lang": "en", "text": "why did you choose that restaurant?", "intent": "PLAN_EXPLANATION", "ctx": "plan"}
+{"id": "m089", "split": "test", "lang": "en", "text": "none of these appeal to me", "intent": "SHOW_DIFFERENT", "ctx": "results"}
+{"id": "m090", "split": "test", "lang": "en", "text": "show me another few", "intent": "SHOW_DIFFERENT", "ctx": "results"}
+{"id": "m091", "split": "test", "lang": "en", "text": "places like Commercial Street", "intent": "SHOW_SIMILAR"}
+{"id": "m092", "split": "test", "lang": "en", "text": "bookmark the last one", "intent": "SAVE_PLACE", "ctx": "results"}
+{"id": "m093", "split": "test", "lang": "en", "text": "pick anything for me", "intent": "SURPRISE_ME"}
+{"id": "m094", "split": "test", "lang": "en", "text": "lonely and bored this weekend", "intent": "MOOD_DISCOVERY"}
+{"id": "m095", "split": "test", "lang": "en", "text": "what's special about Bengaluru's weather", "intent": "GENERAL_BENGALURU"}
+{"id": "m096", "split": "test", "lang": "en", "text": "which festivals is Bangalore known for", "intent": "GENERAL_BENGALURU"}
+{"id": "m097", "split": "test", "lang": "en", "text": "recommend a good laptop", "intent": "OUT_OF_SCOPE"}
+{"id": "m098", "split": "test", "lang": "en", "text": "tell me a joke", "intent": "OUT_OF_SCOPE"}
+{"id": "m099", "split": "test", "lang": "en", "text": "whatever you think", "intent": "CLARIFICATION_RESPONSE", "ctx": "pending"}
+{"id": "m100", "split": "test", "lang": "en", "text": "yep", "intent": "CLARIFICATION_RESPONSE", "ctx": "pending"}
+{"id": "m101", "split": "test", "lang": "hinglish", "text": "yaar bore ho gaya, kuch karte hai", "intent": "MOOD_DISCOVERY"}
+{"id": "m102", "split": "test", "lang": "hinglish", "text": "shaam ko ghoomne kahan jaaye?", "intent": "DISCOVER"}
+{"id": "m103", "split": "test", "lang": "hinglish", "text": "HSR mein best momos", "intent": "PLACE_SEARCH"}
+{"id": "m104", "split": "test", "lang": "hinglish", "text": "parso ke liye plan bana do", "intent": "CREATE_ITINERARY"}
+{"id": "m105", "split": "test", "lang": "hinglish", "text": "koi aur option dikhao", "intent": "SHOW_DIFFERENT", "ctx": "results"}
+{"id": "m106", "split": "test", "lang": "hinglish", "text": "temple wala hata do", "intent": "MODIFY_ITINERARY", "ctx": "plan"}
+{"id": "m107", "split": "test", "lang": "hinglish", "text": "agar hum 5 log ho toh?", "intent": "WHAT_IF_ITINERARY", "ctx": "plan"}
+{"id": "m108", "split": "test", "lang": "hinglish", "text": "Wonderla ka ticket kitne ka hai", "intent": "PLACE_DETAILS"}
+{"id": "m109", "split": "test", "lang": "kn-roman", "text": "ivattu yelli hogbeku?", "intent": "DISCOVER"}
+{"id": "m110", "split": "test", "lang": "kn-roman", "text": "bore aagtide maga", "intent": "MOOD_DISCOVERY"}
+{"id": "m111", "split": "test", "lang": "kn-roman", "text": "Malleshwaram hatthira coffee", "intent": "PLACE_SEARCH"}
+{"id": "m112", "split": "test", "lang": "kn-roman", "text": "naale plan maadkodi", "intent": "CREATE_ITINERARY"}
+{"id": "m113", "split": "test", "lang": "kn", "text": "ವಿಧಾನಸೌಧ ಯಾವಾಗ ಕಟ್ಟಿದರು?", "intent": "LOCAL_KNOWLEDGE"}
+{"id": "m114", "split": "test", "lang": "kn", "text": "ಬೇರೆ ಜಾಗ ತೋರಿಸಿ", "intent": "SHOW_DIFFERENT", "ctx": "results"}
+{"id": "m115", "split": "test", "lang": "en", "text": "stargazing spots", "intent": "DISCOVER"}
+{"id": "m116", "split": "test", "lang": "en", "text": "bowling alleys in Whitefield", "intent": "PLACE_SEARCH"}
+{"id": "m117", "split": "test", "lang": "en", "text": "somewhere peaceful to meditate", "intent": "DISCOVER"}
+{"id": "m118", "split": "test", "lang": "en", "text": "I'd love to see some old temples", "intent": "DISCOVER"}
+{"id": "m119", "split": "test", "lang": "en", "text": "flea markets", "intent": "DISCOVER"}
+{"id": "m120", "split": "test", "lang": "en", "text": "what's good to do with grandparents", "intent": "DISCOVER"}

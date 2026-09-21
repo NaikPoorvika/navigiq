@@ -158,3 +158,62 @@ def test_budget_word_with_amount_is_not_a_cheap_mood():
                                              ("quantum physics", None)])
 def test_controlled_interest(value, expected):
     assert controlled_interest(value) == expected
+
+
+# --- regressions found by the evaluation suites (docs/reports/evaluation_history.md) -----------
+
+@pytest.mark.parametrize("text,size,kind", [
+    ("with 4 friends", 5, PartyType.FRIENDS),                 # the speaker comes too
+    ("3 colleagues and me", 4, PartyType.COLLEAGUES),
+    ("2 adults and a toddler", 3, PartyType.FAMILY_WITH_KIDS),
+    ("2 adults 2 kids", 4, PartyType.FAMILY_WITH_KIDS),
+    ("family of five", 5, PartyType.FAMILY),
+    ("we're 2 couples", 4, None),
+    ("just me", 1, PartyType.SOLO),
+    ("plan for 2 on Friday", 2, None),
+    ("aaj raat kuch masti, 4 log", 4, None),
+    ("romantic dinner date", 2, PartyType.COUPLE),
+])
+def test_party_composites(text, size, kind):
+    p = parse_party(text)
+    assert p.size == size and p.party_type == kind
+
+
+def test_kid_friendly_describes_places_not_the_party():
+    assert parse_party("kid friendly places") is None
+
+
+@pytest.mark.parametrize("text,start,end", [
+    ("kal shaam 5 se 9 tak", "17:00", "21:00"),
+    ("naale beligge 8 rinda 12 varege", "08:00", "12:00"),
+    ("aaj raat 9 se 12 tak", "21:00", "23:59"),
+    ("noon to 5", "12:00", "17:00"),
+    ("leave 5 am, back by 1 pm", "05:00", "13:00"),
+    ("start at noon and end by 6", "12:00", "18:00"),
+    ("head out at 6, back by 6 pm", "06:00", "18:00"),
+    ("date night from 7", "19:00", None),
+    ("3pm onwards", "15:00", None),
+])
+def test_time_window_phrasings(text, start, end):
+    tw = resolve_time_window(text)
+    assert tw.start_hhmm == start and tw.end_hhmm == end
+
+
+@pytest.mark.parametrize("text,expected", [
+    ("Monday next week", date(2026, 9, 28)),
+    ("next week on Friday", date(2026, 10, 2)),
+])
+def test_next_week_weekday(text, expected):
+    assert resolve_date(text, MON).value == expected
+
+
+def test_money_for_the_party_and_totals():
+    assert parse_budget("4000 for both of us").amount == 4000
+    assert parse_budget("we're 3 people with 4500 total").amount == 4500
+    assert parse_budget("1500 per banda").per_person
+    assert parse_budget("3 for 2 hours") is None
+
+
+def test_negation_before_a_place_does_not_negate_interests():
+    p = parse_interests("not near Majestic, street food")
+    assert "street_food" in p.interests and not p.avoid_interests

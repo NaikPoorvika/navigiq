@@ -215,6 +215,22 @@ def test_brand_qid_on_distant_branches_is_cleared_not_merged():
     assert len(out) == 3 and all(r["wikidata_id"] is None for r in out)
 
 
+def test_curated_landmark_absorbs_nearby_same_name_duplicates():
+    # regression: the curated Bull Temple (a Wikidata item) competed with two
+    # OSM "Bull Temple" nodes in search, so the name was always "ambiguous"
+    lat, lon = at(200, 3)
+    landmark = _rec("Dodda Basavana Gudi (Bull Temple)", "temple", lat, lon, "node/1",
+                    qid="Q1531614", curated=True, aliases=["Bull Temple", "Nandi Temple"])
+    near = _rec("Bull Temple", "temple", lat + 0.0005, lon, "node/2")           # ~55 m
+    far = _rec("Bull Temple", "temple", lat + 0.02, lon, "node/3")              # ~2.2 km
+    other_group = _rec("Bull Temple", "restaurant", lat, lon + 0.0003, "node/4")
+    other_qid = _rec("Bull Temple", "temple", lat, lon + 0.0002, "node/5", qid="Q99")
+    out = P.absorb_curated_duplicates([landmark, near, far, other_group, other_qid], P.Manifest())
+    refs = {r["source_ref"] for r in out}
+    assert refs == {"node/1", "node/3", "node/4", "node/5"}
+    assert landmark["merged_refs"] == ["node/2"]
+
+
 def test_chain_detection_by_repeated_names():
     recs = [_rec("Chain Tea", "cafe", *at(i * 60, 4 + i), f"node/{i + 1}") for i in range(4)]
     out = P.deduplicate(recs, P.Manifest())

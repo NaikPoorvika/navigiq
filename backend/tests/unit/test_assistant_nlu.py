@@ -246,3 +246,14 @@ async def test_extraction_with_fake_llm_merges_and_never_breaks_on_garbage():
     assert "photography" in ex2.spec.interests and "unknown_x" not in ex2.spec.interests
     assert ex2.area_names == [] and ex2.must_include_names == []   # not in the user's words
     assert ex2.spec.party_type.value == "friends"
+
+
+@pytest.mark.parametrize("text,areas", [
+    ("Surprise me", []), ("show me cafes", []),         # regression: English "me" is not "mein"
+    ("Koramangala mein chill karna hai", ["koramangala"]),
+    ("naale sanje Indiranagar alli", ["indiranagar"]),
+    ("a heritage morning in Basavanagudi the day after tomorrow", ["basavanagudi"]),
+    ("within 2 hours from now near Jayanagar", ["jayanagar"]),
+])
+def test_area_phrases_in_three_languages(text, areas):
+    assert extract_areas(text) == areas

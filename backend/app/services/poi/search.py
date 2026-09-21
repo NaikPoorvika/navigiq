@@ -12,6 +12,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+from rapidfuzz import fuzz
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -34,6 +35,7 @@ class NameMatch:
     similarity: float
     exact: bool
     score: float
+    coverage: float = 1.0     # share of the query's words found in the matched name
 
 
 @dataclass
@@ -87,10 +89,37 @@ async def resolve_poi_name(db: AsyncSession, name: str, *, limit: int = 5) -> li
             continue
         score = (2.0 if r.exact else 0.0) + 0.7 * sim + 0.2 * float(r.quality_score) + \
             0.1 * float(r.prominence)
-        m = NameMatch(r.id, r.name, r.matched, sim, bool(r.exact), score)
+        m = NameMatch(r.id, r.name, r.matched, sim, bool(r.exact), score,
+                      1.0 if r.exact else token_coverage(q, r.matched))
         if r.id not in best or best[r.id].score < score:
             best[r.id] = m
     return sorted(best.values(), key=lambda m: (-m.score, m.poi_id))[:limit]
+
+
+_COVERAGE_STOP = {"the", "a", "an", "of", "and", "in", "at", "to", "on", "near"}
+
+
+def _word_matches(word: str, name_words: list[str]) -> bool:
+    for n in name_words:
+        if word == n or (len(word) >= 3 and n.startswith(word)) or \
+                (len(word) >= 4 and word in n) or (len(n) >= 4 and word.startswith(n)) or \
+                fuzz.ratio(word, n) >= 80:
+            return True
+    return False
+
+
+def token_coverage(query: str, matched: str) -> float:
+    """Share of the query's words that appear (allowing typos, prefixes and
+    run-together spellings: "lal bagh" ~ "lalbagh") in the matched name.
+
+    Trigram word_similarity alone rates "hey there" as a 0.6 match for a POI
+    whose long name contains "there"; requiring the user's words to be in the
+    name stops greetings and generic phrases resolving to random places."""
+    words = [w for w in query.split() if w not in _COVERAGE_STOP and len(w) >= 2]
+    if not words:
+        return 1.0
+    name_words = matched.split()
+    return sum(_word_matches(w, name_words) for w in words) / len(words)
 
 
 def unambiguous(matches: list[NameMatch]) -> NameMatch | None:
@@ -101,6 +130,9 @@ def unambiguous(matches: list[NameMatch]) -> NameMatch | None:
     if top.exact and (len(matches) == 1 or not matches[1].exact):
         return top
     if top.similarity < 0.5:
+        return None
+    words = len([w for w in top.matched_text.split() if w not in _COVERAGE_STOP])
+    if top.coverage < (1.0 if words <= 2 else 0.66):
         return None
     if len(matches) == 1:
         return top

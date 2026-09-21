@@ -210,15 +210,19 @@ class Agent:
                               has_results=bool(self.state.last_pois),
                               pending_clarification=self.state.pending_clarification is not None)
         guess = I.classify_rules(message, ctx)
-        if guess.confidence >= I.ACCEPT_THRESHOLD:
-            return guess
-        if guess.rule == "bare_name":
+        name_like = guess.rule == "discover" and I.looks_like_name(message)
+        if guess.rule == "bare_name" or name_like:
+            # "Nandi Hills" contains an interest word but is a place: confirm
+            # with a lookup, and for interest-bearing text demand a close match.
             try:
                 found = await self.tool("resolve_poi_name", name=message[:80])
-                if found["resolved"]:
+                if found["resolved"] and (not name_like or found["candidates"][0]["similarity"]
+                                          >= 0.8):
                     return I.IntentGuess(I.Intent.PLACE_DETAILS, 0.85, "rules", "bare_name_poi")
             except ToolFailure:
                 pass
+        if guess.confidence >= I.ACCEPT_THRESHOLD and guess.rule not in I.WEAK_RULES:
+            return guess
         if self.llm_ok:
             try:
                 res = await self.llm.run(
@@ -235,6 +239,11 @@ class Agent:
                                      I.Intent.PLAN_EXPLANATION) and not ctx.has_plan:
                         llm_guess = I.Intent.CREATE_ITINERARY
                     if float(conf) >= LLM_INTENT_MIN:
+                        if {llm_guess, guess.intent} <= I.SEARCH_FAMILY:
+                            # Same workflow; the rules know whether an area was
+                            # named, which is what separates the two labels.
+                            return I.IntentGuess(guess.intent, float(conf), "rules+llm",
+                                                 guess.rule)
                         return I.IntentGuess(llm_guess, float(conf), "llm", None,
                                              [(guess.intent, guess.confidence)])
             except LLMError:

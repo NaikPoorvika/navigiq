@@ -22,6 +22,7 @@ from app.nlu.text import normalize_utterance, phrase_pattern
 CLAUSE_BREAK = re.compile(r"[.;!?]|\b(?:but|however|instead|just|only|prefer|like|love|want|"
                           r"enjoy|need|looking for|interested in)\b")
 CONNECTORS = {"or", "and", "nor", ",", "/", "&"}
+LOCATIVE = re.compile(r"\s+(?:near|in|around|at|close to|next to|from|towards)\b")
 NEGATION_WINDOW_TOKENS = 6
 
 
@@ -87,7 +88,7 @@ def lexicon() -> Lexicon:
                 raise ValueError(f"lexicon: unknown mood {m!r}")
         for phrase in e["phrases"]:
             p = normalize_utterance(str(phrase))
-            entries.append(LexEntry(p, phrase_pattern(p), cats, tags, moods))
+            entries.append(LexEntry(p, phrase_pattern(p, plural=True), cats, tags, moods))
     entries.sort(key=lambda x: (-len(x.phrase), x.phrase))
     negators = tuple(phrase_pattern(normalize_utterance(n))
                      for n in sorted(raw["negators"], key=len, reverse=True))
@@ -118,6 +119,9 @@ def parse_interests(utterance: str) -> InterestParse:
     negator_spans = []
     for pat in lex.negators:
         for m in pat.finditer(text):
+            # "not near Majestic, street food": the negation is about a place.
+            if LOCATIVE.match(text, m.end()):
+                continue
             if not any(taken[m.start():m.end()]):
                 negator_spans.append((m.start(), m.end()))
     negator_spans.sort()
@@ -179,6 +183,8 @@ def parse_interests(utterance: str) -> InterestParse:
     for cs, _ in crowd_spans:
         if governed(cs, 4):
             out.crowd_averse = True
+    if any(p.startswith("+") and "crowd" in p for p in out.matched_phrases):
+        out.crowd_averse = True           # "no crowds", "less crowded" are quiet-mood phrases
     if out.crowd_averse and "quiet" not in out.moods:
         out.moods.append("quiet")
 

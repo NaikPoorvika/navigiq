@@ -33,23 +33,45 @@ from app.nlu.timeparse import (
 )
 from app.schemas.tripspec import TripSpec, is_controlled_interest, minutes_to_hhmm
 
+# The name is captured inside a lookahead so matches can overlap: in "from now
+# near Jayanagar" both "from ..." and "near Jayanagar" are considered.
 AREA_RE = re.compile(
     r"\b(?:near|around|in|at|close to|nearby|next to|from|hatthira|ke paas|side of)\s+"
-    r"([a-z][a-z.'-]*(?:\s+[a-z][a-z.'-]*){0,3})")
+    r"(?=([a-z][a-z.'-]*(?:\s+[a-z][a-z.'-]*){0,3}))")
+# Hindi / Kannada postpositions follow the place: "Koramangala mein", "Jayanagar alli".
+AREA_POST_RE = re.compile(r"\b([a-z][a-z.'-]{3,30}(?:\s+[a-z][a-z.'-]{2,20})?)\s+"
+                          r"(?:mein|alli|nalli|hatthira|hattira|ke paas)\b")
+# "not near Koramangala", "avoid Whitefield", "anywhere but MG Road".
+AVOID_AREA_RE = re.compile(
+    r"\b(?:not (?:near|in|around|at)|avoid(?:ing)?|away from|anywhere but|except|nowhere near|"
+    r"not)\s+([a-z][a-z.'-]*(?:\s+[a-z][a-z.'-]*){0,3})")
 AREA_STOP = {"the", "a", "an", "morning", "evening", "afternoon", "night", "tonight", "today",
              "tomorrow", "bengaluru", "bangalore", "city", "the city", "town", "weekend",
              "noon", "rs", "budget", "mind", "general", "total", "time", "all", "my", "our",
              "front", "person", "advance", "case", "which", "that", "this", "it", "there",
              "about", "least", "most", "rain", "peace", "search", "place", "places",
-             "around", "outskirts", "nature", "view", "stock", "hand", "detail", "search of"}
+             "around", "outskirts", "nature", "view", "stock", "hand", "detail", "search of",
+             # things people are "in" that are not places
+             "wheelchair", "a wheelchair", "pram", "stroller", "car", "cab", "auto", "hurry",
+             "group", "mood", "pain", "love", "office", "college", "school", "queue", "line",
+             "traffic", "bed", "home", "cash", "now", "then", "here"}
 CITY_NAMES = {"bengaluru", "bangalore", "blr", "bengalooru", "bengaluru urban", "ooru"}
 AREA_TRIM = re.compile(r"\s+(for|with|and|but|or|to|under|below|within|by|at|on|from|in|"
                        r"tomorrow|today|tonight|please|this|next|between|budget|rs|around|"
-                       r"after|before|till|until|me|us|we|i|if|because|that|which)\b.*$")
+                       r"after|before|till|until|me|us|we|i|if|because|that|which|the|day|"
+                       r"morning|evening|afternoon|night|now|then)\b.*$")
 MUST_RE = re.compile(r"\b(?:must (?:visit|see|include|go to)|definitely (?:visit|include|go to)|"
                      r"include|have to (?:visit|see|go to)|make sure (?:we|i) (?:visit|see)|"
-                     r"start (?:at|with|from)|end (?:at|with))\s+"
+                     r"start (?:at|with|from)|end (?:at|with)|must-visit|trek to|hike to|"
+                     r"trip to|go to|visit)\s+"
                      r"([a-z][a-z.'-]*(?:\s+[a-z][a-z.'-]*){0,4})")
+# "a full day at Nandi Hills", "picnic at Lalbagh": the named landmark is the outing.
+MUST_AT_RE = re.compile(r"\b(?:day|morning|evening|afternoon|picnic|trip|hike|trek|walk|outing|"
+                        r"sunrise|sunset)\s+(?:at|to|in)\s+([a-z][a-z.'-]{3,}(?:\s+[a-z][a-z.'-]*){0,3}"
+                        r"\s+(?:hills?|palace|fort|falls|lake|gardens?|park|temple|dam|betta))\b")
+# Postfix forms: "Bannerghatta must", "Lalbagh is a must", "Nandi Hills pe trek".
+MUST_POST_RE = re.compile(r"\b([a-z][a-z.'-]{3,30}(?:\s+[a-z][a-z.'-]{2,20}){0,2})\s+"
+                          r"(?:must|is a must|is a must-see|pe|par)\b(?!\s+(?:visit|see|go|include))")
 
 
 @dataclass
@@ -74,26 +96,89 @@ def extract_areas(text: str) -> list[str]:
     for m in AREA_RE.finditer(t):
         name = AREA_TRIM.sub("", m.group(1)).strip(" .'-")
         name = re.sub(r"^(the|a|an)\s+", "", name)
-        if not name or name in AREA_STOP or len(name) < 3:
-            continue
+        if not name or name in AREA_STOP or name.split()[0] in AREA_STOP or len(name) < 3:
+            continue                      # "from now near ...": not a place
         if re.sub(r"^namma\s+|\s+(city|urban)$", "", name) in CITY_NAMES:
             continue                      # "in namma bengaluru", "blr": the whole city, not an area
-        if parse_interests(name).interests and len(name.split()) <= 2 and not re.search(
-                r"(nagar|layout|palya|halli|pura|pet|road|circle|park|block|stage|city)$", name):
+        if parse_interests(name).interests and len(name.split()) <= 2 and \
+                not _PLACE_SUFFIX.search(name):
             continue                      # "in nature", "near lakes" are interests, not areas
         if re.match(r"^\d", name):
             continue
         out.append(name)
+    for m in AREA_POST_RE.finditer(t):
+        name = _clean_place(m.group(1))
+        if name and name not in out:
+            out.append(name)
+    avoid = set(extract_avoid_areas(text))
+    return [a for a in dict.fromkeys(out) if a not in avoid][:3]
+
+
+_PLACE_SUFFIX = re.compile(r"(nagar|layout|palya|halli|pura|pet|road|circle|park|block|stage|city|"
+                           r"street|bazaar|market|town|puram|gudi|wadi|pete|colony|cross|main)$")
+_LEAD_JUNK = re.compile(r"^(?:.*\b(?:the|a|an|to|for|some|koi|kuch|ek|in|at|hai|karna|chill|"
+                        r"masti|ko|ke|saath|dosto|log|hopping|trek|tak|varege|varegu|tanaka|"
+                        r"rinda|inda|se|sanje|beligge|shaam|subah|raat|aaj|kal|naale|ivattu)\s+)")
+
+
+def _clean_place(raw: str) -> str | None:
+    """Keep the trailing place-like words of a postposition match."""
+    name = _LEAD_JUNK.sub("", raw).strip(" .'-")
+    words = name.split()
+    name = " ".join(words[-2:]) if len(words) > 2 else name
+    if not name or name in AREA_STOP or len(name) < 4 or re.match(r"^\d", name):
+        return None
+    if re.sub(r"^namma\s+|\s+(city|urban)$", "", name) in CITY_NAMES:
+        return None
+    if parse_interests(name).interests and not _PLACE_SUFFIX.search(name):
+        first = name.split()[0]
+        if len(name.split()) == 2 and not parse_interests(first).interests:
+            return first
+        return None
+    return name
+
+
+def extract_avoid_areas(text: str) -> list[str]:
+    t = normalize_utterance(text)
+    out = []
+    for m in AVOID_AREA_RE.finditer(t):
+        # The avoided places may be a list: "avoid Whitefield and Electronic City".
+        clause = re.split(r"[;.!?]|\bbut\b", t[m.start(1):], maxsplit=1)[0]
+        parts = re.split(r",|\band\b|\bor\b|&", clause)
+        for i, part in enumerate(parts[:3]):
+            name = AREA_TRIM.sub("", part.strip()).strip(" .'-")
+            name = re.sub(r"^(the|a|an|in|near|around|at)\s+", "", name)
+            if not name or name in AREA_STOP or len(name) < 4 or re.match(r"^\d", name):
+                break
+            if parse_interests(name).interests and not _PLACE_SUFFIX.search(name):
+                break                      # "avoid Whitefield and temples": the list ends
+            if re.match(r"^(too|so|very|much|more|many|crowded|expensive|far|any|anything|sure|"
+                        r"really|interested|into|a fan|keen|walking|rushed|spicy|working|open|"
+                        r"we|i|you|it|they|want|need|like)\b", name):
+                break
+            if i > 0 and len(name.split()) > 3:
+                break
+            out.append(name)
     return list(dict.fromkeys(out))[:3]
 
 
 def extract_must_names(text: str) -> list[str]:
     t = normalize_utterance(text)
     names = []
-    for m in MUST_RE.finditer(t):
+    for m in list(MUST_RE.finditer(t)) + list(MUST_POST_RE.finditer(t)) + \
+            list(MUST_AT_RE.finditer(t)):
         name = AREA_TRIM.sub("", m.group(1)).strip(" .'-")
-        if name and name not in AREA_STOP and len(name) >= 4:
-            names.append(name)
+        name = re.sub(r"^(the|a|an|some|my|our)\s+", "", name)
+        name = _LEAD_JUNK.sub("", name) if " " in name else name
+        if not name or name in AREA_STOP or len(name) < 4:
+            continue
+        if parse_interests(name).interests and not re.search(
+                r"[a-z]{4,}\s+(hills?|palace|park|temple|fort|lake|falls|garden|gardens)$", name):
+            continue
+        if re.match(r"^(somewhere|something|anywhere|places?|there|it|them|see|the city|"
+                    r"outside|out|a|an)\b", name):
+            continue
+        names.append(name)
     return list(dict.fromkeys(names))[:4]
 
 
@@ -143,6 +228,16 @@ def rule_fields(text: str, today: date, now_min: int) -> tuple[dict, dict]:
                 f["date"] = date.fromordinal(today.toordinal() + 1)
             f["start_time"] = minutes_to_hhmm(start)
             f["end_time"] = minutes_to_hhmm(min(start + tw.duration_min, 23 * 60 + 30))
+    if re.search(r"\b(?:start(?:ing)?|leave|leaving|begin|from|head out)\s+(?:right\s+)?now\b|"
+                 r"\bright now\b|\bimmediately\b|\babhi\b", t):
+        start = round_up_to_quarter(now_min)
+        f.setdefault("date", today)
+        if f.get("date") == today:
+            f["start_time"] = minutes_to_hhmm(start)
+            dur = (tw.duration_min if tw else None) or resolve_duration(text)
+            if dur and not (tw and tw.end_min is not None):
+                f["end_time"] = minutes_to_hhmm(min(start + dur, 23 * 60 + 30))
+            extra["has_time_info"] = True
     b = parse_budget(text)
     if b:
         extra["has_budget"] = True
@@ -167,13 +262,20 @@ def rule_fields(text: str, today: date, now_min: int) -> tuple[dict, dict]:
     if "romantic" in ip.moods or (p and p.party_type == PartyType.COUPLE):
         f["romantic"] = True
     if re.search(r"\b(relaxed|relaxing|chill|slow|leisurely|not rushed|easy going|easy-going|"
-                 r"laid back|lazy|aram se)\b", t):
+                 r"laid back|lazy|aram se|gentle|unhurried|easy pace|no rush|nothing strenuous|"
+                 r"chilled|chilling|chill out|calm day|"
+                 r"not too tiring|nothing too tiring|take it easy)\b", t):
         f["pace"] = "relaxed"
     elif re.search(r"\b(packed|as many as possible|quick|fast|hectic|lots of places|"
                    r"cover a lot)\b", t):
         f["pace"] = "quick"
     n = parse_stop_count(text)
-    if n:
+    cap = re.search(r"\b(?:max(?:imum)?|at most|no more than|not more than|up to|upto)\s+(\d)\s+"
+                    r"(?:stops|places)\b|\b(\d)\s+(?:stops|places)\s+(?:max|maximum|at most|tops)\b",
+                    t)
+    if cap:
+        f["max_stop_count"] = int(cap.group(1) or cap.group(2))
+    elif n:
         f["desired_stop_count"] = n
     if re.search(r"\b(indoors?|inside)\b", t):
         f["indoor_preference"] = "indoor"
@@ -186,7 +288,9 @@ def rule_fields(text: str, today: date, now_min: int) -> tuple[dict, dict]:
         meals.append("lunch")
     f["meal_preferences"] = list(dict.fromkeys(meals))
     diet = []
-    if re.search(r"\b(pure veg|pure vegetarian|jain food)\b", t):
+    if re.search(r"\bjain\b", t):
+        diet.append("jain")
+    if re.search(r"\b(pure veg|pure vegetarian)\b", t):
         diet.append("pure_vegetarian")
     elif re.search(r"\b(veg|vegetarian|veggie)\b", t):
         diet.append("vegetarian")
@@ -287,7 +391,7 @@ async def extract_trip_spec(text: str, *, now: datetime, llm=None, use_llm: bool
     sources = {k: "rules" for k in fields}
     areas = extract_areas(text)
     must = extract_must_names(text)
-    avoid_areas: list[str] = []
+    avoid_areas: list[str] = extract_avoid_areas(text)
     ex = Extraction(spec=TripSpec(), duration_min=extra.get("duration_min"),
                     has_time_info=bool(extra.get("has_time_info")),
                     has_budget=bool(extra.get("has_budget")), scope=extra.get("scope"))
@@ -297,7 +401,8 @@ async def extract_trip_spec(text: str, *, now: datetime, llm=None, use_llm: bool
                                 vocabulary=", ".join(VOCABULARY))
             merge_llm(fields, res.parsed or {}, text, today, sources)
             areas = list(dict.fromkeys(areas + _clean_names(res.parsed.get("areas"), text)))[:3]
-            avoid_areas = _clean_names(res.parsed.get("avoid_areas"), text)[:3]
+            avoid_areas = list(dict.fromkeys(
+                avoid_areas + _clean_names(res.parsed.get("avoid_areas"), text)))[:3]
             must = list(dict.fromkeys(must + _clean_names(
                 res.parsed.get("must_include_names"), text)))[:4]
             ex.llm_used = True

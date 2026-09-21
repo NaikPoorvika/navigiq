@@ -57,7 +57,14 @@ def parse_budget(utterance: str) -> Budget | None:
         rf"\s*(?:rs\.?|inr)?\s*{_NUM}(?!\s*(?:km|kms|kilomet|hours|hrs|mins|minutes|people|"
         rf"persons|stops|places|am|pm|:))",
         rf"{_NUM}\s*(?:ka budget|ke andar|tak|mein|budget)",
-        rf"{_NUM}(?=\s*(?:per person|per head|each|pp|a head|per pax))",
+        rf"{_NUM}(?=\s*(?:per person|per head|each|pp|a head|per pax|per banda|per bande|"
+        rf"har ek|a person))",
+        rf"{_NUM}(?=\s*(?:total|in total|overall|altogether|all in|all-in|for all of us|"
+        rf"for everyone|for the group)\b)",
+        # "4000 for both of us", "2500 for two": a sum for the party
+        rf"(?<![\d:]){_NUM}(?=\s*for (?:both of us|the two of us|two of us|us two|both|the two|"
+        rf"two|three|four|five|us|all|\d+(?: people| of us)?)\b)(?!\s*for \d+\s*(?:hours|hrs|"
+        rf"days|mins|minutes))",
     ]
     for pat in patterns:
         for m in re.finditer(pat, t):
@@ -77,45 +84,91 @@ def _n(token: str) -> int | None:
     return WORD_NUMBERS.get(token)
 
 
+_KIDS = r"(?:kids?|children|child|toddlers?|babies|baby|infants?|sons?|daughters?)"
+_COUNT = rf"(\d+|{_NUMWORD})"
+
+
+def _party_size(t: str) -> tuple[int | None, str]:
+    """How many people, from explicit counts only. Composite counts add up
+    ("2 adults and a toddler" = 3); "with 4 friends" includes the speaker."""
+    m = re.search(rf"{_COUNT} adults?(?:,|\s+and|\s*&|\s+with|\s+plus)?\s+"
+                  rf"(?:{_COUNT}|an?)\s+{_KIDS}\b", t)
+    if m and _n(m[1]):
+        kids = _n(m[2]) if m[2] else 1
+        return _n(m[1]) + (kids or 0), m[0]
+    m = re.search(rf"family of {_COUNT}\b", t)
+    if m and _n(m[1]):
+        return _n(m[1]), m[0]
+    m = re.search(rf"{_COUNT} couples\b", t)
+    if m and _n(m[1]):
+        return 2 * _n(m[1]), m[0]
+    m = re.search(rf"{_COUNT} (?:\w+ )?(?:friends|buddies|colleagues|mates|cousins|others) "
+                  rf"(?:and|&|plus) (?:me|myself|i)\b", t)
+    if m and _n(m[1]):
+        return _n(m[1]) + 1, m[0]
+    m = re.search(rf"(?:\b(?:me|myself|i)\s+)?(?:and|&|with|plus) (?:my )?{_COUNT} (?:\w+ )?"
+                  rf"(?:friends|buddies|colleagues|mates|others|people|cousins)\b", t)
+    if m and _n(m[1]):
+        return _n(m[1]) + 1, m[0]
+    m = re.search(rf"{_COUNT} (?:\w+ )?(?:friends|buddies|mates|colleagues)\b", t)
+    if m and _n(m[1]):
+        return _n(m[1]), m[0]
+    m = re.search(rf"(?:we are|we're|group of|party of|there are|there will be) {_COUNT}"
+                  rf"(?![\w:])", t)
+    if m and _n(m[1]):
+        return _n(m[1]), m[0]
+    m = re.search(rf"{_COUNT} (?:of us|people|persons|adults|pax|log|jan|janaru|members)\b", t)
+    if m and _n(m[1]):
+        return _n(m[1]), m[0]
+    m = re.search(rf"\bfor {_COUNT}(?:\s+(?:people|persons|adults|of us))?(?=\s*(?:[,.;!?]|$|"
+                  rf"on\b|this\b|tomorrow|today|tonight|next\b|at\b|from\b|with\b|and\b))", t)
+    if m and _n(m[1]) and 1 <= _n(m[1]) <= 20:
+        return _n(m[1]), m[0]
+    m = re.search(r"\b(?:both of us|the two of us|two of us|us two)\b", t)
+    if m:
+        return 2, m[0]
+    m = re.search(r"\b(?:just me|only me|just myself|by myself|on my own|alone|solo|"
+                  r"i'?m alone)\b", t)
+    if m:
+        return 1, m[0]
+    return None, ""
+
+
+def _party_type(t: str) -> PartyType | None:
+    # "kid friendly places" describes places, not who is coming
+    who = re.sub(r"\b(?:kids?|child)[- ]friendly\b", " ", t)
+    if re.search(rf"\b(?:{_KIDS}|toddler|bachche|bacche|makkalu)\b", who):
+        return PartyType.FAMILY_WITH_KIDS
+    if re.search(r"(?:my )?(?:girlfriend|boyfriend|wife|husband|partner|fiance|fiancee|gf|bf)\b|"
+                 r"\bcouple\b|\bdate night\b|\b(?:a|dinner|lunch|coffee|first|romantic|movie) date\b|"
+                 r"\bfor a date\b|\bon a date\b|\bplan a date\b|\banniversary\b|\bhoneymoon\b", t):
+        return PartyType.COUPLE
+    if re.search(r"\bcolleagues|team outing|office (?:team|group)\b", t):
+        return PartyType.COLLEAGUES
+    if re.search(r"\b(?:friends|buddies|gang|dosto|dost|the boys|the girls|mates|college group)\b",
+                 t):
+        return PartyType.FRIENDS
+    if re.search(r"\b(?:my parents|with parents|mom and dad|amma appa|with my mom|with my dad|"
+                 r"grandparents|grandma|grandpa|elderly)\b", t):
+        return PartyType.PARENTS
+    if re.search(r"\b(?:family|parivar)\b", t):
+        return PartyType.FAMILY
+    if re.search(r"\b(?:solo|alone|by myself|on my own|just me|only me)\b", t):
+        return PartyType.SOLO
+    return None
+
+
 def parse_party(utterance: str) -> Party | None:
     t = normalize_utterance(utterance)
-    m = re.search(r"(?:me|myself|i) (?:and|&|with) (?:my )?(girlfriend|boyfriend|gf|bf|wife|"
-                  r"husband|partner|fiance|fiancee|spouse|date)", t)
-    if m:
-        return Party(2, PartyType.COUPLE, m[0])
-    m = re.search(rf"(?:me|myself|i) (?:and|&|with) (\d+|{_NUMWORD}) (?:\w+ )?(?:friends|buddies|"
-                  rf"colleagues|mates|others|people)", t)
-    if m and _n(m[1]):
-        kind = PartyType.COLLEAGUES if "colleague" in m[0] else PartyType.FRIENDS
-        return Party(_n(m[1]) + 1, kind, m[0])
-    m = re.search(rf"(\d+|{_NUMWORD}) (?:\w+ )?(?:friends|buddies|mates)", t)
-    if m and _n(m[1]):
-        return Party(_n(m[1]), PartyType.FRIENDS, m[0])
-    m = re.search(rf"(\d+|{_NUMWORD}) (?:\w+ )?colleagues", t)
-    if m and _n(m[1]):
-        return Party(_n(m[1]), PartyType.COLLEAGUES, m[0])
-    m = re.search(rf"(?:we are|we're|group of|party of|for|there are|there will be) (\d+|{_NUMWORD})"
-                  rf"(?: of us| people| persons| adults)?(?![\w:])", t)
-    if m and _n(m[1]) and re.search(r"of us|people|persons|adults|group|party|we are|we're", m[0]):
-        return Party(_n(m[1]), None, m[0])
-    m = re.search(rf"(\d+|{_NUMWORD}) (?:of us|people|persons|adults)", t)
-    if m and _n(m[1]):
-        return Party(_n(m[1]), None, m[0])
-    if re.search(r"(?:my )?(?:girlfriend|boyfriend|wife|husband|partner|gf|bf)\b|\bcouple\b|"
-                 r"\bdate night\b|\ba date\b|\bfor a date\b|\bon a date\b", t):
-        return Party(2, PartyType.COUPLE, "couple")
-    if re.search(r"\b(?:kids|children|my son|my daughter|toddler|bachche|makkalu)\b", t):
-        return Party(None, PartyType.FAMILY_WITH_KIDS, "kids")
-    if re.search(r"\b(?:my parents|with parents|mom and dad|amma appa|with my mom|with my dad|"
-                 r"grandparents|elderly)\b", t):
-        return Party(None, PartyType.PARENTS, "parents")
-    if re.search(r"\b(?:family|parivar)\b", t):
-        return Party(None, PartyType.FAMILY, "family")
-    if re.search(r"\b(?:friends|gang|dosto|the boys|the girls)\b", t):
-        return Party(None, PartyType.FRIENDS, "friends")
-    if re.search(r"\b(?:solo|alone|by myself|on my own)\b", t):
-        return Party(1, PartyType.SOLO, "solo")
-    return None
+    size, phrase = _party_size(t)
+    kind = _party_type(t)
+    if size is None and kind == PartyType.COUPLE:
+        size = 2
+    if size == 1 and kind is None:
+        kind = PartyType.SOLO
+    if size is None and kind is None:
+        return None
+    return Party(size, kind, phrase or (kind.value if kind else ""))
 
 
 DEFAULT_PARTY_SIZE = {

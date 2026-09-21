@@ -374,6 +374,51 @@ def apply_curated(records: list[dict], entries: list[curated_mod.CuratedEntry],
     return records
 
 
+ABSORB_RADIUS_M = 300.0
+
+
+def absorb_curated_duplicates(records: list[dict], manifest: Manifest) -> list[dict]:
+    """Fold raw features that duplicate a curated place into it.
+
+    Curation often anchors a landmark on its Wikidata item while OSM carries
+    the same place as separate, differently-named nodes (the Wikidata item
+    "Dodda Basavana Gudi" and two OSM nodes "Bull Temple"). Once curation has
+    given the landmark its aliases, any non-curated record within 300 m whose
+    name equals the landmark's name or an alias, in the same category group,
+    and without a conflicting Wikidata id, is the same place: it is merged
+    (its reference kept in merged_refs) instead of competing with it in
+    search and recommendations."""
+    catalog = category_catalog()
+
+    def group(r: dict) -> str:
+        info = catalog.get(r["category"])
+        return info.group if info else "other"
+
+    names: dict[str, list[dict]] = defaultdict(list)
+    for r in records:
+        if r.get("curated"):
+            for n in {r["name_normalized"], normalize_name(r["name"]),
+                      *(normalize_name(a) for a in r["aliases"])}:
+                if n:
+                    names[n].append(r)
+    absorbed: set[int] = set()
+    for r in records:
+        if r.get("curated") or r["name_normalized"] not in names:
+            continue
+        for c in names[r["name_normalized"]]:
+            if c is r or group(c) != group(r):
+                continue
+            if r["wikidata_id"] and c["wikidata_id"] and r["wikidata_id"] != c["wikidata_id"]:
+                continue
+            if haversine_km(r["lat"], r["lon"], c["lat"], c["lon"]) * 1000 > ABSORB_RADIUS_M:
+                continue
+            _merge_into(c, r)
+            absorbed.add(id(r))
+            break
+    manifest.record("absorb_curated_duplicates", absorbed=len(absorbed))
+    return [r for r in records if id(r) not in absorbed]
+
+
 def _overlay(r: dict, e: curated_mod.CuratedEntry) -> None:
     r["curated"] = True
     r["curated_key"] = e.key

@@ -171,6 +171,7 @@ def run(*, refresh: bool = False, dry_run: bool = False, skip_wiki: bool = False
 
     # 8. curate -----------------------------------------------------------------------------
     records = P.apply_curated(records, entries, manifest)
+    records = P.absorb_curated_duplicates(records, manifest)
 
     # 9. score, 10. validate ----------------------------------------------------------------
     records = P.score_records(records, manifest)

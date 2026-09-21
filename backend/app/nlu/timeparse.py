@@ -137,7 +137,9 @@ def resolve_date(utterance: str, today: date) -> DateResolution | None:
             return DateResolution(today, m[0], "this_weekend_today")
         return DateResolution(this_weekday(today, 5), m[0], "this_weekend")
     wd_names = "|".join(sorted(WEEKDAYS, key=len, reverse=True))
-    m = re.search(_wb(rf"next ({wd_names})"), t)
+    m = (re.search(_wb(rf"next ({wd_names})"), t)
+         or re.search(_wb(rf"({wd_names}),? (?:of )?next week"), t)
+         or re.search(_wb(rf"next week,? (?:on )?({wd_names})"), t))
     if m:
         return DateResolution(next_weekday(today, WEEKDAYS[m[1]]), m[0], "next_weekday")
     m = re.search(_wb(rf"(?:this |coming |on )?({wd_names})"), t)
@@ -218,9 +220,14 @@ def _infer_meridiem(start: int, has_ampm: bool) -> int:
 
 def resolve_time_window(utterance: str) -> TimeWindow | None:
     t = normalize_utterance(utterance)
+    # "noon to 5", "from midday", "till midnight": named clock times.
+    t = re.sub(r"\b(noon|midday|mid-day)\b", "12 pm", t)
+    t = re.sub(r"\bmidnight\b", "11:59 pm", t)
+    # "7 baje" (Hindi), "8 gantege" (Kannada): o'clock markers carry no meridiem.
+    t = re.sub(r"(\d{1,2})\s*(?:baje|bje|gantege|gante|ganteyinda)\b", r"\1", t)
     # Explicit range: "10 am to 7 pm", "from around 11 to 8", "between 4 and 9", "10-6".
     range_re = re.compile(rf"(?<![\d/\-:])(?:from|between|b/w)?\s*(?:around|about|approx\.?|~)?"
-                          rf"\s*{_H}\s*(?:-|to|till|until|and|upto|up to|tak)\s*"
+                          rf"\s*{_H}\s*(?:-|to|till|until|and|upto|up to|tak|se|inda|rinda|ninda)\s*"
                           rf"(?:around|about)?\s*{_H}(?![\d/\-])")
     for m in range_re.finditer(t):
         if re.match(r"\s*(rs|inr|rupees|km|kms|people|persons|friends|stops|hours|hrs)",
@@ -249,20 +256,39 @@ def resolve_time_window(utterance: str) -> TimeWindow | None:
         if 0 <= start < end <= 24 * 60:
             return TimeWindow(start, end, end - start, m[0].strip(), "explicit_range")
     duration = resolve_duration(t)
-    # Single anchor: "after 5 pm", "from 4", "starting at 10", "till 9 pm".
-    m = re.search(rf"(?:after|from|starting(?: at)?|start at|begin(?:ning)? at)\s+{_H}", t)
-    if m:
-        start = _to_min(m[1], m[2], m[3])
+    # Anchors, possibly both in separate phrases: "leave 5 am, back by 1 pm",
+    # "start at noon and end by 6", "after 5 pm", "till 9 pm".
+    start = end = None
+    ms = (re.search(rf"(?:after|from|starting(?: at| from)?|start(?:ing)? (?:at|by|around)|"
+                    rf"begin(?:ning)? at|leav(?:e|ing)(?: at| by| around)?|head(?:ing)? out at|"
+                    rf"set off at|depart(?:ing)?(?: at)?)\s+{_H}", t)
+          or re.search(rf"(?<![\d:]){_H}\s*(?:onwards|on wards|se|inda|rinda)(?!\s*\d)", t))
+    if ms:
+        start = _to_min(ms[1], ms[2], ms[3])
         if start is not None:
-            start = _infer_meridiem(start, bool(m[3]))
-            end = min(start + duration, 23 * 60 + 30) if duration else None
-            return TimeWindow(start, end, duration, m[0], "start_only")
-    m = re.search(rf"(?:till|until|by|before)\s+{_H}", t)
-    if m:
-        end = _to_min(m[1], m[2], m[3])
+            start = _infer_meridiem(start, bool(ms[3]))
+            if not ms[3] and start < 12 * 60 and re.search(_wb(EVENING_WORDS), t):
+                start += 12 * 60           # "date night ... from 7" -> 19:00
+    me = re.search(rf"(?:till|until|by|before|end(?:ing)? (?:at|by)|finish(?:ing)? (?:at|by)|"
+                   rf"back (?:at|by)|done (?:at|by)|wrap up (?:at|by))\s+{_H}", t)
+    if me and (ms is None or me.start() >= ms.end()):
+        end = _to_min(me[1], me[2], me[3])
         if end is not None:
-            end = _infer_meridiem(end, bool(m[3]))
-            return TimeWindow(None, end, duration, m[0], "end_only")
+            end = _infer_meridiem(end, bool(me[3]))
+            if start is not None and end <= start and not me[3] and end + 12 * 60 < 24 * 60:
+                end += 12 * 60             # "start at 10, back by 2" -> 14:00
+            if start is not None and end <= start and not ms[3] and start >= 12 * 60 \
+                    and start - 12 * 60 < end:
+                start -= 12 * 60           # "head out at 6, back by 6 pm" -> 06:00
+            if start is not None and end <= start:
+                end = None
+    if start is not None and end is not None:
+        return TimeWindow(start, end, end - start, f"{ms[0]} .. {me[0]}", "start_and_end")
+    if start is not None:
+        end = min(start + duration, 23 * 60 + 30) if duration else None
+        return TimeWindow(start, end, duration, ms[0], "start_only")
+    if end is not None:
+        return TimeWindow(None, end, duration, me[0], "end_only")
     for phrase in sorted(DAY_PARTS, key=len, reverse=True):
         if re.search(_wb(re.escape(phrase)), t):
             s, e = DAY_PARTS[phrase]
