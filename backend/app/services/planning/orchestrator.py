@@ -44,7 +44,7 @@ from app.services.poi.ranking import DeterministicRanker
 from app.services.poi.search import search_pois
 from app.services.routing.multimodal import MultiModalRouter
 from app.services.routing.service import RoutingUnavailable
-from app.services.weather.client import WeatherWindow, get_window
+from app.services.weather.client import WeatherWindow, get_window, get_windows
 from app.models.itinerary import (
     Itinerary, ItineraryStop, ItineraryVersion, PlanSnapshot, TripSpecRecord,
 )
@@ -240,6 +240,7 @@ async def plan(
     *,
     user_id=None,
     persist: bool = True,
+    weather: WeatherWindow | None = None,
 ) -> PlanResult:
     """The deterministic planning pipeline."""
     import time
@@ -258,9 +259,12 @@ async def plan(
 
     # --- 2. weather (degrades, never blocks) -------------------------------
     t0 = time.perf_counter()
-    weather: WeatherWindow = await get_window(
-        spec.origin.lat, spec.origin.lon, spec.date,
-        spec.start_minute // 60, spec.end_minute // 60)
+    # A multi-day trip fetches every day's forecast in one request and passes
+    # each day in; a single-day plan fetches its own.
+    if weather is None:
+        weather = await get_window(
+            spec.origin.lat, spec.origin.lon, spec.date,
+            spec.start_minute // 60, spec.end_minute // 60)
     result.weather = weather.to_dict()
     t["weather"] = int((time.perf_counter() - t0) * 1000)
 
@@ -511,6 +515,11 @@ async def plan_trip(
     used: list[int] = list(spec.constraints.avoid_poi_ids)
     days_out: list[dict] = []
 
+    # One weather request for the whole trip, not one per day.
+    windows = await get_windows(
+        spec.origin.lat, spec.origin.lon, spec.day_dates,
+        spec.start_minute // 60, spec.end_minute // 60)
+
     for number, day_date in enumerate(spec.day_dates, start=1):
         day_spec = spec.model_copy(update={
             "date": day_date,
@@ -520,7 +529,8 @@ async def plan_trip(
         })
 
         try:
-            r = await plan(db, day_spec, user_id=user_id, persist=persist)
+            r = await plan(db, day_spec, user_id=user_id, persist=persist,
+                           weather=windows.get(day_date))
             entry = {"day": number, "date": day_date.isoformat(),
                      **r.to_dict()}
             if r.ok and r.itinerary:

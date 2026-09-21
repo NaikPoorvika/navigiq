@@ -1,4 +1,4 @@
-﻿# data/mappings/osm_categories.yaml
+# data/mappings/osm_categories.yaml
 #
 # NQ-011 - OSM tag -> NavigIQ category. Deterministic, versioned, diffable.
 # No model is involved in this path, ever.

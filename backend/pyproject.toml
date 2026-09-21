@@ -1,4 +1,4 @@
-﻿[project]
+[project]
 name = "navigiq-backend"
 version = "0.1.0"
 description = "NavigIQ Backend API"
