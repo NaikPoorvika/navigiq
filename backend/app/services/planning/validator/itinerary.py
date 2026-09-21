@@ -1,4 +1,4 @@
-"""NQ-024 - Independent itinerary validator.
+﻿"""NQ-024 - Independent itinerary validator.
 
 THE RULE THAT MAKES THIS REAL: re-derive from primary sources. Do not reuse
 the optimizer's arithmetic. A validator that trusts the thing it is checking
@@ -27,8 +27,10 @@ TRAVEL_TOLERANCE_S = 60
 COST_TOLERANCE_INR = 1
 SINGLE_WALK_CAP_M = 1500
 
-BBOX_MIN_LAT, BBOX_MAX_LAT = 11.9, 13.75
-BBOX_MIN_LON, BBOX_MAX_LON = 76.7, 78.9
+# One definition of the region, shared with the TripSpec schema.
+from app.core.region import (  # noqa: E402
+    BBOX_MAX_LAT, BBOX_MAX_LON, BBOX_MIN_LAT, BBOX_MIN_LON,
+)
 
 
 class Rule(str, Enum):

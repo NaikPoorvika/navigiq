@@ -30,7 +30,7 @@ from dataclasses import dataclass
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
-CENTRE_LAT, CENTRE_LON = 12.9794, 77.5912       # Vidhana Soudha
+from app.core.region import CENTRE_LAT, CENTRE_LON
 MAX_USEFUL_DISTANCE_KM = 60.0
 MIN_SIMILARITY = 0.35
 
