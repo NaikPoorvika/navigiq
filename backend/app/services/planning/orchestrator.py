@@ -361,7 +361,7 @@ async def plan(
                            spec.start_minute, spec.end_minute)]
     for s in ranked:
         p = s.poi
-        cost, _ = estimate_poi_cost(
+        cost, cost_basis = estimate_poi_cost(
             p.get("cost_estimate_inr"), p.get("category_typical_inr", 0),
             spec.party_size)
         # The trip day's opening window, from search. The optimizer treats
@@ -385,9 +385,8 @@ async def plan(
             hours_confidence=p.get("hours_confidence") or 0.0,
             is_meal=p["category"] in ("restaurant", "cafe",
                                       "street_food", "dessert"),
-            lat=p["lat"], lon=p["lon"],
+            lat=p["lat"], lon=p["lon"], cost_basis=cost_basis,
         ))
-
     requirements = [
         InterestRequirement(i.category.value, i.count,
                             i.priority.value == "must")

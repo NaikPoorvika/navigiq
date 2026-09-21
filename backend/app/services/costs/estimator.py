@@ -140,7 +140,10 @@ def estimate_poi_cost(
     """
     if cost_estimate_inr is not None:
         return int(cost_estimate_inr) * party_size, "poi_specific"
-    return int(category_typical_inr) * party_size, "category_median"
+    # A TYPICAL cost for the category, not this venue's price (ADR-014).
+    # Kept because budgets need a food estimate, and it lets a tight budget
+    # prefer street food over restaurants.
+    return int(category_typical_inr) * party_size, "category_estimate"
 
 
 def estimate_trip_cost(
@@ -161,7 +164,7 @@ def estimate_trip_cost(
             stop.get("category_typical_inr", 0),
             party_size,
         )
-        if basis == "category_median" and amount > 0:
+        if basis == "category_estimate" and amount > 0:
             bd.unknown_count += 1
         if amount:
             bd.add(stop.get("name", "stop"), amount, basis)

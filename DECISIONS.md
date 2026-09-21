@@ -154,3 +154,26 @@ a hallucinated lat/lon is discarded before it reaches planning.
 clarifying questions rather than a guess. Defaults that are applied are
 returned as explicit `assumptions`. `TripDraft.model_json_schema()` is the
 schema for constrained decoding in NQ-029.
+
+
+## ADR-014: POI costs are labelled category estimates
+**Status:** Accepted
+**Date:** 2026-09-21
+
+**Context:** No POI has a real price. Every stop showed a category figure —
+every restaurant "Rs 600", every temple "Rs 0" — presented as though it were
+that venue's price.
+
+**Decision:** Keep the category figures for planning: budgets need a food
+estimate, and they let a tight budget prefer street food over restaurants.
+Change the presentation: each stop carries `cost_basis: category_estimate`,
+and the itinerary carries a `cost_note` saying these are typical category
+costs, not venue prices.
+
+**Rejected — dropping POI costs entirely.** Totals would cover transport only,
+so a Rs 1500 budget would report "Rs 60" and the user would overspend on food.
+The optimizer would also lose the ability to choose cheaper food on a tight
+budget.
+
+**Consequences:** The UI shows "≈ Rs 600 typical" rather than "Rs 600". Real
+prices, when curated, use `cost_basis: poi_specific` and take precedence.

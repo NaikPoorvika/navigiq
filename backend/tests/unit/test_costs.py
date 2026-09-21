@@ -76,7 +76,7 @@ def test_unknown_poi_cost_falls_back_to_category_median_not_zero():
     unpriced POIs over priced ones."""
     amount, basis = estimate_poi_cost(None, 300, party_size=1)
     assert amount == 300
-    assert basis == "category_median"
+    assert basis == "category_estimate"
 
 
 def test_known_poi_cost_wins_over_category():

@@ -54,6 +54,7 @@ class OptimizerNode:
     is_meal: bool = False
     lat: float | None = None
     lon: float | None = None
+    cost_basis: str = "poi_specific"
 
 
 @dataclass
@@ -80,6 +81,7 @@ class Stop:
     travel_minutes_from_prev: int
     lat: float | None = None
     lon: float | None = None
+    cost_basis: str = "poi_specific"
 
 
 @dataclass
@@ -103,6 +105,11 @@ class OptimizerResult:
             "status": self.status.value,
             "optimizer": self.optimizer,
             "total_cost_inr": self.total_cost_inr,
+                        "cost_note": ("Food and entry costs are typical estimates for "
+                          "each category, not the venue's actual prices. "
+                          "Transport fares are estimated from published rates."),
+            "estimated_cost_stops": sum(
+                1 for s in self.stops if s.cost_basis == "category_estimate"),
             "total_duration_min": self.total_duration_min,
             "total_walk_m": self.total_walk_m,
             "objective_value": self.objective_value,
@@ -114,6 +121,7 @@ class OptimizerResult:
                     "category": s.category,
                     "arrive_min": s.arrive_min, "depart_min": s.depart_min,
                     "visit_minutes": s.visit_minutes, "cost_inr": s.cost_inr,
+                    "cost_basis": s.cost_basis,
                     "mode_from_prev": s.mode_from_prev,
                     "travel_minutes_from_prev": s.travel_minutes_from_prev,
                     "lat": s.lat, "lon": s.lon,
@@ -368,7 +376,7 @@ def optimize(
             cost_inr=node.cost_inr,
             mode_from_prev=arc.mode if arc else None,
             travel_minutes_from_prev=arc.duration_min if arc else 0,
-            lat=node.lat, lon=node.lon,
+            lat=node.lat, lon=node.lon, cost_basis=node.cost_basis,
         ))
         result.total_cost_inr += node.cost_inr + (arc.cost_inr if arc else 0)
         result.total_walk_m += arc.walk_m if arc else 0

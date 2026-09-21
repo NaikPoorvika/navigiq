@@ -153,7 +153,7 @@ async def test_detail_returns_full_record(db):
     assert d is not None
     assert d["name"] == rows[0].name
     assert d["source"] == "openstreetmap"
-    assert d["cost_basis"] in ("poi_specific", "category_median")
+    assert d["cost_basis"] in ("poi_specific", "category_estimate")
     assert len(d["opening_hours"]) >= 7, "a week of hours expected"
 
 

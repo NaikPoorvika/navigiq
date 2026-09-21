@@ -258,7 +258,7 @@ async def get_poi_detail(db: AsyncSession, poi_id: int) -> dict | None:
         "cost_estimate_inr": row.cost_estimate_inr,
         "category_typical_inr": row.typical_cost_inr,
         "cost_basis": "poi_specific" if row.cost_estimate_inr is not None
-                      else "category_median",
+                      else "category_estimate",
         "visit_minutes": row.visit_minutes,
         "indoor": row.indoor,
         "curated": row.curated,
