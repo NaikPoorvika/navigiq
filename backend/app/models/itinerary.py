@@ -1,22 +1,27 @@
-"""NQ-025 - Itinerary persistence.
+"""Itinerary persistence.
 
 Itineraries are IMMUTABLE once written. Every change - a modification, a
-reroute, a what-if - creates a new version rather than mutating a row. That
-makes undo, comparison and reroute history free, and means a stored plan can
-always be replayed exactly as it was produced.
+restore, an applied what-if - creates a new version rather than mutating a
+row, so undo, history and comparison are free and a stored plan can always
+be replayed exactly as it was produced.
 
-plan_snapshots exists for that replay: without the TripSpec, the candidate
-set and the optimizer parameters, "why did it pick that cafe last Tuesday"
-is unanswerable.
+A what-if is a version with kind='variant'. It has no version_no, is never
+the current version, and is either applied (copied into a new real version)
+or rejected. The original plan is untouched until the user applies it.
+
+Ownership: user_id for signed-in users, session_id (an opaque anonymous
+token) otherwise. Anonymous exploration and planning never require an account.
+
+Transport columns on itinerary_stops are retained for the future
+TransportationProvider (ADR-022) and are always NULL in this version.
 """
 from __future__ import annotations
 
 from sqlalchemy import (
-    Boolean, CheckConstraint, Column, DateTime, ForeignKey, Index, Integer,
-    Numeric, SmallInteger, String, Text, UniqueConstraint, func,
+    CheckConstraint, Column, DateTime, ForeignKey, Index, Integer,
+    SmallInteger, String, Text, UniqueConstraint, func,
 )
 from sqlalchemy.dialects.postgresql import JSONB, UUID
-from geoalchemy2 import Geography
 
 from app.db.base_class import Base
 
@@ -27,7 +32,7 @@ class TripSpecRecord(Base):
     user_id = Column(UUID(as_uuid=True), ForeignKey("user.id", ondelete="CASCADE"))
     payload = Column(JSONB, nullable=False)
     version = Column(String(10), nullable=False)
-    source = Column(String(20), nullable=False)          # form | llm | modification
+    source = Column(String(20), nullable=False)          # form | llm | modification | what_if
     parent_id = Column(Integer, ForeignKey("tripspecs.id"))
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
@@ -40,16 +45,25 @@ class Itinerary(Base):
     __tablename__ = "itineraries"
     id = Column(Integer, primary_key=True)
     user_id = Column(UUID(as_uuid=True), ForeignKey("user.id", ondelete="CASCADE"))
+    session_id = Column(String(64), index=True)
+    title = Column(Text)
     tripspec_id = Column(Integer, ForeignKey("tripspecs.id"), nullable=False)
-    current_version_id = Column(Integer)                 # FK added post-create
+    # Circular with itinerary_versions.itinerary_id, so the FK is added
+    # after both tables exist (use_alter).
+    current_version_id = Column(Integer, ForeignKey(
+        "itinerary_versions.id", ondelete="SET NULL", use_alter=True,
+        name="fk_itinerary_current_version"))
     status = Column(String(20), nullable=False, default="draft")
     mode = Column(String(20), nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), server_default=func.now())
 
     __table_args__ = (
         CheckConstraint(
-            "status IN ('draft','active','completed','abandoned')",
+            "status IN ('draft','saved','active','completed','abandoned')",
             name="ck_itinerary_status"),
+        CheckConstraint("user_id IS NOT NULL OR session_id IS NOT NULL",
+                        name="ck_itinerary_owner"),
     )
 
 
@@ -58,14 +72,20 @@ class ItineraryVersion(Base):
     id = Column(Integer, primary_key=True)
     itinerary_id = Column(Integer, ForeignKey("itineraries.id", ondelete="CASCADE"),
                           nullable=False)
-    version_no = Column(SmallInteger, nullable=False)
-    reason = Column(String(30), nullable=False)          # initial | modification | reroute
+    version_no = Column(SmallInteger)                    # NULL for variants
+    kind = Column(String(10), nullable=False, default="version")
+    variant_status = Column(String(10))
+    parent_version_id = Column(Integer, ForeignKey("itinerary_versions.id"))
+    reason = Column(String(30), nullable=False)          # initial | modification | restore | what_if | apply_variant
+    change_operation = Column(JSONB)
+    label = Column(Text)
+    tripspec_snapshot = Column(JSONB)
+    itinerary = Column(JSONB)               # rendered exactly as shown
     total_cost_inr = Column(Integer, nullable=False, default=0)
     total_duration_min = Column(Integer, nullable=False, default=0)
     total_walk_m = Column(Integer, nullable=False, default=0)
-    # The raw CP-SAT objective, not a 0-1 quality measure. Scales with the
-    # MUST weight (100,000), so it needs integer range, and it is only
-    # comparable between plans built from the same candidate set.
+    # The raw CP-SAT objective, only comparable between plans built from the
+    # same candidate set.
     objective_value = Column(Integer)
     # The validator's verdict is stored, not just its outcome. An itinerary
     # nobody can audit is an itinerary nobody should trust.
@@ -74,6 +94,12 @@ class ItineraryVersion(Base):
 
     __table_args__ = (
         UniqueConstraint("itinerary_id", "version_no", name="uq_version_no"),
+        CheckConstraint("kind IN ('version','variant')", name="ck_version_kind"),
+        CheckConstraint(
+            "(kind = 'version' AND version_no IS NOT NULL AND variant_status IS NULL) OR "
+            "(kind = 'variant' AND version_no IS NULL AND "
+            " variant_status IN ('pending','applied','rejected'))",
+            name="ck_version_variant_shape"),
     )
 
 
@@ -88,15 +114,18 @@ class ItineraryStop(Base):
     depart_min = Column(SmallInteger, nullable=False)
     visit_minutes = Column(SmallInteger, nullable=False)
     cost_inr = Column(Integer, nullable=False, default=0)
+    transition_buffer_min = Column(SmallInteger, nullable=False, default=0)
+    # Reserved for the future TransportationProvider. Always NULL today.
     mode_from_prev = Column(String(20))
-    travel_seconds_from_prev = Column(Integer, default=0)
-    travel_distance_m_from_prev = Column(Integer, default=0)
-    walk_m_from_prev = Column(Integer, default=0)
-    leg_cost_inr = Column(Integer, default=0)
+    travel_seconds_from_prev = Column(Integer)
+    travel_distance_m_from_prev = Column(Integer)
+    walk_m_from_prev = Column(Integer)
+    leg_cost_inr = Column(Integer)
     notes = Column(JSONB, nullable=False, default=dict)
 
     __table_args__ = (
         UniqueConstraint("version_id", "seq", name="uq_stop_seq"),
+        CheckConstraint("depart_min >= arrive_min", name="ck_stop_times"),
     )
 
 

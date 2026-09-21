@@ -1,0 +1,80 @@
+# data/config/recommendation_weights.yaml
+#
+# ADR-027 - Deterministic recommendation scoring. No LLM participates in any
+# score; the model only turns the resulting reason codes into prose.
+#
+# Every component is in [0, 1]. When a component has no signal for a request
+# (no interests stated, no weather, no user history) it is NEUTRAL (0.5), never
+# zero - absence of information must not reorder results arbitrarily.
+#
+# Changing a weight changes rankings for everyone: bump `version` so traces
+# (agent_runs.ranking_config_version) show which configuration ranked a result.
+
+version: "2026-09-21.2"
+
+weights:
+  interest_match:       0.24
+  mood_match:           0.14
+  semantic_similarity:  0.06
+  quality:              0.16
+  prominence:           0.05
+  party_suitability:    0.07
+  budget_fit:           0.06
+  weather_suitability:  0.05
+  geographic_relevance: 0.08
+  preference_fit:       0.04
+  novelty:              0.03
+  context_fit:          0.02
+
+interest_weights:
+  category_exact: 1.0
+  category_secondary: 0.75
+  tag: 0.7
+  mood: 0.55
+
+novelty:
+  shown_recently_penalty: 0.85     # multiplier applied as 1 - penalty
+  shown_window_hours: 24
+  dismissed_penalty: 0.97
+  dismissed_window_days: 30
+  visited_penalty: 0.6
+  saved_boost: 0.15                # added to preference_fit for "For you"
+  category_novelty_boost: 0.2      # "something different": unseen categories
+
+diversity:
+  # Greedy selection: each already-picked POI of the same category/chain
+  # multiplies the next candidate's score by these factors.
+  same_category_decay: 0.72
+  same_chain_decay: 0.2
+  max_per_category: 3
+  max_per_chain: 1
+
+geography:
+  local_falloff_km: 6.0           # anchor-relative score reaches 0 here
+  city_falloff_km: 30.0
+  regional_sweet_spot_km: [35, 85] # "escape" requests favour this band
+
+surprise:
+  min_quality: 0.42
+  pool_size: 30
+  picks: 3
+
+hidden_gems:
+  # A hidden gem is independent (not a chain) and either explicitly offbeat
+  # or barely documented - and still good enough to recommend. Curated
+  # landmarks only qualify when NavigIQ tagged them offbeat.
+  max_prominence: 0.2
+  min_quality: 0.36
+
+relevance:
+  # Multipliers applied when a place does not match what was asked for.
+  category_miss: 0.35      # an explicitly requested category is missing
+  relevance_miss: 0.55     # asked moods/tags barely match
+  min_relevance: 0.3
+
+different:
+  max_jaccard_overlap: 0.2
+
+reasons:
+  high_prominence_min: 0.45
+  short_activity_max_min: 45

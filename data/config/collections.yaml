@@ -1,0 +1,132 @@
+# data/config/collections.yaml
+#
+# Discovery collections (section 24). DATA-DRIVEN: each collection is a
+# recommendation query, never a hard-coded list of POIs. Membership changes
+# as the inventory, curation and quality scores change.
+#
+# Fields map onto the recommendation request: interests (categories/tags),
+# moods, avoid, scope (local|city|regional|anywhere), budget_per_person,
+# party_type, mode (discover|hidden_gems|for_you), indoor_preference, rain.
+
+version: 1
+
+collections:
+  - id: for_you
+    title: For you
+    subtitle: Picked from what you save and prefer
+    mode: for_you
+    requires_user: true
+  - id: top_picks
+    title: Bengaluru essentials
+    subtitle: Well-documented places worth knowing
+    moods: [cultural, scenic]
+    scope: city
+  - id: something_different
+    title: Something different
+    subtitle: Workshops, farms and experiences off the usual list
+    interests: [workshop, experience, farm, gaming, activity, gallery]
+    mode: hidden_gems
+    scope: anywhere
+  - id: hidden_gems
+    title: Hidden gems
+    subtitle: Lesser-known places with real character
+    mode: hidden_gems
+    scope: city
+  - id: under_500
+    title: Under ₹500
+    subtitle: Good outings that cost little or nothing
+    budget_per_person: 500
+    moods: [budget]
+    scope: city
+  - id: romantic
+    title: Romantic Bengaluru
+    subtitle: Lakes, gardens and cafes for two
+    moods: [romantic]
+    party_type: couple
+    scope: city
+  - id: quiet
+    title: Quiet places
+    subtitle: Calm corners away from the crowds
+    moods: [quiet, peaceful]
+    scope: city
+  - id: photography
+    title: Photography spots
+    subtitle: Photogenic places, sunsets and viewpoints
+    moods: [photography]
+    scope: anywhere
+  - id: rainy_day
+    title: Rainy-day ideas
+    subtitle: Indoor places that work in any weather
+    tags: [rain_friendly]
+    indoor_preference: indoor
+    scope: city
+  - id: family_day
+    title: Family day
+    subtitle: Easy, kid-friendly outings
+    party_type: family_with_kids
+    moods: [family]
+    scope: city
+  - id: with_parents
+    title: With parents
+    subtitle: Comfortable, unhurried places
+    party_type: parents
+    moods: [peaceful, cultural]
+    scope: city
+  - id: student_budget
+    title: Student budget
+    subtitle: Fun with friends without spending much
+    party_type: friends
+    budget_per_person: 300
+    moods: [social, budget]
+    scope: city
+  - id: nature_escapes
+    title: Nature escapes
+    subtitle: Hills, lakes and forests outside the city
+    moods: [nature]
+    scope: regional
+  - id: heritage
+    title: Heritage Bengaluru
+    subtitle: Palaces, forts and old-city history
+    interests: [heritage, palace, fort, monument, history, architecture]
+    scope: anywhere
+  - id: weekend_escapes
+    title: Weekend escapes
+    subtitle: Day trips within about 90 km
+    interests: [hill, waterfall, reservoir, fort, nature, farm]
+    scope: regional
+  - id: food
+    title: Food exploration
+    subtitle: Street food, local eateries and desserts
+    interests: [street_food, restaurant, dessert, market]
+    moods: [foodie]
+    scope: city
+  - id: cafes
+    title: Cafes worth discovering
+    subtitle: Coffee, conversations and laptop-friendly spots
+    interests: [cafe]
+    mode: hidden_gems
+    scope: city
+  - id: outdoor
+    title: Outdoor activities
+    subtitle: Get moving - treks, sports and open spaces
+    moods: [active, adventurous]
+    scope: anywhere
+  - id: creative
+    title: Creative activities
+    subtitle: Galleries, workshops and making things
+    moods: [creative]
+    scope: city
+  - id: spiritual
+    title: Spiritual places
+    subtitle: Temples, churches, mosques and quiet reflection
+    moods: [spiritual]
+    scope: anywhere
+  - id: scenic
+    title: Scenic destinations
+    subtitle: Views worth the trip
+    moods: [scenic]
+    scope: regional
+  - id: outside_bengaluru
+    title: Things outside Bengaluru
+    subtitle: Towns, temples and landscapes in the wider region
+    scope: regional

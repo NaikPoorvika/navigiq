@@ -1,0 +1,231 @@
+# data/config/lexicon.yaml
+#
+# Deterministic phrase -> controlled vocabulary map (ADR-024).
+#
+# Used by the rule layer of intent classification, by discovery parsing (no
+# LLM needed for "cheap nature places") and to post-process LLM extraction:
+# any interest the model returns must survive this vocabulary.
+#
+# Each entry maps phrases (lowercase; matched on word boundaries after
+# normalisation) to any of:
+#   categories: taxonomy v2 category keys
+#   tags:       experience tags
+#   moods:      moods
+# Covers English, conversational English, common Hinglish and romanized
+# Kannada, and a few Kannada-script words.
+
+version: 1
+
+entries:
+  # --- moods -------------------------------------------------------------------
+  - phrases: [peaceful, peace, calm, serene, tranquil, sukoon, "shanti", "shaanti", "ಶಾಂತ"]
+    moods: [peaceful]
+  - phrases: [quiet, silent, "not crowded", "less crowded", "no crowd", "away from crowds",
+              "without crowds", "uncrowded", "less people", "few people"]
+    moods: [quiet]
+    tags: [quiet]
+  - phrases: [romantic, romance, "a date", "on a date", "for a date", "date night", "date idea",
+              "date ideas", "dating",
+              girlfriend, boyfriend, "my partner", "my wife", "my husband", couple, anniversary]
+    moods: [romantic]
+  - phrases: [adventure, adventurous, thrill, thrilling, adrenaline, "something wild", daring]
+    moods: [adventurous]
+  - phrases: [social, "hang out", hangout, "hang-out", "meet people", lively, buzzing, vibe, "fun vibe"]
+    moods: [social]
+  - phrases: [creative, crafty, artsy, "make something", diy]
+    moods: [creative]
+  - phrases: [culture, cultural, "local culture", traditional, tradition]
+    moods: [cultural]
+  - phrases: [spiritual, divine, meditation, meditate, prayer, pray, blessings, "darshan"]
+    moods: [spiritual]
+  - phrases: [active, sporty, workout, exercise, energetic, "get moving", fitness]
+    moods: [active]
+  - phrases: [relax, relaxing, relaxed, chill, chilled, "chill out", lazy, unwind, laidback,
+              "laid back", "take it easy", "aaram", "aram se", "aaraam"]
+    moods: [relaxing]
+  - phrases: [foodie, food, eat, eating, hungry, "grab a bite", "khana", "khaana", "oota", "ಊಟ",
+              cuisine, "food exploration", "food walk", "food trail"]
+    moods: [foodie]
+    tags: [food]
+  - phrases: [nature, natural, greenery, green, outdoors, outdoor, "fresh air", "open air",
+              wildlife, "prakriti", "hasiru"]
+    moods: [nature]
+    tags: [nature]
+  - phrases: [photography, photographer, photo, photos, "photo shoot", photoshoot, pictures,
+              instagram, instagrammable, "insta", "pics", camera, "photo spots"]
+    moods: [photography]
+    tags: [photogenic]
+  - phrases: [nightlife, "night out", partying, party, clubbing, club, pub, pubs, bar, bars,
+              drinks, beer, brewery, breweries, "craft beer", cocktails]
+    moods: [nightlife]
+    categories: [nightlife]
+  - phrases: [learn, learning, educational, "learn something", knowledge, curious, science]
+    moods: [learning]
+    tags: [educational]
+  - phrases: [luxury, luxurious, fancy, upscale, premium, "fine dining", classy, splurge]
+    moods: [luxury]
+    tags: [premium]
+  - phrases: [cheap, affordable, inexpensive, "low cost", "pocket friendly", "on a budget",
+              "pocket-friendly", "student budget", "budget friendly", "budget-friendly",
+              "tight budget", "low budget", "budget places", "budget options", "sasta",
+              "kam budget", "for free", "free of cost", "free entry", "free things",
+              "free places", "free stuff", "costs nothing", "no cost", "free things to do",
+              "cheap things to do", "cheap things"]
+    moods: [budget]
+    tags: [budget]
+  - phrases: [offbeat, "hidden gem", "hidden gems", unusual, "off the beaten", "lesser known",
+              "lesser-known", underrated, "not touristy", "non touristy", unique, quirky,
+              "something different", different]
+    moods: [offbeat]
+    tags: [offbeat]
+  - phrases: [scenic, views, view, "nice view", "beautiful view", panoramic, vista, landscape]
+    moods: [scenic]
+    tags: [scenic]
+
+  # --- company ---------------------------------------------------------------------
+  - phrases: [family, "with family", "whole family", "family day", "parivar"]
+    moods: [family]
+    tags: [family]
+  - phrases: [kids, kid, children, child, "my son", "my daughter", toddler, "bachche", "makkalu"]
+    tags: [kids]
+  - phrases: [parents, "my parents", "mom and dad", "with my mom", "with my dad", elderly,
+              seniors, grandparents, "amma appa"]
+    tags: [family]
+  - phrases: [friends, "with friends", "college friends", gang, "the boys", "the girls", group,
+              "dost", "dosto", "yaar", "snehitaru"]
+    tags: [group, social]
+  - phrases: [solo, alone, "by myself", "on my own", "me time"]
+    tags: [solo]
+
+  # --- specific experiences ------------------------------------------------------------
+  - phrases: [sunset, sunsets, "golden hour", "evening view", "sooryasta"]
+    tags: [sunset]
+    moods: [scenic]
+  - phrases: [sunrise, sunrises, "early morning view", "suryoday", "sooryodaya"]
+    tags: [sunrise]
+    moods: [scenic]
+  - phrases: [rain, raining, rainy, "if it rains", "may rain", monsoon, indoor, indoors,
+              "inside", "baarish"]
+    tags: [rain_friendly, indoor]
+  - phrases: [work, working, "work from", laptop, wifi, "wi-fi", remote, study, studying]
+    tags: [work_friendly]
+  - phrases: [music, "live music", gig, gigs, concert, concerts, jazz]
+    tags: [music]
+  - phrases: [art, arts, artsy, painting, paintings, artwork, exhibition, exhibitions]
+    tags: [art]
+    categories: [gallery]
+  - phrases: [sports, sport, cricket, football]
+    tags: [sports]
+  - phrases: [history, historical, historic, heritage, "old bangalore", "old bengaluru", colonial,
+              ancient, "itihas", "itihaas"]
+    tags: [historic]
+    moods: [cultural]
+  - phrases: [shopping, shop, "shop around", "window shopping", boutiques, "khareedari"]
+    categories: [shopping]
+    tags: [shopping]
+
+  # --- categories ------------------------------------------------------------------------
+  - phrases: [cafe, cafes, café, cafés, coffee, "coffee shop", "filter coffee", "kaapi", "kaafi",
+              "ಕಾಫಿ", chai, tea, "chai tapri"]
+    categories: [cafe]
+    tags: [coffee]
+  - phrases: [restaurant, restaurants, dinner, lunch, brunch, "place to eat", "places to eat",
+              dining, "meal", breakfast, biryani, dosa, thali]
+    categories: [restaurant]
+    tags: [food]
+  - phrases: ["street food", chaat, "food street", "eat street", "thindi", "tindi", "thindi beedi"]
+    categories: [street_food]
+    tags: [food]
+  - phrases: [dessert, desserts, "ice cream", icecream, sweets, "sweet tooth", cake, bakery,
+              bakeries, "mithai"]
+    categories: [dessert]
+  - phrases: [park, parks, "baag", "bagh"]
+    categories: [park]
+  - phrases: [garden, gardens, "botanical garden", flowers, "flower show", "udyana"]
+    categories: [garden]
+  - phrases: [lake, lakes, "lakeside", "kere", "kerey", "jheel", "talaab", "ಕೆರೆ"]
+    categories: [lake]
+  - phrases: [hill, hills, trek, treks, trekking, hike, hiking, hikes, climb, "betta", "pahad",
+              "ಬೆಟ್ಟ", peak, summit]
+    categories: [hill]
+    tags: [active]
+  - phrases: [viewpoint, viewpoints, "view point", lookout, overlook]
+    categories: [viewpoint]
+  - phrases: [forest, forests, woods, jungle, "jungle walk", "kaadu"]
+    categories: [forest]
+  - phrases: [waterfall, waterfalls, falls, "jalapata"]
+    categories: [waterfall]
+  - phrases: [dam, dams, reservoir, reservoirs, backwaters]
+    categories: [reservoir]
+  - phrases: ["nature reserve", sanctuary, "wildlife sanctuary", "national park", safari, zoo,
+              "bird watching", birding, birds]
+    categories: [nature]
+  - phrases: [museum, museums, "sangrahalaya"]
+    categories: [museum]
+    tags: [educational]
+  - phrases: [gallery, galleries, "art gallery"]
+    categories: [gallery]
+  - phrases: [planetarium, "science centre", "science center", "science museum"]
+    categories: [science]
+  - phrases: [palace, palaces, "mahal", "aramane"]
+    categories: [palace]
+  - phrases: [fort, forts, fortress, "kote", "qila", "killa"]
+    categories: [fort]
+  - phrases: [monument, monuments, statue, statues, memorial]
+    categories: [monument]
+  - phrases: [architecture, "old buildings", buildings]
+    categories: [architecture]
+  - phrases: [temple, temples, "mandir", "mandira", "devasthana", "devasthanam", "gudi",
+              "ದೇವಸ್ಥಾನ", "ದೇವಾಲಯ"]
+    categories: [temple]
+    moods: [spiritual]
+  - phrases: [church, churches, cathedral, basilica]
+    categories: [church]
+  - phrases: [mosque, mosques, masjid, dargah]
+    categories: [mosque]
+  - phrases: [market, markets, bazaar, bazaars, "flea market", "pete", "mandi", "santhe"]
+    categories: [market]
+  - phrases: [mall, malls]
+    categories: [mall]
+  - phrases: [movie, movies, cinema, film, theatre, theater, plays, "stand up", standup,
+              comedy]
+    categories: [entertainment]
+  - phrases: [gaming, arcade, arcades, bowling, "escape room", "escape rooms", "vr", "video games",
+              "board games", "game zone", snooker, games]
+    categories: [gaming]
+    tags: [gaming]
+  - phrases: [activity, activities, "things to do", "something to do", "go karting", karting,
+              "go-karting", trampoline, "rock climbing", climbing, skating]
+    categories: [activity]
+    tags: [active]
+  - phrases: [paragliding, rappelling, ziplining, zipline, "zip line", camping, "adventure sports"]
+    categories: [adventure]
+    moods: [adventurous]
+  - phrases: [farm, farms, "farm stay", vineyard, vineyards, winery, wineries, "wine tasting"]
+    categories: [farm]
+  - phrases: [workshop, workshops, pottery, "art class", "craft class", class, classes]
+    categories: [workshop]
+    moods: [creative]
+  - phrases: [neighbourhood, neighborhood, "walk around", stroll, strolling, "walking tour",
+              "heritage walk", "explore the area"]
+    categories: [walking_area]
+  - phrases: [books, bookstore, bookstores, bookshop, "book shop", library, reading]
+    categories: [shopping]
+    tags: [quiet, educational]
+
+# Words that negate the interest that follows them ("no malls", "not malls",
+# "don't want malls", "avoid crowded places", "without temples").
+negators: [
+  "no", "not", "don't want", "dont want", "do not want", "don't like", "dont like",
+  "do not like", "hate", "avoid", "without", "except", "other than", "skip", "no more",
+  "not into", "anything but", "bina",
+  "preferably not", "rather not", "not interested in", "except for", "exclude", "excluding",
+  "minus", "never"
+]
+
+# Negators that FOLLOW what they negate (Hindi, Kannada): "mall nahi", "mall beda".
+postfix_negators: ["nahi", "nahin", "nahi chahiye", "nahi jaana", "mat", "beda", "bedaa", "ಬೇಡ",
+                   "not please", "not needed"]
+
+# Phrases that describe a crowd preference rather than an interest to avoid.
+crowd_phrases: ["crowded", "crowds", "crowd", "busy places", "rush", "packed", "bheed", "rush-y"]

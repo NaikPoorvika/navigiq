@@ -1,4 +1,4 @@
-﻿"""NQ-023 - CP-SAT itinerary optimizer.
+"""NQ-023 - CP-SAT itinerary optimizer.
 
 An orienteering problem with time windows: choose a SUBSET of candidate POIs
 and an order, maximizing collected preference score subject to a time horizon,
@@ -18,6 +18,13 @@ THREE THINGS THAT SILENTLY BREAK THIS MODEL, all avoided below:
      to ints explicitly or they silently truncate to zero.
 
 Node 0 is the origin and is always visited. Nodes 1..n are candidates.
+
+V2 (ADR-022): transportation is deferred, so the planner passes arcs whose
+duration is the fixed transition buffer, whose cost and walk are zero, and
+which carry the straight-line `distance_km` between stops. That distance is
+used ONLY for geographic coherence (a compactness penalty in the objective;
+over-long hops are removed by the caller) and is never converted into time.
+Node 0 is then a virtual start with zero-length arcs to every stop.
 """
 from __future__ import annotations
 
@@ -52,6 +59,7 @@ class OptimizerNode:
     close_min: int                # latest departure
     hours_confidence: float = 1.0
     is_meal: bool = False
+    must_visit: bool = False      # hard: user-required place (v2)
 
 
 @dataclass
@@ -61,6 +69,7 @@ class OptimizerArc:
     cost_inr: int
     walk_m: int
     mode: str
+    distance_km: float = 0.0      # straight-line; coherence only, never time
 
 
 @dataclass
@@ -159,18 +168,37 @@ def optimize(
     meal_required: bool = False,
     meal_windows: list[tuple[int, int]] | None = None,
     time_limit_s: float = SOLVE_TIME_LIMIT_S,
+    max_stops: int | None = None,
+    min_stops: int | None = None,
+    visit_multiplier: float | None = None,
+    compactness_weight: float = 0.0,
+    category_caps: dict[str, int] | None = None,
+    min_visit_minutes: int = 15,
+    early_start_weight: int = 0,
 ) -> OptimizerResult:
-    """Solve. nodes[0] is the origin; arcs maps (i, j) -> OptimizerArc."""
+    """Solve. nodes[0] is the origin; arcs maps (i, j) -> OptimizerArc.
+
+    v2 keyword arguments (all optional, defaults preserve v1 behaviour):
+      max_stops / min_stops   override the mode's stop cap; min is hard
+      visit_multiplier        override the mode's visit scaling (1.0 = as given)
+      compactness_weight      objective penalty per km of hop distance
+      category_caps           hard ceiling per category
+    """
     n = len(nodes)
     if n < 2:
         return OptimizerResult(status=OptimizerStatus.INFEASIBLE)
 
     w = MODES.get(mode, MODES["balanced"])
+    multiplier = w.visit_multiplier if visit_multiplier is None else visit_multiplier
+    stop_cap = w.max_stops if max_stops is None else max_stops
     m = cp_model.CpModel()
 
     # --- variables --------------------------------------------------------
     visit = [m.NewBoolVar(f"visit_{i}") for i in range(n)]
     m.Add(visit[0] == 1)                       # origin is always visited
+    for i in range(1, n):
+        if nodes[i].must_visit:
+            m.Add(visit[i] == 1)
 
     arc_lit: dict[tuple[int, int], cp_model.IntVar] = {}
     circuit_arcs: list[tuple[int, int, cp_model.IntVar]] = []
@@ -208,7 +236,7 @@ def optimize(
 
     # --- visit duration ---------------------------------------------------
     for i in range(1, n):
-        vm = max(15, int(nodes[i].visit_minutes * w.visit_multiplier))
+        vm = max(min_visit_minutes, int(nodes[i].visit_minutes * multiplier))
         m.Add(depart[i] == arrive[i] + vm).OnlyEnforceIf(visit[i])
         m.Add(depart[i] == arrive[i]).OnlyEnforceIf(visit[i].Not())
 
@@ -244,7 +272,13 @@ def optimize(
     m.Add(total_walk <= max_walk_m)
 
     # --- stop cap ----------------------------------------------------------
-    m.Add(sum(visit[1:]) <= w.max_stops)
+    m.Add(sum(visit[1:]) <= stop_cap)
+    if min_stops:
+        m.Add(sum(visit[1:]) >= min_stops)
+    for category, cap in (category_caps or {}).items():
+        members = [i for i in range(1, n) if nodes[i].category == category]
+        if members:
+            m.Add(sum(visit[i] for i in members) <= cap)
 
     # --- interests ---------------------------------------------------------
     must_satisfied: list[cp_model.IntVar] = []
@@ -311,6 +345,14 @@ def optimize(
     # Cost is discouraged mildly. Coefficient scaled here rather than dividing
     # the expression - CP-SAT linear expressions do not support //.
     obj.append(-int(w.time_efficiency * 1) * total_cost)
+    if early_start_weight > 0:
+        # Tie-breaker only: among equally good plans prefer the one that does
+        # not leave the start of the window idle. Tiny next to any score gap.
+        obj.append(-early_start_weight * sum(arrive[i] - start_min for i in range(1, n)))
+    if compactness_weight > 0:
+        # Hop distance in units of 100 m. A coherence preference, not time.
+        obj.append(-sum(lit * int(round(arcs[(i, j)].distance_km * 10 * compactness_weight))
+                        for (i, j), lit in arc_lit.items()))
     m.Maximize(sum(obj))
 
     # --- solve -------------------------------------------------------------
@@ -380,8 +422,3 @@ def optimize(
                 f"{req.category}: got {got} of {req.count}")
 
     return result
-
-
-
-
-

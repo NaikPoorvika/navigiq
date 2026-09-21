@@ -1,63 +1,43 @@
-"""NQ-022 - Feasibility pre-check and relaxation ladder.
+"""Feasibility pre-check and relaxation suggestions (v2, section 47).
 
-Runs BEFORE the optimizer. Cheap analytic lower bounds catch impossible trips
-in milliseconds rather than after a 10-second CP-SAT solve that was never
-going to succeed.
+Runs BEFORE the optimizer. Cheap lower bounds catch impossible requests in
+milliseconds - "10 places in 2 hours for ₹100" - instead of after a solve
+that was never going to succeed.
 
-Uses haversine with a detour factor for the travel lower bound. That is
-acceptable HERE because a lower bound only needs to be optimistic - if even
-the optimistic estimate does not fit, the trip is impossible. Real OSRM times
-are used everywhere else; a guessed distance must never reach a delivered
-itinerary.
+No travel time is estimated anywhere (ADR-022). The time lower bound is the
+sum of each stop's MINIMUM visit duration plus the transition buffers between
+them; the cost lower bound is the sum of MINIMUM estimated costs for the party.
+If even these optimistic bounds do not fit, the request is infeasible.
 
-THE RULE: MUST constraints are never relaxed without explicit user
-confirmation. Automatic relaxation is limited to dropping NICE_TO_HAVE,
-reducing SHOULD counts, and widening the search radius.
+Relaxations are suggestions for the user, each carrying the concrete
+modification operation that would apply it. Nothing that touches something
+the user explicitly required is ever applied automatically.
 """
 from __future__ import annotations
 
-import math
 from dataclasses import dataclass, field
 from enum import Enum
 
-from app.schemas.tripspec import Category, Interest, Priority, TripSpec
-
-# Streets are not straight lines. Applied to haversine for the lower bound.
-DETOUR_FACTOR = 1.35
-
-# Optimistic speeds for the lower bound only. Real times come from OSRM.
-LOWER_BOUND_SPEED_KMH = 25.0
-
-# Minimum transport cost assumed per leg when a vehicle mode is allowed.
-MIN_LEG_COST_INR = 30
+from app.schemas.tripspec import TripSpec, minutes_to_hhmm
 
 
 class Violation(str, Enum):
     TIME = "TIME_INFEASIBLE"
     BUDGET = "BUDGET_INFEASIBLE"
-    REACH = "REACH_INFEASIBLE"
-    HOURS = "HOURS_INFEASIBLE"
-    WEATHER = "WEATHER_INFEASIBLE"
+    NO_CANDIDATES = "NO_CANDIDATES"
+    MUST_CLOSED = "MUST_INCLUDE_CLOSED"
+    STOPS = "STOP_COUNT_INFEASIBLE"
 
 
 @dataclass
 class Relaxation:
-    step: int
+    code: str
     description: str
-    impact: str
-    requires_confirmation: bool
-    # What applying this would change, for apply_relaxation to act on.
-    action: str
-    payload: dict = field(default_factory=dict)
+    operation: dict             # a closed modification op the UI can apply
 
     def to_dict(self) -> dict:
-        return {
-            "step": self.step,
-            "description": self.description,
-            "impact": self.impact,
-            "requires_confirmation": self.requires_confirmation,
-            "action": self.action,
-        }
+        return {"code": self.code, "description": self.description,
+                "operation": self.operation}
 
 
 @dataclass
@@ -65,235 +45,121 @@ class FeasibilityReport:
     feasible: bool
     violated: list[Violation] = field(default_factory=list)
     bounds: dict = field(default_factory=dict)
-    suggested_relaxations: list[Relaxation] = field(default_factory=list)
+    relaxations: list[Relaxation] = field(default_factory=list)
+    message: str | None = None
 
     def to_dict(self) -> dict:
-        return {
-            "feasible": self.feasible,
-            "violated": [v.value for v in self.violated],
-            "bounds": self.bounds,
-            "suggested_relaxations": [
-                r.to_dict() for r in self.suggested_relaxations],
-        }
-
-
-def haversine_km(a: tuple[float, float], b: tuple[float, float]) -> float:
-    R = 6371.0
-    p1, p2 = math.radians(a[0]), math.radians(b[0])
-    dp = p2 - p1
-    dl = math.radians(b[1] - a[1])
-    h = math.sin(dp / 2) ** 2 + math.cos(p1) * math.cos(p2) * math.sin(dl / 2) ** 2
-    return 2 * R * math.asin(math.sqrt(h))
+        return {"feasible": self.feasible, "violated": [v.value for v in self.violated],
+                "bounds": self.bounds, "message": self.message,
+                "suggested_relaxations": [r.to_dict() for r in self.relaxations]}
 
 
 @dataclass
-class CandidateSummary:
-    """The minimum the pre-check needs about available POIs.
-
-    Supplied by the caller so this module stays free of database access and
-    remains a pure function - which is what makes it unit-testable.
-    """
-    category: str
-    count: int
-    min_cost_inr: int
-    min_visit_minutes: int
-    nearest_km: float
-    any_open_in_window: bool
-    all_outdoor: bool = False
+class StopBound:
+    """The minimum a required stop costs in time and money."""
+    name: str
+    min_visit: int
+    min_cost_pp: int
+    open_in_window: bool | None     # None = hours unknown
 
 
-class FeasibilityEngine:
-    def __init__(self, category_defaults: dict[str, int] | None = None) -> None:
-        # category -> default_visit_minutes, from poi_categories
-        self.visit_defaults = category_defaults or {}
+def check(spec: TripSpec, *, must: list[StopBound], candidate_count: int,
+          min_visit_any: int = 20, min_cost_pp_any: int = 0) -> FeasibilityReport:
+    """Lower-bound check on a plannable spec."""
+    report = FeasibilityReport(feasible=True)
+    window = spec.window_minutes or 0
+    buffer = spec.transition_buffer_minutes
+    party = spec.effective_party_size
+    budget = spec.effective_budget_total
+    requested = max(spec.desired_stop_count or 0, len(must), 1)
 
-    def _visit_minutes(self, category: str, candidates: dict) -> int:
-        c = candidates.get(category)
-        if c and c.min_visit_minutes:
-            return c.min_visit_minutes
-        return self.visit_defaults.get(category, 45)
+    must_time = sum(b.min_visit for b in must)
+    extra = max(0, requested - len(must))
+    min_time = must_time + extra * min_visit_any + max(0, requested - 1) * buffer
+    min_cost = (sum(b.min_cost_pp for b in must) + extra * min_cost_pp_any) * party
+    report.bounds = {
+        "available_minutes": window, "min_required_minutes": min_time,
+        "requested_stops": requested, "transition_buffer_minutes": buffer,
+        "party_size": party, "min_estimated_cost_inr": min_cost,
+        "budget_inr": budget, "candidate_count": candidate_count,
+    }
 
-    def check(
-        self,
-        spec: TripSpec,
-        candidates: dict[str, CandidateSummary],
-        heavy_rain_expected: bool = False,
-    ) -> FeasibilityReport:
-        """Lower-bound check. Optimistic by construction - if this fails,
-        no arrangement of real POIs and real travel times can succeed."""
-        report = FeasibilityReport(feasible=True)
-        available = spec.window_minutes
+    if min_time > window:
+        report.feasible = False
+        report.violated.append(Violation.TIME if len(must) or not spec.desired_stop_count
+                               else Violation.STOPS)
+    if budget is not None and min_cost > budget:
+        report.feasible = False
+        report.violated.append(Violation.BUDGET)
+    closed = [b.name for b in must if b.open_in_window is False]
+    if closed:
+        report.feasible = False
+        report.violated.append(Violation.MUST_CLOSED)
+        report.bounds["closed_required_places"] = closed
+    if candidate_count == 0 and not must:
+        report.feasible = False
+        report.violated.append(Violation.NO_CANDIDATES)
 
-        must = spec.must_interests
-        must_stops = sum(i.count for i in must)
-        all_stops = spec.total_requested_stops
+    if not report.feasible:
+        report.relaxations = relaxations(spec, report, min_time)
+        report.message = describe(report)
+    return report
 
-        # --- visit time lower bound ---------------------------------------
-        required_visit = sum(
-            i.count * self._visit_minutes(i.category.value, candidates)
-            for i in must
-        )
 
-        # --- travel time lower bound --------------------------------------
-        # Optimistic: assume every stop is at the nearest available POI of its
-        # category, and legs are straight-line at a generous speed.
-        legs = max(must_stops, 1)
-        nearest_sum_km = sum(
-            candidates[i.category.value].nearest_km * i.count
-            for i in must if i.category.value in candidates
-        )
-        min_travel_km = nearest_sum_km * DETOUR_FACTOR
-        min_travel = (min_travel_km / LOWER_BOUND_SPEED_KMH) * 60
-
-        total_required = required_visit + min_travel
-
-        report.bounds = {
-            "available_minutes": available,
-            "required_visit_minutes": round(required_visit),
-            "min_travel_minutes": round(min_travel),
-            "total_required_minutes": round(total_required),
-            "must_stops": must_stops,
-            "requested_stops": all_stops,
-        }
-
-        if total_required > available:
-            report.feasible = False
-            report.violated.append(Violation.TIME)
-
-        # --- budget lower bound -------------------------------------------
-        if spec.budget_inr is not None:
-            min_poi_cost = sum(
-                candidates[i.category.value].min_cost_inr * i.count
-                for i in must if i.category.value in candidates
-            ) * spec.party_size
-            uses_vehicle = any(m.value != "walking" for m in spec.transport)
-            min_transport = legs * MIN_LEG_COST_INR if uses_vehicle else 0
-            min_cost = min_poi_cost + min_transport
-
-            report.bounds["min_cost_inr"] = min_cost
-            report.bounds["budget_inr"] = spec.budget_inr
-
-            if min_cost > spec.budget_inr:
-                report.feasible = False
-                report.violated.append(Violation.BUDGET)
-
-        # --- reach ---------------------------------------------------------
-        missing = [i.category.value for i in must
-                   if i.category.value not in candidates
-                   or candidates[i.category.value].count == 0]
-        if missing:
-            report.feasible = False
-            report.violated.append(Violation.REACH)
-            report.bounds["categories_with_no_candidates"] = missing
-
-        # --- opening hours --------------------------------------------------
-        closed = [i.category.value for i in must
-                  if i.category.value in candidates
-                  and not candidates[i.category.value].any_open_in_window]
-        if closed:
-            report.feasible = False
-            report.violated.append(Violation.HOURS)
-            report.bounds["categories_closed_in_window"] = closed
-
-        # --- weather ---------------------------------------------------------
-        if heavy_rain_expected:
-            washed_out = [i.category.value for i in must
-                          if i.category.value in candidates
-                          and candidates[i.category.value].all_outdoor]
-            if washed_out:
-                report.feasible = False
-                report.violated.append(Violation.WEATHER)
-                report.bounds["outdoor_categories_in_rain"] = washed_out
-
-        if not report.feasible:
-            report.suggested_relaxations = self._ladder(spec, report)
-
-        return report
-
-    def _ladder(self, spec: TripSpec, report: FeasibilityReport) -> list[Relaxation]:
-        """Ordered relaxations. Steps 1, 2 and 4 are automatic; the rest
-        require the user to agree, because they change what was asked for."""
-        out: list[Relaxation] = []
-        v = report.violated
-
-        nice = [i for i in spec.interests if i.priority == Priority.NICE]
-        if nice:
-            out.append(Relaxation(
-                1, f"Drop {len(nice)} optional interest(s): "
-                   f"{', '.join(i.category.value for i in nice)}",
-                "frees time and budget", False, "drop_nice"))
-
-        should_multi = [i for i in spec.interests
-                        if i.priority == Priority.SHOULD and i.count > 1]
-        if should_multi:
-            out.append(Relaxation(
-                2, "Visit one of each preferred category instead of several",
-                f"removes {sum(i.count - 1 for i in should_multi)} stop(s)",
-                False, "reduce_should_counts"))
-
-        if Violation.TIME in v:
-            new_end = min(spec.end_minute + 60, 22 * 60)
+def relaxations(spec: TripSpec, report: FeasibilityReport, min_time: int) -> list[Relaxation]:
+    out: list[Relaxation] = []
+    v = set(report.violated)
+    window = spec.window_minutes or 0
+    requested = report.bounds["requested_stops"]
+    if Violation.TIME in v or Violation.STOPS in v:
+        if requested > 1:
+            fewer = max(1, requested - max(1, (min_time - window) // 45 + 1))
+            out.append(Relaxation("REDUCE_STOPS", f"Plan {fewer} stop{'s' * (fewer > 1)} "
+                                  f"instead of {requested}",
+                                  {"op": "set_stop_count", "count": fewer}))
+        if spec.end_minute is not None:
+            new_end = min(23 * 60, spec.end_minute + max(60, min_time - window + 15))
             if new_end > spec.end_minute:
-                out.append(Relaxation(
-                    3, f"Extend the trip to "
-                       f"{new_end // 60:02d}:{new_end % 60:02d}",
-                    f"adds {new_end - spec.end_minute} minutes",
-                    True, "extend_end", {"new_end_minute": new_end}))
-
-        if Violation.REACH in v:
-            out.append(Relaxation(
-                4, "Search a wider area",
-                "more places become reachable", False, "widen_radius"))
-
-        if Violation.BUDGET in v:
-            out.append(Relaxation(
-                5, "Allow cheaper alternatives (street food instead of "
-                   "restaurants)",
-                "lowers the minimum cost", True, "cheaper_substitutes"))
-
-        must = spec.must_interests
-        multi_must = [i for i in must if i.count > 1]
-        if multi_must:
-            out.append(Relaxation(
-                6, f"Reduce required stops: "
-                   f"{', '.join(f'{i.count} {i.category.value}' for i in multi_must)}"
-                   f" to one each",
-                "significantly reduces time and cost", True,
-                "reduce_must_counts"))
-
-        if len(must) > 1:
-            out.append(Relaxation(
-                7, "Drop one of your required categories",
-                "last resort", True, "drop_must"))
-
-        return out
+                out.append(Relaxation("INCREASE_TIME", f"End at {minutes_to_hhmm(new_end)} "
+                                      f"instead of {spec.end_time}",
+                                      {"op": "set_end_time", "time": minutes_to_hhmm(new_end)}))
+        if spec.pace.value != "quick":
+            out.append(Relaxation("FASTER_PACE", "Use a quicker pace with shorter visits",
+                                  {"op": "set_pace", "pace": "quick"}))
+    if Violation.BUDGET in v:
+        needed = report.bounds["min_estimated_cost_inr"]
+        rounded = ((needed + 99) // 100) * 100
+        out.append(Relaxation("INCREASE_BUDGET", f"Raise the budget to about ₹{rounded}",
+                              {"op": "set_budget", "amount": rounded}))
+        out.append(Relaxation("FREE_PLACES", "Focus on free places like parks, lakes and "
+                              "temples", {"op": "add_interest", "interest": "budget"}))
+    if Violation.NO_CANDIDATES in v:
+        if spec.anchor_area is not None:
+            out.append(Relaxation("CHANGE_AREA", "Search across the whole city instead of "
+                                  f"around {spec.anchor_area.name}",
+                                  {"op": "set_area", "area": None}))
+        if spec.interests:
+            out.append(Relaxation("WIDEN_CATEGORIES", "Allow a wider mix of places",
+                                  {"op": "remove_interest", "interest": spec.interests[-1]}))
+    if Violation.MUST_CLOSED in v:
+        out.append(Relaxation("CHANGE_TIME", "Pick a time window when the required place "
+                              "is open", {"op": "set_start_time", "time": None}))
+    return out
 
 
-def apply_relaxation(spec: TripSpec, relaxation: Relaxation) -> TripSpec:
-    """Return a modified copy. Pure - never mutates the input."""
-    data = spec.model_dump()
-
-    if relaxation.action == "drop_nice":
-        data["interests"] = [i for i in data["interests"]
-                             if i["priority"] != Priority.NICE.value]
-
-    elif relaxation.action == "reduce_should_counts":
-        for i in data["interests"]:
-            if i["priority"] == Priority.SHOULD.value:
-                i["count"] = 1
-
-    elif relaxation.action == "extend_end":
-        m = relaxation.payload["new_end_minute"]
-        data["end_time_local"] = f"{m // 60:02d}:{m % 60:02d}"
-
-    elif relaxation.action == "reduce_must_counts":
-        for i in data["interests"]:
-            if i["priority"] == Priority.MUST.value:
-                i["count"] = 1
-
-    elif relaxation.action in ("widen_radius", "cheaper_substitutes", "drop_must"):
-        # Handled by the caller: radius is a search parameter, substitution
-        # and dropping a MUST need a user choice about which one.
-        pass
-
-    return TripSpec.model_validate(data)
+def describe(report: FeasibilityReport) -> str:
+    b = report.bounds
+    parts = []
+    if Violation.TIME in report.violated or Violation.STOPS in report.violated:
+        parts.append(f"{b['requested_stops']} stops need at least {b['min_required_minutes']} "
+                     f"minutes but the window is {b['available_minutes']}")
+    if Violation.BUDGET in report.violated:
+        parts.append(f"the places need at least ₹{b['min_estimated_cost_inr']} but the budget "
+                     f"is ₹{b['budget_inr']}")
+    if Violation.MUST_CLOSED in report.violated:
+        parts.append("a required place is closed in that window: "
+                     + ", ".join(b.get("closed_required_places", [])))
+    if Violation.NO_CANDIDATES in report.violated:
+        parts.append("no places match all of these constraints")
+    return "That combination isn't feasible with the current constraints: " + "; ".join(
+        parts) + "."

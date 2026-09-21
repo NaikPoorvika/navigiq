@@ -1,15 +1,11 @@
-"""NQ-021 tier 2 - semantic validation.
+"""Tier 2 - semantic validation of a TripSpec v2.
 
-Tier 1 (Pydantic) catches malformed values. This catches specs that are
+Tier 1 (Pydantic) rejects malformed values. This catches specs that are
 well-formed but do not make sense: a date in the past, a budget that cannot
-buy the requested categories, transport that contradicts the walking limit.
+buy anything for the party, a window that starts before most places open.
 
-Tier 3 (NQ-022 feasibility) then asks whether the trip can exist at all
-given real POIs and real travel times.
-
-These return structured issues rather than raising, because the agent in
-NQ-031 needs to turn them into a clarifying question, and the form in
-NQ-026 needs to highlight a specific field.
+Issues are returned, not raised: the assistant turns them into one concise
+clarification and the form highlights the field.
 """
 from __future__ import annotations
 
@@ -17,12 +13,17 @@ from dataclasses import dataclass, field
 from datetime import date as date_type
 from enum import Enum
 
-from app.schemas.tripspec import Category, TransportMode, TripSpec
+from app.schemas.tripspec import TripSpec
+
+DAYLIGHT_INTERESTS = {"park", "garden", "lake", "nature", "hill", "viewpoint", "forest",
+                      "waterfall", "reservoir", "fort", "sunrise"}
+FOOD_INTERESTS = {"cafe", "restaurant", "street_food", "dessert", "food", "coffee", "foodie"}
+MIN_BUDGET_PER_PERSON_INR = 50
 
 
 class Severity(str, Enum):
-    ERROR = "error"       # cannot plan
-    WARNING = "warning"   # can plan, but the user should know
+    ERROR = "error"
+    WARNING = "warning"
 
 
 @dataclass
@@ -34,13 +35,8 @@ class Issue:
     suggestion: str | None = None
 
     def to_dict(self) -> dict:
-        return {
-            "code": self.code,
-            "field": self.field,
-            "message": self.message,
-            "severity": self.severity.value,
-            "suggestion": self.suggestion,
-        }
+        return {"code": self.code, "field": self.field, "message": self.message,
+                "severity": self.severity.value, "suggestion": self.suggestion}
 
 
 @dataclass
@@ -60,131 +56,92 @@ class SemanticReport:
         return not self.errors
 
     def to_dict(self) -> dict:
-        return {
-            "valid": self.is_valid,
-            "errors": [i.to_dict() for i in self.errors],
-            "warnings": [i.to_dict() for i in self.warnings],
-        }
+        return {"valid": self.is_valid, "errors": [i.to_dict() for i in self.errors],
+                "warnings": [i.to_dict() for i in self.warnings]}
 
 
-# Categories that cannot be visited after dark in any useful sense.
-DAYLIGHT_ONLY = {Category.PARK, Category.LAKE, Category.NATURE,
-                 Category.VIEWPOINT, Category.HISTORICAL}
-
-# Rough floor per person for a trip with any paid category in it.
-MIN_BUDGET_PER_PERSON_INR = 50
-
-
-def validate_semantics(
-    spec: TripSpec,
-    today: date_type | None = None,
-) -> SemanticReport:
+def validate_semantics(spec: TripSpec, today: date_type | None = None,
+                       now_minute: int | None = None) -> SemanticReport:
+    from app.nlu.timeparse import minute_of_day, now_ist, today_ist
     report = SemanticReport()
-    today = today or date_type.today()
+    today = today or today_ist()
 
-    # --- date -------------------------------------------------------------
-    if spec.date < today:
-        report.issues.append(Issue(
-            "DATE_IN_PAST", "date",
-            f"{spec.date} has already passed",
-            suggestion="Choose today or a future date"))
+    if spec.date is not None:
+        if spec.date < today:
+            report.issues.append(Issue("DATE_IN_PAST", "date", f"{spec.date} has already passed",
+                                       suggestion="Choose today or a future date"))
+        elif (spec.date - today).days > 365:
+            report.issues.append(Issue("DATE_TOO_FAR", "date",
+                                       "plans more than a year ahead are unlikely to hold",
+                                       Severity.WARNING))
+        if spec.date == today and spec.end_minute is not None:
+            current = now_minute if now_minute is not None else minute_of_day(now_ist())
+            if spec.end_minute <= current:
+                report.issues.append(Issue(
+                    "WINDOW_ALREADY_OVER", "end_time",
+                    "that time window has already ended today",
+                    suggestion="Pick a later time or another day"))
 
-    if (spec.date - today).days > 365:
-        report.issues.append(Issue(
-            "DATE_TOO_FAR", "date",
-            "planning more than a year ahead is unlikely to be accurate",
-            Severity.WARNING))
-
-    # --- time window ------------------------------------------------------
-    if spec.end_minute > 23 * 60:
-        report.issues.append(Issue(
-            "ENDS_VERY_LATE", "end_time_local",
-            "the trip ends after 23:00; most places will be closed",
-            Severity.WARNING))
-
-    if spec.start_minute < 6 * 60:
-        report.issues.append(Issue(
-            "STARTS_VERY_EARLY", "start_time_local",
-            "the trip starts before 06:00; few places will be open",
-            Severity.WARNING))
-
-    # Outdoor categories requested entirely after dark.
-    outdoor_must = [i for i in spec.must_interests
-                    if i.category in DAYLIGHT_ONLY]
-    if outdoor_must and spec.start_minute >= 19 * 60:
-        names = ", ".join(i.category.value for i in outdoor_must)
+    if spec.end_minute is not None and spec.end_minute > 23 * 60:
+        report.issues.append(Issue("ENDS_VERY_LATE", "end_time",
+                                   "the plan ends after 23:00; most places will be closed",
+                                   Severity.WARNING))
+    if spec.start_minute is not None and spec.start_minute < 6 * 60:
+        report.issues.append(Issue("STARTS_VERY_EARLY", "start_time",
+                                   "the plan starts before 06:00; few places will be open",
+                                   Severity.WARNING))
+    daylight = DAYLIGHT_INTERESTS & set(spec.interests)
+    if daylight and spec.start_minute is not None and spec.start_minute >= 19 * 60:
         report.issues.append(Issue(
             "OUTDOOR_AFTER_DARK", "interests",
-            f"{names} requested but the trip starts after 19:00",
-            Severity.WARNING,
-            "These are usually daylight activities"))
+            f"{', '.join(sorted(daylight))} requested but the plan starts after 19:00",
+            Severity.WARNING, "These are usually daylight activities"))
 
-    # --- budget -----------------------------------------------------------
-    if spec.budget_inr is not None:
-        floor = MIN_BUDGET_PER_PERSON_INR * spec.party_size
-        if spec.budget_inr < floor:
+    total = spec.effective_budget_total
+    if total is not None:
+        floor = MIN_BUDGET_PER_PERSON_INR * spec.effective_party_size
+        if 0 < total < floor:
             report.issues.append(Issue(
-                "BUDGET_TOO_LOW", "budget_inr",
-                f"Rs {spec.budget_inr} for {spec.party_size} people is below "
-                f"a workable minimum of Rs {floor}",
-                suggestion=f"Raise the budget to at least Rs {floor}, or "
-                           f"request only free categories"))
+                "BUDGET_VERY_LOW", "budget_total",
+                f"₹{total} for {spec.effective_party_size} people only covers free places",
+                Severity.WARNING, "Free parks, lakes and temples still work"))
 
-    # --- transport --------------------------------------------------------
-    if TransportMode.WALKING not in spec.transport:
-        report.issues.append(Issue(
-            "NO_WALKING", "transport",
-            "walking is not an allowed mode; every stop needs a vehicle leg",
-            Severity.WARNING))
-
-    walk_only = spec.transport == [TransportMode.WALKING]
-    if walk_only and spec.total_requested_stops > 3:
-        report.issues.append(Issue(
-            "WALKING_ONLY_MANY_STOPS", "transport",
-            f"{spec.total_requested_stops} stops on foot is ambitious",
-            Severity.WARNING,
-            "Add auto or cab , or reduce the number of stops"))
-
-    if walk_only and spec.constraints.max_walking_km < 3:
-        report.issues.append(Issue(
-            "WALKING_ONLY_SHORT_LIMIT", "constraints.max_walking_km",
-            f"walking-only with a {spec.constraints.max_walking_km} km limit "
-            f"leaves very little reach"))
-
-    # --- interests --------------------------------------------------------
-    if spec.constraints.max_stops is not None:
-        if spec.total_requested_stops > spec.constraints.max_stops:
+    if spec.budget_total is not None and spec.budget_per_person is not None:
+        implied = spec.budget_per_person * spec.effective_party_size
+        if abs(implied - spec.budget_total) > max(50, 0.1 * spec.budget_total):
             report.issues.append(Issue(
-                "TOO_MANY_INTERESTS", "interests",
-                f"{spec.total_requested_stops} stops requested but max_stops "
-                f"is {spec.constraints.max_stops}",
-                Severity.WARNING,
-                "Lower-priority interests will be dropped first"))
+                "BUDGET_CONFLICT", "budget_total",
+                f"total ₹{spec.budget_total} and ₹{spec.budget_per_person} per person disagree",
+                suggestion="Keep one of them"))
 
-    seen: set[Category] = set()
-    for i in spec.interests:
-        if i.category in seen:
+    if spec.party_type is not None and spec.party_size is not None:
+        if spec.party_type.value == "couple" and spec.party_size != 2:
+            report.issues.append(Issue("PARTY_MISMATCH", "party_size",
+                                       "a couple is two people", Severity.WARNING))
+        if spec.party_type.value == "solo" and spec.party_size != 1:
+            report.issues.append(Issue("PARTY_MISMATCH", "party_size",
+                                       "solo means one person", Severity.WARNING))
+
+    window = spec.window_minutes
+    if window is not None and spec.desired_stop_count:
+        min_needed = spec.desired_stop_count * 20 + (spec.desired_stop_count - 1) * \
+            spec.transition_buffer_minutes
+        if min_needed > window:
+            # A warning, not an error: the feasibility check reports it as
+            # INFEASIBLE with concrete relaxations the user can apply.
             report.issues.append(Issue(
-                "DUPLICATE_INTEREST", "interests",
-                f"{i.category.value} appears more than once",
-                suggestion="Use a single entry with a higher count"))
-        seen.add(i.category)
+                "TOO_MANY_STOPS", "desired_stop_count",
+                f"{spec.desired_stop_count} stops do not fit in {window} minutes",
+                Severity.WARNING, "Fewer stops or a longer window"))
 
-    # --- dietary ----------------------------------------------------------
-    c = spec.constraints
-    if c.vegan and not c.vegetarian:
-        report.issues.append(Issue(
-            "VEGAN_WITHOUT_VEGETARIAN", "constraints",
-            "vegan is set but vegetarian is not; vegan implies vegetarian",
-            Severity.WARNING))
+    wants_food = bool(FOOD_INTERESTS & set(spec.interests)) or bool(spec.meal_preferences)
+    if spec.dietary_preferences and not wants_food and window is not None and window < 180:
+        report.issues.append(Issue("DIET_WITHOUT_FOOD", "dietary_preferences",
+                                   "a dietary preference is set but no food stop is likely",
+                                   Severity.WARNING))
 
-    meal_categories = {Category.RESTAURANT, Category.CAFE,
-                       Category.STREET_FOOD, Category.DESSERT}
-    wants_food = any(i.category in meal_categories for i in spec.interests)
-    if (c.vegetarian or c.vegan or c.halal) and not wants_food:
-        report.issues.append(Issue(
-            "DIET_WITHOUT_FOOD", "constraints",
-            "a dietary restriction is set but no food stop was requested",
-            Severity.WARNING))
-
+    if set(spec.preferred_areas and [a.name.lower() for a in spec.preferred_areas]) & {
+            a.lower() for a in spec.avoid_areas}:
+        report.issues.append(Issue("AREA_CONFLICT", "avoid_areas",
+                                   "an area is both preferred and avoided"))
     return report

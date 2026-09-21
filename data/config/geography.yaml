@@ -1,0 +1,54 @@
+# data/config/geography.yaml
+#
+# ADR-023 - Bengaluru discovery envelope.
+#
+# The centre and outer radius live in backend settings
+# (BENGALURU_CENTER_LAT / _LON, BENGALURU_DISCOVERY_RADIUS_KM) so they can be
+# overridden per environment. This file holds the band boundaries and the
+# adaptive search radii that sit inside that envelope.
+#
+# THESE ARE DISCOVERY CLASSIFICATIONS, NOT TRAVEL-TIME ASSUMPTIONS.
+# Nothing in NavigIQ converts a geodesic distance into minutes.
+
+version: 1
+
+# Boundary rule: a POI is inside the envelope when
+#   distance_from_center_km <= BENGALURU_DISCOVERY_RADIUS_KM   (inclusive).
+# 90.0 km is included; 90.1 km is excluded.
+boundary_inclusive: true
+
+# Upper bounds are inclusive. A POI at exactly 15.0 km is CITY_CORE.
+region_bands:
+  - {bucket: CITY_CORE,     max_km: 15}
+  - {bucket: CITY,          max_km: 30}
+  - {bucket: OUTSKIRTS,     max_km: 60}
+  - {bucket: NEARBY_ESCAPE, max_km: 90}
+
+# Adaptive search radii, used when a request names or implies an area.
+# "Cafe near Jayanagar" must never return a cafe 65 km away.
+adaptive_radius_km:
+  near_place: 3.0          # "near <locality>" / "around <locality>"
+  near_place_max: 6.0      # widened once when too few results
+  in_area: 5.0             # "in <locality>"
+  city_default_max_km: 30  # "in Bengaluru" -> CITY_CORE + CITY only
+  near_me: 5.0
+
+# Which buckets an unscoped request may draw from, by scope.
+scope_buckets:
+  local:    [CITY_CORE, CITY]
+  city:     [CITY_CORE, CITY]
+  regional: [OUTSKIRTS, NEARBY_ESCAPE]
+  anywhere: [CITY_CORE, CITY, OUTSKIRTS, NEARBY_ESCAPE]
+
+# Planning coherence. Straight-line distance between consecutive stops is
+# used ONLY to keep a day geographically sensible, never as travel time.
+planning:
+  max_hop_km_city: 12.0        # consecutive stops in a city plan
+  max_hop_km_escape: 25.0      # within an escape cluster
+  cluster_radius_km_city: 8.0
+  cluster_radius_km_escape: 20.0
+  # A POI farther than this from the plan's anchor behaves as a primary
+  # destination: it needs a large time block and is never packed in as
+  # one stop of many.
+  primary_destination_min_km: 45.0
+  primary_destination_min_window_min: 300

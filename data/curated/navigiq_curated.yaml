@@ -1,0 +1,523 @@
+# data/curated/navigiq_curated.yaml
+#
+# NavigIQ editorial overlay (ADR-026). See backend/app/ingestion/curated.py.
+#
+# RULES
+#  * Never supplies coordinates. An entry annotates an existing feature
+#    (match by wikidata id / source_ref / name) or creates one from recorded
+#    geometry (from_wikidata / from_place / from_osm).
+#  * Descriptions are experiential and editorial. No ratings, no invented
+#    facts, no numbers.
+#  * cost = [min, typical, max] INR PER PERSON, shown to users as an
+#    ESTIMATE (cost_confidence = curated_estimate). Ranges are deliberately
+#    wide where fees vary (camera, foreigner, safari tiers). Transport is
+#    never included.
+#  * visit_duration = [min, typical, max] minutes on site.
+#  * editorial_score (0-1) is NavigIQ's confidence that a place is worth
+#    suggesting unprompted. It is never shown as a rating.
+
+version: 1
+
+entries:
+  # ============================ CITY: gardens, parks, lakes ============================
+  - key: lalbagh
+    match: {wikidata: Q200711}
+    display_name: Lalbagh Botanical Garden
+    category: garden
+    aliases: [Lalbagh, Lal Bagh, Lalbagh Garden]
+    short_description: A sprawling historic botanical garden with old trees, a glasshouse, a lake and an ancient rock outcrop - calm and green in the early morning.
+    experience_tags: [peaceful, photogenic, nature, relaxing, sunrise, family, romantic, active]
+    editorial_score: 0.95
+    visit_duration: [60, 120, 180]
+    cost: [0, 30, 60]
+    suitability: {family_friendly: true, kids_friendly: true, senior_friendly: true, couple_friendly: true, solo_friendly: true}
+  - key: cubbon-park
+    match: {wikidata: Q3633776}
+    category: park
+    aliases: [Sri Chamarajendra Park, Cubbon]
+    short_description: The city's great central park - shaded avenues, lawns and colonial-era buildings, at its most peaceful on quiet mornings.
+    experience_tags: [peaceful, nature, photogenic, relaxing, active, family, solo, historic]
+    editorial_score: 0.94
+    visit_duration: [45, 90, 150]
+    cost: [0, 0, 0]
+    suitability: {family_friendly: true, kids_friendly: true, senior_friendly: true, couple_friendly: true, solo_friendly: true}
+  - key: ulsoor-lake
+    match: {wikidata: Q30587793}
+    category: lake
+    aliases: [Halasuru Lake, Ulsoor Lake]
+    short_description: A large lake near the city centre with islands and a walking promenade; pleasant around sunset.
+    experience_tags: [scenic, sunset, peaceful, photogenic, relaxing]
+    editorial_score: 0.82
+    visit_duration: [30, 60, 90]
+    cost: [0, 0, 100]
+  - key: sankey-tank
+    match: {wikidata: Q7331115}
+    category: lake
+    aliases: [Sankey Lake, Sankey Tank]
+    short_description: A tree-lined lake in Malleshwaram with a popular walking path - a favourite for evening walks and sunsets.
+    experience_tags: [peaceful, sunset, scenic, active, photogenic, relaxing]
+    editorial_score: 0.86
+    visit_duration: [30, 60, 90]
+    cost: [0, 0, 0]
+  - key: hebbal-lake
+    match: {wikidata: Q5695346}
+    category: lake
+    short_description: A large lake in north Bengaluru known for birdlife, with a park along its shore.
+    experience_tags: [nature, peaceful, photogenic, sunset, quiet]
+    editorial_score: 0.74
+    visit_duration: [30, 60, 90]
+  - key: puttenahalli-lake
+    match: {wikidata: Q17084588}
+    category: lake
+    short_description: A small community-restored lake in JP Nagar, quiet and good for spotting birds.
+    experience_tags: [quiet, nature, peaceful, offbeat, photogenic]
+    editorial_score: 0.7
+    visit_duration: [30, 45, 75]
+  - key: madiwala-lake
+    match: {wikidata: Q30621418}
+    category: lake
+    short_description: One of the city's larger lakes, with open water views and birdlife.
+    experience_tags: [nature, scenic, sunset, peaceful]
+    editorial_score: 0.66
+    visit_duration: [30, 45, 75]
+  - key: big-banyan-tree
+    match: {wikidata: Q5287736}
+    display_name: Big Banyan Tree
+    category: nature
+    aliases: [Dodda Alada Mara, Big Banyan Tree]
+    short_description: A single enormous banyan tree whose aerial roots have grown into a small grove on the city's south-western edge.
+    experience_tags: [nature, peaceful, photogenic, offbeat, family, quiet]
+    editorial_score: 0.8
+    visit_duration: [30, 45, 75]
+    cost: [0, 0, 0]
+    flags: {short_escape: true}
+
+  # ============================ CITY: heritage & culture ============================
+  - key: bangalore-palace
+    match: {wikidata: Q3520057}
+    category: palace
+    aliases: [Bengaluru Palace]
+    short_description: A Tudor-style royal palace set in wide grounds, with period interiors, paintings and ornate halls.
+    experience_tags: [historic, photogenic, cultural, family]
+    editorial_score: 0.9
+    visit_duration: [60, 90, 120]
+    cost: [200, 300, 600]
+    suitability: {family_friendly: true, senior_friendly: true, couple_friendly: true}
+  - key: vidhana-soudha
+    match: {wikidata: Q283257}
+    category: architecture
+    short_description: The imposing granite seat of the state legislature - admired from outside, and striking when lit up in the evening.
+    experience_tags: [historic, photogenic, cultural]
+    remove_tags: [indoor, rain_friendly]
+    editorial_score: 0.82
+    visit_duration: [15, 20, 40]
+    cost: [0, 0, 0]
+  - key: tipu-summer-palace
+    match: {wikidata: Q7809034}
+    category: palace
+    aliases: [Tipu Sultan's Summer Palace, Tipu Palace]
+    short_description: A two-storey palace built largely of teak with carved arches and painted walls, in the old city.
+    experience_tags: [historic, cultural, photogenic, quiet]
+    editorial_score: 0.84
+    visit_duration: [30, 45, 75]
+    cost: [20, 30, 300]
+  - key: bangalore-fort
+    match: {wikidata: Q4855049}
+    category: fort
+    short_description: The surviving gateway and walls of the old city fort, a short walk from the palace of Tipu Sultan.
+    experience_tags: [historic, cultural, photogenic]
+    editorial_score: 0.72
+    visit_duration: [20, 30, 45]
+    cost: [0, 0, 0]
+  - key: russell-market
+    match: {wikidata: Q7381672}
+    category: market
+    aliases: [Russel Market, Russell Market]
+    short_description: A historic covered market in Shivajinagar full of flowers, fruit, meat and colour - busy, loud and very photogenic.
+    experience_tags: [cultural, photogenic, social, food, historic]
+    editorial_score: 0.78
+    visit_duration: [30, 45, 90]
+    cost: [0, 0, 0]
+  - key: st-marys-basilica
+    match: {wikidata: Q7590089}
+    category: church
+    short_description: A Gothic-style basilica in Shivajinagar with stained glass and a tall spire, among the oldest churches in the city.
+    experience_tags: [spiritual, historic, photogenic, quiet]
+    editorial_score: 0.76
+    visit_duration: [20, 30, 45]
+  - key: gavi-gangadhareshwara
+    match: {wikidata: Q5528052}
+    category: temple
+    short_description: An ancient cave temple carved into rock in Gavipuram, with monolithic pillars and a quiet, atmospheric interior.
+    experience_tags: [spiritual, historic, cultural, offbeat]
+    editorial_score: 0.8
+    visit_duration: [20, 40, 60]
+  - key: dodda-ganeshana-gudi
+    match: {wikidata: Q1531614}
+    display_name: Dodda Ganeshana Gudi
+    category: temple
+    short_description: A popular temple in Basavanagudi known for its large Ganesha idol.
+    experience_tags: [spiritual, cultural, historic]
+    editorial_score: 0.7
+    visit_duration: [15, 30, 45]
+  - key: iskcon-bangalore
+    match: {wikidata: Q4500903}
+    category: temple
+    aliases: [ISKCON Temple, ISKCON Bangalore]
+    short_description: A large hilltop temple complex in Rajajinagar, grand and lively, especially in the evenings.
+    experience_tags: [spiritual, cultural, photogenic]
+    editorial_score: 0.84
+    visit_duration: [45, 75, 120]
+    cost: [0, 0, 0]
+  - key: ngma
+    match: {wikidata: Q17077814}
+    category: gallery
+    aliases: [NGMA, NGMA Bengaluru, National Gallery of Modern Art]
+    short_description: A modern and contemporary art gallery in a restored heritage mansion with a quiet garden.
+    experience_tags: [art, quiet, cultural, indoor, rain_friendly, historic]
+    editorial_score: 0.84
+    visit_duration: [60, 90, 120]
+    cost: [20, 20, 500]
+  - key: venkatappa-gallery
+    match: {wikidata: Q24950240}
+    category: gallery
+    short_description: A public art gallery beside Cubbon Park with paintings and sculpture, calm and uncrowded.
+    experience_tags: [art, quiet, cultural, indoor, rain_friendly, offbeat]
+    editorial_score: 0.72
+    visit_duration: [30, 45, 75]
+  - key: vitm
+    match: {wikidata: Q3537014}
+    category: science
+    aliases: [Visvesvaraya Museum, VITM]
+    short_description: A hands-on science and technology museum with engines, interactive exhibits and galleries that children love.
+    experience_tags: [educational, kids, family, indoor, rain_friendly]
+    editorial_score: 0.86
+    visit_duration: [90, 120, 180]
+    cost: [60, 100, 150]
+    suitability: {family_friendly: true, kids_friendly: true}
+  - key: hal-museum
+    match: {wikidata: Q5628915}
+    category: science
+    aliases: [HAL Heritage Centre and Aerospace Museum, HAL Museum]
+    short_description: An aerospace museum with aircraft displays indoors and out, a treat for aviation fans and kids.
+    experience_tags: [educational, kids, family, photogenic]
+    editorial_score: 0.82
+    visit_duration: [60, 90, 120]
+    cost: [50, 100, 150]
+    suitability: {family_friendly: true, kids_friendly: true}
+  - key: nehru-planetarium
+    match: {name: Jawaharlal Nehru Planetarium, category: science}
+    short_description: A planetarium with sky shows and space exhibits, good for kids and rainy afternoons.
+    experience_tags: [educational, kids, family, indoor, rain_friendly]
+    editorial_score: 0.78
+    visit_duration: [60, 75, 90]
+    cost: [50, 75, 100]
+
+  # ============================ CITY: food heritage ============================
+  - key: vv-puram-food-street
+    match: {wikidata: Q30693619}
+    display_name: VV Puram Food Street
+    category: street_food
+    aliases: [VV Puram Food Street, Thindi Beedi, Eat Street]
+    short_description: A lane of street-food stalls in VV Puram that comes alive in the evenings with local snacks and sweets.
+    experience_tags: [food, social, budget, photogenic]
+    editorial_score: 0.84
+    visit_duration: [45, 60, 90]
+    cost: [100, 250, 400]
+  - key: mtr
+    match: {wikidata: Q6794121}
+    aliases: [MTR, Mavalli Tiffin Rooms]
+    short_description: A landmark vegetarian restaurant known for classic South Indian breakfasts and meals.
+    experience_tags: [food, historic, cultural]
+    editorial_score: 0.85
+    visit_duration: [30, 45, 75]
+    cost: [150, 300, 500]
+  - key: vidyarthi-bhavan
+    match: {wikidata: Q7928217}
+    short_description: A beloved old eatery in Basavanagudi famous for its crisp dosas and filter coffee.
+    experience_tags: [food, historic, cultural, budget, coffee]
+    editorial_score: 0.84
+    visit_duration: [30, 45, 60]
+    cost: [100, 200, 300]
+
+  # ============================ CITY: streets & neighbourhoods ============================
+  - key: commercial-street
+    from_wikidata: Q24943501
+    category: walking_area
+    display_name: Commercial Street
+    short_description: A dense shopping street for clothes, jewellery and bargains, busiest in the evenings and at weekends.
+    experience_tags: [shopping, social, budget, cultural]
+    editorial_score: 0.78
+    visit_duration: [45, 90, 150]
+    cost: [0, 0, 0]
+  - key: church-street
+    from_wikidata: Q48733607
+    category: walking_area
+    display_name: Church Street
+    short_description: A lively cobbled street off MG Road lined with cafes, bookshops, pubs and restaurants.
+    experience_tags: [food, social, coffee, music, shopping]
+    editorial_score: 0.8
+    visit_duration: [45, 90, 150]
+    cost: [0, 0, 0]
+  - key: mg-road
+    from_osm: 'way["highway"]["name"="Mahatma Gandhi Road"]'
+    from_osm_within_km: 4
+    category: walking_area
+    display_name: MG Road
+    aliases: [M.G. Road, Mahatma Gandhi Road]
+    short_description: The central boulevard of the city's commercial district, with shops, restaurants and the metro running above.
+    experience_tags: [shopping, social, food, historic]
+    editorial_score: 0.74
+    visit_duration: [30, 60, 120]
+    cost: [0, 0, 0]
+  - key: brigade-road
+    from_osm: 'way["highway"]["name"="Brigade Road"]'
+    from_osm_within_km: 5
+    category: walking_area
+    display_name: Brigade Road
+    short_description: A busy central shopping and dining street connecting MG Road to the south, bright and crowded in the evenings.
+    experience_tags: [shopping, social, food]
+    editorial_score: 0.72
+    visit_duration: [45, 60, 120]
+    cost: [0, 0, 0]
+  - key: malleshwaram
+    from_place: Malleshwaram
+    category: neighborhood
+    display_name: Malleshwaram
+    short_description: One of the city's older neighbourhoods - temples, flower sellers, traditional eateries and leafy streets made for a slow walk.
+    experience_tags: [cultural, food, historic, photogenic, peaceful]
+    editorial_score: 0.84
+    visit_duration: [60, 120, 180]
+  - key: basavanagudi
+    from_place: Basavanagudi
+    category: neighborhood
+    display_name: Basavanagudi
+    short_description: An old south Bengaluru neighbourhood of temples, heritage homes and classic eateries around Gandhi Bazaar.
+    experience_tags: [cultural, food, historic, photogenic]
+    editorial_score: 0.82
+    visit_duration: [60, 120, 180]
+  - key: indiranagar
+    from_place: Indiranagar
+    category: neighborhood
+    display_name: Indiranagar
+    short_description: A buzzy neighbourhood of cafes, restaurants, boutiques and pubs along 100 Feet Road and 12th Main.
+    experience_tags: [food, social, coffee, shopping, music]
+    editorial_score: 0.78
+    visit_duration: [60, 120, 180]
+  - key: koramangala
+    from_place: Koramangala
+    category: neighborhood
+    display_name: Koramangala
+    short_description: A young, busy neighbourhood packed with cafes, restaurants and places to hang out.
+    experience_tags: [food, social, coffee]
+    editorial_score: 0.72
+    visit_duration: [60, 120, 180]
+  - key: kr-market
+    from_wikidata: Q18386400
+    category: market
+    display_name: K. R. Market
+    aliases: [KR Market, Krishna Rajendra Market, City Market]
+    short_description: The city's great wholesale market - a heady, crowded maze of flowers, vegetables and spices, most vivid early in the morning.
+    experience_tags: [cultural, photogenic, social, historic]
+    editorial_score: 0.8
+    visit_duration: [30, 60, 90]
+    cost: [0, 0, 0]
+  - key: gandhi-bazaar
+    from_wikidata: Q39086796
+    category: walking_area
+    display_name: Gandhi Bazaar
+    short_description: The bustling main street of Basavanagudi, lined with flower sellers, sweet shops and old-style eateries.
+    experience_tags: [food, cultural, shopping, photogenic, social]
+    editorial_score: 0.8
+    visit_duration: [45, 60, 120]
+    cost: [0, 0, 0]
+  - key: chickpet
+    from_wikidata: Q5096366
+    category: neighborhood
+    display_name: Chickpet
+    short_description: The old commercial heart of the city - crowded lanes of silk, brass, spices and wholesale shops.
+    experience_tags: [shopping, cultural, historic, photogenic, social]
+    editorial_score: 0.74
+    visit_duration: [60, 90, 150]
+
+  # ============================ REGION: hills, escapes, nature ============================
+  - key: nandi-hills
+    from_wikidata: Q3518367
+    category: hill
+    display_name: Nandi Hills
+    aliases: [Nandi Betta, Nandidurga]
+    short_description: A hill fort and viewpoint north of the city, famous for sunrise views over the clouds on cool mornings.
+    experience_tags: [sunrise, scenic, photogenic, nature, historic, romantic]
+    remove_tags: [active, adventurous]
+    editorial_score: 0.94
+    visit_duration: [120, 180, 300]
+    cost: [20, 50, 200]
+    flags: {recommended_as_primary_destination: true, short_escape: true, day_trip_suitable: true, requires_large_time_block: true}
+    suitability: {family_friendly: true, couple_friendly: true, group_friendly: true, solo_friendly: true}
+  - key: bhoga-nandeeshwara
+    match: {name: Bhoga Nandeeshwara Temple, category: temple}
+    short_description: An ancient temple complex at the foot of Nandi Hills with finely carved stone pillars and a stepped tank.
+    experience_tags: [spiritual, historic, photogenic, cultural, quiet]
+    editorial_score: 0.84
+    visit_duration: [30, 60, 90]
+    flags: {short_escape: true}
+  - key: skandagiri
+    match: {wikidata: Q7533903}
+    display_name: Skandagiri
+    category: hill
+    aliases: [Skandagiri, Kalawara Betta]
+    short_description: A hill trek with fort ruins at the top, popular with early-morning trekkers for the view at sunrise.
+    experience_tags: [adventurous, active, sunrise, scenic, nature, historic]
+    editorial_score: 0.86
+    visit_duration: [180, 240, 360]
+    flags: {recommended_as_primary_destination: true, short_escape: true, day_trip_suitable: true, requires_large_time_block: true}
+    suitability: {senior_friendly: false, group_friendly: true}
+  - key: savandurga
+    match: {wikidata: Q2723663}
+    display_name: Savandurga
+    category: hill
+    aliases: [Savandurga, Savanadurga]
+    short_description: A huge granite monolith hill west of the city with a steep, rewarding climb and temples at its base.
+    experience_tags: [adventurous, active, scenic, nature, spiritual]
+    editorial_score: 0.84
+    visit_duration: [180, 240, 360]
+    flags: {recommended_as_primary_destination: true, short_escape: true, day_trip_suitable: true, requires_large_time_block: true}
+    suitability: {senior_friendly: false, group_friendly: true}
+  - key: shivagange
+    match: {wikidata: Q7499268}
+    display_name: Shivagange
+    category: hill
+    short_description: A sacred hill with temples along a rocky climb and wide views from the top.
+    experience_tags: [spiritual, adventurous, active, scenic]
+    editorial_score: 0.8
+    visit_duration: [150, 210, 300]
+    flags: {recommended_as_primary_destination: true, short_escape: true, day_trip_suitable: true, requires_large_time_block: true}
+  - key: makalidurga
+    match: {wikidata: Q6738639}
+    display_name: Makalidurga
+    category: hill
+    short_description: A rocky hill with a ruined fort and a lake below - a quieter trekking alternative to the busier hills.
+    experience_tags: [adventurous, active, offbeat, scenic, historic]
+    editorial_score: 0.78
+    visit_duration: [180, 240, 360]
+    flags: {recommended_as_primary_destination: true, short_escape: true, day_trip_suitable: true, requires_large_time_block: true}
+  - key: devarayanadurga
+    match: {wikidata: Q24946748}
+    display_name: Devarayanadurga
+    category: hill
+    short_description: A forested hill with temples and a winding road to the top, green and cool after the rains.
+    experience_tags: [spiritual, scenic, nature, peaceful]
+    editorial_score: 0.76
+    visit_duration: [120, 180, 240]
+    flags: {recommended_as_primary_destination: true, short_escape: true, day_trip_suitable: true}
+  - key: antaragange
+    match: {wikidata: Q4770973}
+    display_name: Antaragange
+    category: hill
+    aliases: [Anthargange, Antara Gange]
+    short_description: A boulder-strewn hill near Kolar with caves to scramble through and a temple spring.
+    experience_tags: [adventurous, active, offbeat, spiritual, nature]
+    editorial_score: 0.78
+    visit_duration: [150, 210, 300]
+    flags: {recommended_as_primary_destination: true, short_escape: true, day_trip_suitable: true, requires_large_time_block: true}
+  - key: hesaraghatta
+    match: {wikidata: Q5745519}
+    display_name: Hesaraghatta Lake
+    category: lake
+    short_description: A large reservoir and grassland north-west of the city, open and quiet, with birdlife and wide sunsets.
+    experience_tags: [nature, peaceful, sunset, scenic, offbeat, quiet]
+    editorial_score: 0.76
+    visit_duration: [60, 90, 150]
+    flags: {short_escape: true}
+  - key: kanva-reservoir
+    match: {wikidata: Q6365696}
+    category: reservoir
+    short_description: A reservoir amid low hills near Channapatna, peaceful for a picnic-style outing.
+    experience_tags: [nature, peaceful, scenic, relaxing]
+    editorial_score: 0.7
+    visit_duration: [60, 90, 150]
+    flags: {short_escape: true, day_trip_suitable: true}
+  - key: manchanabele
+    match: {name: Manchanabele reservoir}
+    display_name: Manchanabele Reservoir
+    category: reservoir
+    aliases: [Manchanabele Dam, Manchinbele]
+    short_description: A reservoir framed by hills west of the city, popular for its sunset views.
+    experience_tags: [scenic, sunset, nature, photogenic, offbeat]
+    editorial_score: 0.74
+    visit_duration: [60, 90, 150]
+    flags: {short_escape: true, day_trip_suitable: true}
+  - key: muthyala-maduvu
+    match: {wikidata: Q6943914}
+    display_name: Muthyala Maduvu
+    category: waterfall
+    aliases: [Pearl Valley]
+    short_description: A small seasonal waterfall in a wooded valley, at its best after good rains.
+    experience_tags: [nature, scenic, peaceful, photogenic]
+    editorial_score: 0.72
+    visit_duration: [60, 90, 150]
+    flags: {short_escape: true, day_trip_suitable: true}
+  - key: thottikallu
+    match: {wikidata: Q7796940}
+    display_name: Thottikallu Falls
+    category: waterfall
+    aliases: [TK Falls, Thottikallu Falls]
+    short_description: A seasonal waterfall and rocky stream on the city's southern edge, worth a visit after rain.
+    experience_tags: [nature, scenic, adventurous, offbeat]
+    editorial_score: 0.7
+    visit_duration: [60, 90, 150]
+    flags: {short_escape: true}
+  - key: chunchi-falls
+    match: {name: Chunchi Falls, category: waterfall}
+    short_description: A waterfall on the Arkavathi river in a rocky gorge, best after the monsoon.
+    experience_tags: [nature, scenic, adventurous, photogenic]
+    editorial_score: 0.74
+    visit_duration: [60, 90, 150]
+    flags: {recommended_as_primary_destination: true, short_escape: true, day_trip_suitable: true, requires_large_time_block: true}
+  - key: mekedatu
+    match: {wikidata: Q37415}
+    display_name: Mekedatu
+    category: nature
+    short_description: A dramatic narrow gorge of the Kaveri river through rocky forest, a full-day outing from the city.
+    experience_tags: [nature, scenic, adventurous, photogenic]
+    editorial_score: 0.8
+    visit_duration: [120, 180, 300]
+    flags: {recommended_as_primary_destination: true, short_escape: true, day_trip_suitable: true, requires_large_time_block: true}
+  - key: bannerghatta
+    match: {wikidata: Q2588520}
+    display_name: Bannerghatta National Park
+    category: nature
+    aliases: [Bannerghatta, Bannerghatta Biological Park]
+    short_description: A national park on the southern edge of the city with a zoo, safari and butterfly park - an easy family day out.
+    experience_tags: [nature, family, kids, adventurous, photogenic]
+    editorial_score: 0.88
+    visit_duration: [120, 240, 360]
+    cost: [100, 400, 1000]
+    flags: {recommended_as_primary_destination: true, short_escape: true, requires_large_time_block: true}
+    suitability: {family_friendly: true, kids_friendly: true}
+  - key: janapada-loka
+    match: {wikidata: Q6150767}
+    category: museum
+    aliases: [Janapada Loka, Jaanapada Loka]
+    short_description: A folk arts museum near Ramanagara with village crafts, instruments and traditional architecture.
+    experience_tags: [cultural, educational, offbeat, family, art]
+    editorial_score: 0.76
+    visit_duration: [60, 90, 150]
+    flags: {short_escape: true, day_trip_suitable: true}
+  - key: ramadevarabetta
+    match: {wikidata: Q112252443}
+    display_name: Ramadevarabetta Vulture Sanctuary
+    category: nature
+    short_description: A rocky hill sanctuary near Ramanagara protecting rare vultures, with a temple at the top.
+    experience_tags: [nature, offbeat, adventurous, scenic]
+    editorial_score: 0.72
+    visit_duration: [90, 150, 240]
+    flags: {short_escape: true, day_trip_suitable: true}
+  - key: adiyogi
+    match: {name: Adiyogi, category: monument}
+    category: monument
+    short_description: A giant Adiyogi bust near Chikkaballapur, set against open hills and striking at dusk.
+    experience_tags: [spiritual, photogenic, scenic]
+    editorial_score: 0.76
+    visit_duration: [45, 75, 120]
+    flags: {short_escape: true, day_trip_suitable: true}

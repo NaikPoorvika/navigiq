@@ -1,205 +1,146 @@
-﻿# data/mappings/osm_categories.yaml
+# data/mappings/osm_categories.yaml
 #
-# NQ-011 - OSM tag -> NavigIQ category. Deterministic, versioned, diffable.
-# No model is involved in this path, ever.
+# OSM tags -> NavigIQ taxonomy v2 (ADR-024, ADR-026).
 #
-# Reconciled against data/artifacts/unmapped_report.csv
-# (580 combinations, 85,778 staging records). Counts in comments are real.
+# ORDERED RULES, FIRST MATCH WINS. More specific rules come first (a museum
+# named "... Science ..." is `science`, a Hindu place of worship is `temple`).
+# Deterministic, versioned, diffable. No model is involved in this path.
 #
-# PROVISIONAL: category values target the Category enum proposed in NQ-021,
-# which is not yet frozen. Reconcile when NQ-021 lands.
+# match:     every key must hold. A string is an exact value, a list is any
+#            of those values, "*" means the key exists.
+# name_regex: optional case-insensitive regex on the name.
+# requires:  name | wikidata | notable (wikidata OR wikipedia OR tourism OR
+#            heritage tag) - records failing a requirement are DROPPED.
+# min_extent_m: minimum bounding-box diagonal for areas (drops tiny ponds);
+#            nodes carry no extent and pass only when they also have wikidata.
+# secondary: extra category links with weights 0-1.
+# tags:      experience tags implied by the rule (on top of category defaults).
 
-version: 1
-updated: 2026-09-03
-reconciled_against: data/artifacts/unmapped_report.csv
-staging_records: 85778
+version: 2
 
-# ---------------------------------------------------------------------------
-# FOOD & DRINK
-# ---------------------------------------------------------------------------
-amenity=restaurant: {primary: restaurant}                     # 3672
-amenity=fast_food:  {primary: street_food, secondary: [{category: restaurant, weight: 0.4}]}   # 1870
-amenity=cafe:       {primary: cafe}                           # 1240
-amenity=ice_cream:  {primary: dessert}                        # 218
-amenity=pub:        {primary: bar, secondary: [{category: nightlife, weight: 0.7}]}  # 251
-amenity=bar:        {primary: bar, secondary: [{category: nightlife, weight: 0.7}]}  # 206
-amenity=biergarten: {primary: bar}
-amenity=food_court: {primary: restaurant, indoor: true}
-shop=bakery:        {primary: dessert, secondary: [{category: cafe, weight: 0.4}]}   # 719
-shop=confectionery: {primary: dessert}
-shop=pastry:        {primary: dessert}
-shop=coffee:        {primary: cafe}
+rules:
+  # --- food & drink ------------------------------------------------------------
+  - {match: {amenity: cafe}, category: cafe}
+  - {match: {shop: [coffee, tea]}, category: cafe}
+  - {match: {amenity: ice_cream}, category: dessert}
+  - {match: {shop: [bakery, confectionery, pastry]}, category: dessert,
+     secondary: [{category: cafe, weight: 0.4}]}
+  - {match: {amenity: [restaurant, food_court]}, category: restaurant}
+  - {match: {amenity: fast_food}, category: street_food,
+     secondary: [{category: restaurant, weight: 0.4}], tags: [budget]}
+  - {match: {amenity: [bar, pub, biergarten, nightclub]}, category: nightlife}
 
-# ---------------------------------------------------------------------------
-# HISTORY, CULTURE, RELIGION
-# ---------------------------------------------------------------------------
-# place_of_worship is 2877 - the third largest real category. NQ-013 should
-# refine using religion=*; `temple` is the closest existing enum value for all
-# faiths. Do NOT invent an enum value here - that is an NQ-021 change.
-amenity=place_of_worship:
-  primary: temple
-  secondary: [{category: historical, weight: 0.3}]
-tourism=museum:     {primary: museum, indoor: true}
-tourism=gallery:    {primary: art_gallery, indoor: true}
-tourism=artwork:    {primary: landmark}                       # 291
-tourism=attraction: {primary: landmark}
-historic=monument:  {primary: historical, landmark: true}
-historic=memorial:  {primary: historical}
-historic=castle:    {primary: historical, landmark: true}
-historic=fort:      {primary: historical, landmark: true}
-historic=palace:    {primary: historical, landmark: true}
-historic=ruins:     {primary: historical}
-historic=archaeological_site: {primary: historical}
-historic=building:  {primary: historical}
-amenity=community_centre: {primary: entertainment, indoor: true}   # 288
+  # --- science & culture -------------------------------------------------------
+  - {match: {amenity: planetarium}, category: science, requires: [name]}
+  - {match: {man_made: observatory}, category: science, requires: [name, notable]}
+  - {match: {tourism: museum}, name_regex: "science|planetarium|technolog|space|aerospace",
+     category: science, requires: [name]}
+  - {match: {tourism: museum}, category: museum, requires: [name]}
+  - {match: {tourism: gallery}, category: gallery, requires: [name]}
+  - {match: {amenity: arts_centre}, category: gallery, requires: [name],
+     secondary: [{category: experience, weight: 0.5}], tags: [art]}
+  - {match: {amenity: [theatre, concert_hall]}, category: entertainment, requires: [name],
+     tags: [cultural, music]}
+  - {match: {amenity: cinema}, category: entertainment, requires: [name]}
 
-# ---------------------------------------------------------------------------
-# NATURE & OUTDOORS
-# ---------------------------------------------------------------------------
-leisure=park:   {primary: park, indoor: false, secondary: [{category: nature, weight: 0.6}]}   # 2310
-leisure=garden: {primary: park, secondary: [{category: nature, weight: 0.6}]}                  # 813
-leisure=nature_reserve: {primary: nature}
-natural=peak:   {primary: viewpoint, secondary: [{category: sunset, weight: 0.8}]}
-natural=bare_rock: {primary: viewpoint, requires_name: true}  # 293, e.g. Lalbagh Rock
-tourism=viewpoint: {primary: viewpoint, secondary: [{category: sunset, weight: 0.7}]}
-man_made=bridge: {primary: landmark, requires_name: true}     # 237
+  # --- history & heritage ------------------------------------------------------
+  - {match: {historic: [palace]}, category: palace, requires: [name]}
+  - {match: {historic: castle, castle_type: [palace, stately, manor]}, category: palace,
+     requires: [name]}
+  - {match: {historic: [fort, castle]}, category: fort, requires: [name]}
+  - {match: {historic: [monument]}, category: monument, requires: [name]}
+  - {match: {tourism: artwork}, category: monument, requires: [name, notable]}
+  - {match: {historic: [ruins, archaeological_site, tomb, battlefield]}, category: history,
+     requires: [name]}
+  - {match: {historic: memorial}, category: history, requires: [name, notable]}
+  - {match: {historic: [building, manor, city_gate, gate, heritage]}, category: heritage,
+     requires: [name]}
 
-# natural=water is 28832 - 34% of ALL staging records, overwhelmingly unnamed
-# rural ponds and irrigation tanks. Only named water bodies of meaningful size
-# are destinations (Ulsoor Lake, Sankey Tank, Hebbal Lake).
-natural=water:
-  primary: lake
-  secondary: [{category: nature, weight: 0.5}, {category: sunset, weight: 0.4}]
-  requires_name: true
-  min_area_sqm: 20000
-  note: >
-    NQ-013 MUST apply requires_name AND min_area_sqm. Without both, ~28k
-    drainage ponds enter the POI table and destroy result quality.
+  # --- spiritual (after historic, so a historic temple keeps its heritage rule
+  #     only when tagged historic=*; plain places of worship land here) -------
+  - {match: {amenity: place_of_worship, religion: hindu}, category: temple, requires: [name]}
+  - {match: {amenity: place_of_worship, religion: christian}, category: church, requires: [name]}
+  - {match: {amenity: place_of_worship, religion: muslim}, category: mosque, requires: [name]}
+  - {match: {amenity: place_of_worship}, category: religious_site, requires: [name]}
 
-# ---------------------------------------------------------------------------
-# SHOPPING & MARKETS
-# ---------------------------------------------------------------------------
-shop=mall:           {primary: shopping, indoor: true}
-amenity=marketplace: {primary: market, secondary: [{category: shopping, weight: 0.5}]}
-shop=books:          {primary: bookstore, secondary: [{category: shopping, weight: 0.4}]}
-shop=clothes:        {primary: shopping}                      # 1545
-shop=jewelry:        {primary: shopping}                      # 376
-shop=shoes:          {primary: shopping}                      # 248
-shop=handicraft:     {primary: shopping, secondary: [{category: market, weight: 0.4}]}
-shop=department_store: {primary: shopping, indoor: true}
-amenity=library:     {primary: bookstore, indoor: true}
+  # --- nature --------------------------------------------------------------------
+  - {match: {waterway: waterfall}, category: waterfall, requires: [name]}
+  - {match: {natural: waterfall}, category: waterfall, requires: [name]}
+  - {match: {boundary: [national_park]}, category: nature, requires: [name]}
+  - {match: {leisure: nature_reserve}, category: nature, requires: [name]}
+  - {match: {boundary: protected_area}, category: nature, requires: [name, notable]}
+  - {match: {tourism: zoo}, category: nature, requires: [name],
+     secondary: [{category: family, weight: 0.8}, {category: kids, weight: 0.8}],
+     tags: [family, kids]}
+  - {match: {natural: [peak, hill]}, category: hill, requires: [name],
+     tags: [sunrise, sunset]}
+  - {match: {natural: bare_rock}, category: viewpoint, requires: [name]}
+  - {match: {tourism: viewpoint}, category: viewpoint, requires: [name],
+     tags: [sunset]}
+  - {match: {water: reservoir}, category: reservoir, requires: [name], min_extent_m: 300}
+  - {match: {landuse: reservoir}, category: reservoir, requires: [name], min_extent_m: 300}
+  - {match: {waterway: dam}, category: reservoir, requires: [name, notable]}
+  - {match: {man_made: dam}, category: reservoir, requires: [name, notable]}
+  - {match: {natural: water, water: [lake, pond, lagoon, oxbow]}, category: lake,
+     requires: [name], min_extent_m: 250}
+  - {match: {natural: water}, category: lake, requires: [name], min_extent_m: 250}
+  - {match: {natural: wood}, category: forest, requires: [name], min_extent_m: 800}
+  - {match: {landuse: forest}, category: forest, requires: [name], min_extent_m: 800}
+  - {match: {natural: cave_entrance}, category: adventure, requires: [name]}
+  - {match: {natural: cliff}, category: adventure, requires: [name, notable]}
+  - {match: {leisure: garden, "garden:type": botanical}, category: garden, requires: [name]}
+  - {match: {leisure: garden}, category: garden, requires: [name], min_extent_m: 60}
+  - {match: {leisure: park}, category: park, requires: [name],
+     secondary: [{category: nature, weight: 0.5}]}
+  - {match: {tourism: picnic_site}, category: park, requires: [name]}
 
-# ---------------------------------------------------------------------------
-# ENTERTAINMENT & NIGHTLIFE
-# ---------------------------------------------------------------------------
-amenity=cinema:      {primary: entertainment, indoor: true}
-amenity=theatre:     {primary: entertainment, indoor: true}
-amenity=arts_centre: {primary: art_gallery, secondary: [{category: entertainment, weight: 0.5}]}
-amenity=nightclub:   {primary: nightlife}
-tourism=zoo:         {primary: entertainment, secondary: [{category: nature, weight: 0.6}]}
-tourism=theme_park:  {primary: entertainment}
-leisure=water_park:  {primary: entertainment}
+  # --- entertainment & activities ---------------------------------------------
+  - {match: {tourism: theme_park}, category: entertainment, requires: [name],
+     secondary: [{category: family, weight: 0.8}, {category: kids, weight: 0.8}],
+     tags: [family, kids, group]}
+  - {match: {leisure: water_park}, category: entertainment, requires: [name],
+     secondary: [{category: family, weight: 0.8}, {category: kids, weight: 0.8}],
+     tags: [family, kids, group]}
+  - {match: {tourism: aquarium}, category: entertainment, requires: [name],
+     tags: [family, kids, indoor]}
+  - {match: {leisure: [amusement_arcade, bowling_alley, escape_game]}, category: gaming,
+     requires: [name]}
+  - {match: {amenity: [gaming_centre, gaming_lounge]}, category: gaming, requires: [name]}
+  - {match: {leisure: [trampoline_park, miniature_golf, ice_rink, horse_riding]},
+     category: activity, requires: [name]}
+  - {match: {sport: [karting, motor]}, category: activity, requires: [name]}
+  - {match: {sport: [climbing, paragliding, free_flying, zipline]}, category: adventure,
+     requires: [name]}
+  - {match: {leisure: golf_course}, category: activity, requires: [name], tags: [premium]}
+  - {match: {leisure: stadium}, category: entertainment, requires: [name, notable],
+     tags: [sports]}
+  - {match: {tourism: camp_site}, category: adventure, requires: [name],
+     secondary: [{category: nature, weight: 0.6}]}
 
-# ---------------------------------------------------------------------------
-# EXPLICIT DROPS - not destinations
-# ---------------------------------------------------------------------------
-# Every entry is a real high-count combination from the report. Listed here
-# rather than hidden in code so the decision stays reviewable.
-drop:
-  # infrastructure and street furniture (~29,000 records)
-  - man_made=pond                 # 20358 - drainage, not destinations
-  - amenity=bench                 # 1863
-  - amenity=parking               # 1677
-  - amenity=bank                  # 1675
-  - amenity=atm                   # 1323
-  - amenity=fuel                  # 1265
-  - amenity=parking_entrance      # 782
-  - amenity=toilets               # 590
-  - amenity=fixme                 # 513 - a mapper TODO marker, not a place
-  - amenity=waste_basket          # 497
-  - amenity=shelter               # 382
-  - amenity=post_office           # 243
+  # --- experiences ---------------------------------------------------------------
+  - {match: {craft: [pottery, ceramics]}, category: workshop, requires: [name]}
+  - {match: {craft: [winery, brewery]}, category: experience, requires: [name]}
+  - {match: {landuse: vineyard}, category: experience, requires: [name, notable]}
+  - {match: {tourism: wine_cellar}, category: experience, requires: [name]}
+  - {match: {place: farm}, category: farm, requires: [name, notable]}
+  - {match: {tourism: [farm, agritourism]}, category: farm, requires: [name]}
 
-  # healthcare (~4,600)
-  - amenity=hospital              # 1801
-  - amenity=clinic                # 1319
-  - amenity=pharmacy              # 1071
-  - amenity=dentist               # 439
-  - amenity=doctors
-  - amenity=veterinary
+  # --- shopping -------------------------------------------------------------------
+  - {match: {shop: mall}, category: mall, requires: [name]}
+  - {match: {shop: department_store}, category: mall, requires: [name]}
+  - {match: {amenity: marketplace}, category: market, requires: [name]}
+  - {match: {shop: books}, category: shopping, requires: [name], tags: [quiet, educational]}
+  - {match: {shop: [craft, handicraft, art, antiques]}, category: shopping, requires: [name],
+     tags: [art]}
 
-  # education and childcare (~3,400)
-  - amenity=school                # 2188
-  - amenity=college               # 810
-  - amenity=kindergarten          # 223
-  - amenity=childcare             # 221
-  - amenity=university
+  # --- places to wander ------------------------------------------------------------
+  - {match: {highway: pedestrian}, category: walking_area, requires: [name]}
+  - {match: {amenity: library}, category: other, requires: [name, notable],
+     tags: [quiet, educational, indoor]}
 
-  # sports facilities, not visitor destinations (~4,800)
-  - leisure=pitch                 # 1981
-  - leisure=swimming_pool         # 1398
-  - leisure=playground            # 630
-  - leisure=sports_centre         # 492
-  - leisure=fitness_centre        # 256
-  - leisure=track
+  # --- generic attractions last ------------------------------------------------
+  - {match: {tourism: attraction}, category: other, requires: [name]}
+  - {match: {heritage: "*"}, category: heritage, requires: [name]}
 
-  # everyday retail and services (~4,000)
-  - shop=supermarket              # 746
-  - shop=convenience              # 476
-  - shop=hairdresser              # 442
-  - shop=beauty                   # 433
-  - shop=electronics              # 350
-  - shop=greengrocer              # 316
-  - shop=car                      # 282
-  - shop=mobile_phone             # 279
-  - shop=furniture                # 278
-  - shop=motorcycle               # 262
-  - shop=dairy                    # 225
-  - shop=yes                      # 212 - untyped, unusable
-  - shop=optician                 # 210
-  - shop=hardware
-  - shop=car_repair
-
-  # civic and transport
-  - amenity=bus_station           # 210
-  - amenity=police
-  - amenity=fire_station
-  - amenity=courthouse
-
-  # accommodation: out of scope for a day-trip planner (~1,100)
-  - tourism=hotel                 # 675
-  - tourism=hostel                # 454
-  - tourism=guest_house
-
-# ---------------------------------------------------------------------------
-# NAMED LANDMARK OVERRIDES
-# ---------------------------------------------------------------------------
-# Feeds category_landmark_flag in the prominence score. This is a curation
-# list, NOT a rating. Matched on exact normalized name, never substring -
-# "Lalbagh" as a substring also matches "Lalbagh Nursing Home".
-landmark_names:
-  - Lalbagh Botanical Gardens
-  - Cubbon Park
-  - Bangalore Palace
-  - Vidhana Soudha
-  - Tipu Sultan's Summer Palace
-  - Bull Temple
-  - ISKCON Temple
-  - Bannerghatta National Park
-  - Nandi Hills
-  - Ulsoor Lake
-  - Sankey Tank
-  - Hebbal Lake
-  - Attara Kacheri
-  - Bangalore Fort
-  - St. Mary's Basilica
-  - National Gallery of Modern Art
-  - Visvesvaraya Industrial and Technological Museum
-  - HAL Aerospace Museum
-
-# ---------------------------------------------------------------------------
-# RESOLUTION ORDER
-# ---------------------------------------------------------------------------
-# When a feature carries several POI keys, first match wins. historic=monument
-# + tourism=attraction must resolve to `historical`, not the vaguer `landmark`.
-key_priority: [historic, tourism, leisure, amenity, shop, natural, man_made, craft, office]
+# Localities come from these place values (the gazetteer), never from POIs.
+gazetteer_place_types: [city, town, suburb, quarter, neighbourhood, village, locality, hamlet]

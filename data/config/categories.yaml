@@ -1,0 +1,75 @@
+# data/config/categories.yaml
+#
+# ADR-024 - Controlled category taxonomy v2.
+#
+# CLOSED SET. The Category enum in backend/app/domain/taxonomy.py must match
+# these keys exactly (tests/unit/test_taxonomy.py and the DB parity test
+# enforce it). The LLM can never add a value: unmapped phrases go to
+# free_text_interests and are resolved by the deterministic lexicon.
+#
+# Durations are minutes; costs are INR PER PERSON and are CATEGORY-LEVEL
+# ESTIMATES used only when a POI has nothing better (cost_confidence
+# "category_default"). Transportation is never included (ADR-022).
+#
+# theme: true marks categories that describe an experience rather than a
+# place type. They are valid interests and secondary categories, never a
+# POI's primary category.
+
+version: 2
+
+categories:
+  # --- nature & outdoors -----------------------------------------------------
+  park:        {name: Park,          group: nature,   io: outdoor, dur: [30, 60, 120],  cost: [0, 0, 50],       default_tags: [outdoor, nature, relaxing]}
+  garden:      {name: Garden,        group: nature,   io: outdoor, dur: [45, 75, 150],  cost: [0, 30, 100],     default_tags: [outdoor, nature, peaceful, photogenic]}
+  lake:        {name: Lake,          group: nature,   io: outdoor, dur: [30, 60, 120],  cost: [0, 0, 50],       default_tags: [outdoor, nature, scenic, peaceful]}
+  nature:      {name: Nature reserve, group: nature,  io: outdoor, dur: [60, 150, 300], cost: [0, 100, 500],    default_tags: [outdoor, nature, scenic]}
+  hill:        {name: Hill,          group: nature,   io: outdoor, dur: [90, 180, 360], cost: [0, 50, 300],     default_tags: [outdoor, nature, scenic, adventurous, active]}
+  viewpoint:   {name: Viewpoint,     group: nature,   io: outdoor, dur: [20, 45, 90],   cost: [0, 0, 50],       default_tags: [outdoor, scenic, photogenic]}
+  forest:      {name: Forest,        group: nature,   io: outdoor, dur: [60, 120, 240], cost: [0, 0, 200],      default_tags: [outdoor, nature, quiet]}
+  waterfall:   {name: Waterfall,     group: nature,   io: outdoor, dur: [45, 90, 180],  cost: [0, 30, 100],     default_tags: [outdoor, nature, scenic, photogenic]}
+  reservoir:   {name: Reservoir,     group: nature,   io: outdoor, dur: [45, 90, 180],  cost: [0, 0, 50],       default_tags: [outdoor, nature, scenic]}
+  # --- culture & learning ----------------------------------------------------
+  museum:      {name: Museum,        group: culture,  io: indoor,  dur: [45, 90, 150],  cost: [0, 50, 300],     default_tags: [indoor, educational, cultural, rain_friendly]}
+  gallery:     {name: Art gallery,   group: culture,  io: indoor,  dur: [30, 60, 120],  cost: [0, 0, 200],      default_tags: [indoor, art, cultural, quiet, rain_friendly]}
+  science:     {name: Science centre, group: culture, io: indoor,  dur: [60, 120, 180], cost: [50, 100, 300],   default_tags: [indoor, educational, kids, rain_friendly]}
+  history:     {name: Historic site, group: culture,  io: outdoor, dur: [20, 45, 90],   cost: [0, 0, 50],       default_tags: [historic, cultural, outdoor]}
+  heritage:    {name: Heritage site, group: culture,  io: mixed,   dur: [30, 60, 120],  cost: [0, 20, 100],     default_tags: [historic, cultural, photogenic]}
+  palace:      {name: Palace,        group: culture,  io: mixed,   dur: [45, 90, 150],  cost: [0, 200, 600],    default_tags: [historic, cultural, photogenic]}
+  fort:        {name: Fort,          group: culture,  io: outdoor, dur: [45, 90, 180],  cost: [0, 25, 100],     default_tags: [historic, cultural, outdoor, photogenic]}
+  monument:    {name: Monument,      group: culture,  io: outdoor, dur: [15, 30, 60],   cost: [0, 0, 50],       default_tags: [historic, outdoor, photogenic]}
+  architecture: {name: Architecture, group: culture,  io: outdoor, dur: [15, 30, 60],   cost: [0, 0, 0],        default_tags: [historic, photogenic, outdoor]}
+  # --- spiritual ---------------------------------------------------------------
+  temple:      {name: Temple,        group: spiritual, io: mixed,  dur: [20, 45, 90],   cost: [0, 0, 100],      default_tags: [spiritual, cultural]}
+  church:      {name: Church,        group: spiritual, io: indoor, dur: [15, 30, 60],   cost: [0, 0, 0],        default_tags: [spiritual, quiet, cultural]}
+  mosque:      {name: Mosque,        group: spiritual, io: indoor, dur: [15, 30, 60],   cost: [0, 0, 0],        default_tags: [spiritual, cultural]}
+  religious_site: {name: Religious site, group: spiritual, io: mixed, dur: [20, 40, 90], cost: [0, 0, 0],       default_tags: [spiritual, cultural]}
+  # --- food & drink ------------------------------------------------------------
+  cafe:        {name: Cafe,          group: food,     io: indoor,  dur: [30, 60, 120],  cost: [150, 300, 600],  default_tags: [indoor, coffee, food, social, rain_friendly], meal: true}
+  restaurant:  {name: Restaurant,    group: food,     io: indoor,  dur: [45, 75, 120],  cost: [200, 500, 1500], default_tags: [indoor, food, social, rain_friendly], meal: true}
+  street_food: {name: Street food,   group: food,     io: outdoor, dur: [15, 30, 60],   cost: [50, 150, 300],   default_tags: [food, budget, social], meal: true}
+  dessert:     {name: Dessert,       group: food,     io: indoor,  dur: [15, 30, 45],   cost: [80, 200, 400],   default_tags: [food, indoor]}
+  # --- shopping ----------------------------------------------------------------
+  # Entry is free; discretionary spending is never estimated.
+  shopping:    {name: Shopping,      group: shopping, io: indoor,  dur: [30, 60, 150],  cost: [0, 0, 0],        default_tags: [shopping, indoor]}
+  market:      {name: Market,        group: shopping, io: outdoor, dur: [30, 60, 120],  cost: [0, 0, 0],        default_tags: [shopping, cultural, social, photogenic]}
+  mall:        {name: Mall,          group: shopping, io: indoor,  dur: [60, 120, 240], cost: [0, 0, 0],        default_tags: [shopping, indoor, rain_friendly, social]}
+  # --- entertainment & activities ---------------------------------------------
+  entertainment: {name: Entertainment, group: fun,    io: indoor,  dur: [90, 150, 240], cost: [200, 400, 1500], default_tags: [social, indoor, rain_friendly]}
+  gaming:      {name: Gaming,        group: fun,      io: indoor,  dur: [60, 90, 150],  cost: [300, 600, 1200], default_tags: [gaming, social, indoor, group, rain_friendly]}
+  activity:    {name: Activity,      group: fun,      io: mixed,   dur: [60, 90, 180],  cost: [300, 700, 1500], default_tags: [active, social, group]}
+  adventure:   {name: Adventure,     group: fun,      io: outdoor, dur: [120, 180, 360], cost: [500, 1500, 3000], default_tags: [adventurous, active, outdoor]}
+  nightlife:   {name: Nightlife,     group: fun,      io: indoor,  dur: [90, 150, 240], cost: [500, 1200, 3000], default_tags: [social, music, indoor]}
+  # --- experiences ---------------------------------------------------------------
+  farm:        {name: Farm,          group: experience, io: outdoor, dur: [90, 180, 360], cost: [0, 500, 2000],  default_tags: [outdoor, nature, family]}
+  experience:  {name: Experience,    group: experience, io: mixed,  dur: [60, 120, 240], cost: [300, 800, 2500], default_tags: [social, cultural]}
+  workshop:    {name: Workshop,      group: experience, io: indoor, dur: [90, 150, 240], cost: [500, 1200, 2500], default_tags: [art, indoor, educational, rain_friendly]}
+  # --- places to wander --------------------------------------------------------
+  neighborhood: {name: Neighbourhood, group: explore, io: outdoor, dur: [60, 120, 180], cost: [0, 0, 0],       default_tags: [cultural, food, shopping, photogenic]}
+  walking_area: {name: Walking area,  group: explore, io: outdoor, dur: [30, 60, 120],  cost: [0, 0, 0],       default_tags: [outdoor, social, shopping]}
+  # --- themes (never primary) ----------------------------------------------------
+  photography: {name: Photography,   group: theme,    io: mixed,   dur: [30, 60, 120],  cost: [0, 0, 0],        default_tags: [photogenic], theme: true}
+  romantic:    {name: Romantic,      group: theme,    io: mixed,   dur: [30, 60, 120],  cost: [0, 0, 0],        default_tags: [romantic], theme: true}
+  family:      {name: Family,        group: theme,    io: mixed,   dur: [30, 60, 120],  cost: [0, 0, 0],        default_tags: [family], theme: true}
+  kids:        {name: Kids,          group: theme,    io: mixed,   dur: [30, 60, 120],  cost: [0, 0, 0],        default_tags: [kids], theme: true}
+  # --- fallback ----------------------------------------------------------------
+  other:       {name: Other,         group: other,    io: mixed,   dur: [30, 60, 120],  cost: [0, 0, 0],        default_tags: []}
