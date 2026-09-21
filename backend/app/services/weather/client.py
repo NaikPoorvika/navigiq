@@ -18,7 +18,8 @@ from datetime import date as date_type
 import httpx
 
 BASE_URL = "https://api.open-meteo.com/v1/forecast"
-TIMEOUT_S = 4.0
+TIMEOUT_S = 3.0
+FAILURE_BACKOFF_S = 300    # after a failure, skip the provider for 5 minutes
 FORECAST_HORIZON_DAYS = 15
 HEAVY_RAIN_MM = 2.5          # mm/hour within the window that makes outdoor stops a bad idea
 RAIN_PROBABILITY_WET = 60    # % chance that counts as "rain likely"
@@ -26,6 +27,7 @@ CACHE_TTL_S = 1800
 CACHE_MAX = 256
 
 _cache: OrderedDict[tuple, tuple[float, dict]] = OrderedDict()
+_down_until = 0.0          # monotonic time until which the provider is treated as down
 
 
 @dataclass
@@ -96,9 +98,14 @@ async def get_window(lat: float, lon: float, on: date_type, start_hour: int,
     if horizon < 0 or horizon > FORECAST_HORIZON_DAYS:
         return WeatherWindow(available=False,
                              degraded_reason="date outside the forecast horizon")
+    global _down_until
+    if time.monotonic() < _down_until:
+        # A recent failure: do not make every plan wait for another timeout.
+        return WeatherWindow(available=False, degraded_reason="weather service unreachable")
     try:
         data = await _fetch_day(lat, lon, on)
     except Exception as exc:  # noqa: BLE001 - any failure degrades, never crashes
+        _down_until = time.monotonic() + FAILURE_BACKOFF_S
         return WeatherWindow(available=False, degraded_reason=f"{type(exc).__name__}")
     return summarize(data, start_hour, end_hour)
 

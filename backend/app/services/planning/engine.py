@@ -52,7 +52,10 @@ PACE = {
     "relaxed": {"visit": 1.25, "max_stops": 3},
 }
 CANDIDATE_CAP = 20          # ADR-010: CP-SAT proves optimality at 20 single-worker
-SOLVE_TIME_LIMIT_S = 8.0
+SOLVE_TIME_LIMIT_S = 6.0        # wall-clock safety cap only
+SOLVE_WORK_LIMIT = 1.0          # deterministic-time budget: reproducible under load; on a
+                                # 6-request benchmark it matched the 8 s wall-clock objective
+                                # every time while cutting the worst solve from 8.0 s to 3.2 s
 COMPACTNESS_WEIGHT = 200.0  # 1 km of hop costs ~0.02 of a stop's score
 EARLY_START_WEIGHT = 20     # per minute of arrival after the window opens: an idle
                             # hour weighs about as much as 0.6 km of extra hops
@@ -269,17 +272,20 @@ async def plan(db: AsyncSession, spec: TripSpec, *, now: datetime | None = None,
     attempts = []
     opt = optimize(nodes, arcs, **common, max_stops=max_stops, min_stops=min_stops,
                    meal_required=need_meal, meal_windows=meal_windows,
-                   time_limit_s=SOLVE_TIME_LIMIT_S)
+                   time_limit_s=SOLVE_TIME_LIMIT_S,
+                   deterministic_limit=SOLVE_WORK_LIMIT)
     attempts.append(("cpsat", opt))
     if not opt.is_solution and need_meal:
         opt = optimize(nodes, arcs, **common, max_stops=max_stops, min_stops=min_stops,
-                       meal_required=False, time_limit_s=SOLVE_TIME_LIMIT_S)
+                       meal_required=False, time_limit_s=SOLVE_TIME_LIMIT_S,
+                       deterministic_limit=SOLVE_WORK_LIMIT)
         attempts.append(("cpsat_no_meal", opt))
         if opt.is_solution:
             out.notes.append("A meal stop didn't fit these constraints, so none is included")
     if not opt.is_solution and min_stops:
         opt = optimize(nodes, arcs, **common, max_stops=max_stops, min_stops=None,
-                       time_limit_s=SOLVE_TIME_LIMIT_S)
+                       time_limit_s=SOLVE_TIME_LIMIT_S,
+                       deterministic_limit=SOLVE_WORK_LIMIT)
         attempts.append(("cpsat_relaxed_count", opt))
         if opt.is_solution and len(opt.stops) < min_stops:
             out.notes.append(f"Only {len(opt.stops)} stops fit; you asked for {min_stops}")

@@ -175,6 +175,7 @@ def optimize(
     category_caps: dict[str, int] | None = None,
     min_visit_minutes: int = 15,
     early_start_weight: int = 0,
+    deterministic_limit: float | None = None,
 ) -> OptimizerResult:
     """Solve. nodes[0] is the origin; arcs maps (i, j) -> OptimizerArc.
 
@@ -358,6 +359,11 @@ def optimize(
     # --- solve -------------------------------------------------------------
     solver = cp_model.CpSolver()
     solver.parameters.max_time_in_seconds = time_limit_s
+    if deterministic_limit is not None:
+        # Work-based limit: the same input stops at the same point of the
+        # search on any machine and under any load, so results reproduce;
+        # the wall-clock limit above stays as a safety cap.
+        solver.parameters.max_deterministic_time = deterministic_limit
     # Single worker: parallel search is non-deterministic even with a fixed
     # seed, because workers race and ties are broken by whichever finishes
     # first. Reproducibility matters more here than raw speed - plan_snapshots

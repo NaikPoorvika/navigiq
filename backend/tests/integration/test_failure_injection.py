@@ -114,6 +114,7 @@ def weather_down(monkeypatch):
         raise httpx.ConnectError("open-meteo unreachable")
     monkeypatch.setattr(settings, "WEATHER_ENABLED", True)
     monkeypatch.setattr(weather, "_fetch_day", boom)
+    monkeypatch.setattr(weather, "_down_until", 0.0)
     weather._cache.clear()
     yield
 
@@ -122,6 +123,7 @@ async def test_weather_outage_degrades_plans_and_answers(async_client, weather_d
     from datetime import timedelta
 
     from app.nlu.timeparse import today_ist
+    from app.services.weather import client as weather
     h = sid()
     tomorrow = (today_ist() + timedelta(days=1)).isoformat()
     r = await async_client.post("/api/v1/plans", headers=h, json={**PLAN, "date": tomorrow})
@@ -133,6 +135,8 @@ async def test_weather_outage_degrades_plans_and_answers(async_client, weather_d
     ans = await chat(async_client, "Will it rain today?", h)
     assert "won't guess" in ans["text"] and ans["warnings"]
     assert "°C" not in ans["text"]
+    # one failure backs the provider off: later requests do not wait again
+    assert weather._down_until > 0
 
 
 # --- redis ---------------------------------------------------------------------------------------
