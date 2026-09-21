@@ -42,6 +42,9 @@ class POISummary:
     indoor: bool | None
     open_at_requested: bool | None
     hours_confidence: float | None
+    open_min: int | None
+    close_min: int | None
+    is_24h: bool | None
     curated: bool
 
     def to_dict(self) -> dict:
@@ -65,6 +68,9 @@ class POISummary:
                 float(self.hours_confidence)
                 if self.hours_confidence is not None else None
             ),
+                        "open_min": self.open_min,
+            "close_min": self.close_min,
+            "is_24h": self.is_24h,
             "hours_verified": (
                 self.hours_confidence is not None
                 and float(self.hours_confidence) >= HOURS_CONFIDENCE_THRESHOLD
@@ -82,7 +88,10 @@ hours AS (
            poi_id, open_min, close_min, is_24h, confidence
     FROM poi_opening_hours
     WHERE (:dow)::int IS NULL OR day_of_week = (:dow)::int
-    ORDER BY poi_id, confidence DESC
+    -- Longest interval first. A bar open 18:00-02:00 has a 00:00-02:00
+    -- continuation row on the same weekday; picking the earliest interval
+    -- would treat it as closed all evening.
+    ORDER BY poi_id, confidence DESC, (close_min - open_min) DESC
 )
 SELECT
     p.id,
@@ -108,6 +117,9 @@ SELECT
     COALESCE(p.visit_minutes, c.default_visit_minutes) AS visit_minutes,
     COALESCE(p.indoor, c.is_indoor) AS indoor,
     h.confidence                AS hours_confidence,
+        h.open_min                  AS open_min,
+    h.close_min                 AS close_min,
+    h.is_24h                    AS is_24h,
     CASE
         WHEN (:minute)::int IS NULL OR h.poi_id IS NULL THEN NULL
         WHEN h.is_24h THEN true
@@ -195,7 +207,9 @@ async def search_pois(
             category_typical_inr=r.typical_cost_inr,
             visit_minutes=r.visit_minutes, indoor=r.indoor,
             open_at_requested=r.open_at_requested,
-            hours_confidence=r.hours_confidence, curated=r.curated,
+            hours_confidence=r.hours_confidence,
+            open_min=r.open_min, close_min=r.close_min, is_24h=r.is_24h,
+            curated=r.curated,
         )
         for r in result
     ]

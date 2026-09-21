@@ -196,7 +196,22 @@ async def _persist(
     itin.current_version_id = version.id
     await db.commit()
     return itin.id
-
+async def _hours_for_stops(
+    db: AsyncSession, poi_ids: list[int], day_of_week: int,
+) -> dict[int, object]:
+    """Re-query opening hours from the primary table for the validator,
+    rather than trusting what flowed through search and the optimizer."""
+    if not poi_ids:
+        return {}
+    rows = (await db.execute(text("""
+        SELECT DISTINCT ON (poi_id)
+               poi_id, open_min, close_min, is_24h, confidence
+        FROM poi_opening_hours
+        WHERE poi_id = ANY(CAST(:ids AS bigint[]))
+          AND day_of_week = :dow
+        ORDER BY poi_id, confidence DESC, (close_min - open_min) DESC
+    """), {"ids": poi_ids, "dow": day_of_week})).all()
+    return {r.poi_id: r for r in rows}
 async def plan(
     db: AsyncSession,
     spec: TripSpec,
@@ -327,7 +342,13 @@ async def plan(
         cost, _ = estimate_poi_cost(
             p.get("cost_estimate_inr"), p.get("category_typical_inr", 0),
             spec.party_size)
-        hours = p.get("opening_hours_window") or (0, 1440)
+        # The trip day's opening window, from search. The optimizer treats
+        # it as hard only when confidence >= 0.5 (real OSM hours); category
+        # defaults stay soft, per NQ-014.
+        if p.get("is_24h") or p.get("open_min") is None:
+            hours = (0, 1440)
+        else:
+            hours = (p["open_min"], p["close_min"])
         nodes.append(OptimizerNode(
             poi_id=p["id"], name=p["name"],
             # The MATCHED category, not the primary. A lake found via a
@@ -372,6 +393,8 @@ async def plan(
     # --- 8. independent validation -----------------------------------------
     t0 = time.perf_counter()
     by_id = {s.poi["id"]: s.poi for s in ranked}
+    hours_now = await _hours_for_stops(
+        db, [st.poi_id for st in opt.stops if st.poi_id], spec.date.weekday())
     stop_facts = []
     for st in opt.stops:
         p = by_id.get(st.poi_id, {})
@@ -387,8 +410,11 @@ async def plan(
             lat=p.get("lat", 0.0), lon=p.get("lon", 0.0),
             arrive_min=st.arrive_min, depart_min=st.depart_min,
             cost_inr=st.cost_inr,
-            open_min=None, close_min=None,
-            hours_confidence=p.get("hours_confidence") or 0.0,
+                        open_min=(None if (h := hours_now.get(st.poi_id)) is None
+                      else (0 if h.is_24h else h.open_min)),
+            close_min=(None if h is None
+                       else (1440 if h.is_24h else h.close_min)),
+            hours_confidence=float(h.confidence) if h is not None else 0.0,
             indoor=bool(p.get("indoor")),
             travel_s_from_prev=arc.duration_s if arc else None,
             optimizer_travel_s_from_prev=st.travel_minutes_from_prev * 60,
