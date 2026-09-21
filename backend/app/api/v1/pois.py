@@ -51,9 +51,10 @@ async def categories(db: AsyncSession = Depends(get_db)) -> dict:
     rows = (await db.execute(text("""
         SELECT c.key, c.display_name, c.default_visit_minutes,
                c.is_indoor, c.typical_cost_inr, c.meal_category,
-               count(p.id) AS poi_count
+               count(DISTINCT p.id) AS poi_count
         FROM poi_categories c
-        LEFT JOIN pois p ON p.primary_category = c.id AND p.active
+        LEFT JOIN poi_category_links l ON l.category_id = c.id
+        LEFT JOIN pois p ON p.id = l.poi_id AND p.active
         GROUP BY c.id ORDER BY c.id
     """))).all()
     return {

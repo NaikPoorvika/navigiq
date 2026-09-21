@@ -385,6 +385,7 @@ async def plan(
             hours_confidence=p.get("hours_confidence") or 0.0,
             is_meal=p["category"] in ("restaurant", "cafe",
                                       "street_food", "dessert"),
+            lat=p["lat"], lon=p["lon"],
         ))
 
     requirements = [
@@ -476,6 +477,9 @@ async def plan(
 
     result.ok = True
     result.itinerary = opt.to_dict()
+    result.itinerary["origin"] = {"name": spec.origin.name,
+                                  "lat": spec.origin.lat,
+                                  "lon": spec.origin.lon}
 
     if persist:
         itinerary_id = await _persist(

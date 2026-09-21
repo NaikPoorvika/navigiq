@@ -19,7 +19,9 @@ from __future__ import annotations
 from datetime import date, datetime, timedelta
 from enum import Enum
 from typing import Annotated, Literal
-
+from app.core.region import (
+    BBOX_MAX_LAT, BBOX_MAX_LON, BBOX_MIN_LAT, BBOX_MIN_LON,
+)
 from pydantic import BaseModel, Field, field_validator, model_validator
 
 TRIPSPEC_VERSION: Literal["1.0"] = "1.0"
@@ -34,8 +36,7 @@ TRIPSPEC_VERSION: Literal["1.0"] = "1.0"
 # The guard exists to catch a model hallucinating coordinates in another
 # country. It is NOT a trip-radius control - that is radius_km and the
 # NQ-022 feasibility engine.
-BBOX_MIN_LAT, BBOX_MAX_LAT = 11.9, 13.75
-BBOX_MIN_LON, BBOX_MAX_LON = 76.7, 78.9
+
 
 
 class Priority(str, Enum):

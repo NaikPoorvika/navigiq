@@ -52,6 +52,8 @@ class OptimizerNode:
     close_min: int                # latest departure
     hours_confidence: float = 1.0
     is_meal: bool = False
+    lat: float | None = None
+    lon: float | None = None
 
 
 @dataclass
@@ -76,6 +78,8 @@ class Stop:
     cost_inr: int
     mode_from_prev: str | None
     travel_minutes_from_prev: int
+    lat: float | None = None
+    lon: float | None = None
 
 
 @dataclass
@@ -112,6 +116,7 @@ class OptimizerResult:
                     "visit_minutes": s.visit_minutes, "cost_inr": s.cost_inr,
                     "mode_from_prev": s.mode_from_prev,
                     "travel_minutes_from_prev": s.travel_minutes_from_prev,
+                    "lat": s.lat, "lon": s.lon,
                 }
                 for s in self.stops
             ],
@@ -363,6 +368,7 @@ def optimize(
             cost_inr=node.cost_inr,
             mode_from_prev=arc.mode if arc else None,
             travel_minutes_from_prev=arc.duration_min if arc else 0,
+            lat=node.lat, lon=node.lon,
         ))
         result.total_cost_inr += node.cost_inr + (arc.cost_inr if arc else 0)
         result.total_walk_m += arc.walk_m if arc else 0
