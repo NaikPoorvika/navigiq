@@ -102,3 +102,55 @@ to 20.
 candidate set. The optimizer chooses from the 20 best-ranked POIs rather than
 50. If the cap is ever raised, the time limit must rise with it and
 determinism must be re-verified.
+
+## ADR-011: Place gazetteer
+**Status:** Accepted
+**Date:** 2026-09-21
+
+**Context:** The LLM must never produce coordinates (ADR-002), but nothing
+turned a place name into lat/lon. Searching POIs for "Indiranagar" returned a
+library, a plaque and a bar — never the neighbourhood.
+
+**Decision:** Extract `place=*` nodes and areas from the same OSM extract into
+a `places` table (9,163 rows) and resolve names across `places` and `pois`
+through `GET /places/resolve`. Rank by trigram similarity, place kind,
+proximity to the city centre and an exact-name bonus.
+
+**Consequences:** Confidence comes from the score gap between the top two
+*distinct* candidates. "Indiranagar" is genuinely two places 9 km apart and
+returns `needs_clarification`. OSM duplicates within 200 m are not treated as
+ambiguity. Spelling variants resolve ("Malleshwaram" → "Malleswaram").
+
+## ADR-012: Multi-day trips as independent days
+**Status:** Accepted
+**Date:** 2026-09-21
+
+**Context:** The original plan treated multi-day planning as research scope —
+accommodation, overnight travel and cross-day optimization make it a
+different product. Users still ask for "3 days in Bengaluru".
+
+**Decision:** `TripSpec.days` (1–7). Each day is planned as its own single-day
+itinerary from the same origin and time window, with no POI repeated across
+days. Exposed as `POST /plan/trip`; `POST /plan` is unchanged.
+
+**Consequences:** No accommodation, no overnight travel, no cross-day
+optimization. A budget, if given, applies per day. Days run sequentially
+because each must exclude earlier days' POIs — roughly 4 s per day after the
+OSRM `/table` change, so 7 days is under 30 s.
+
+## ADR-013: The LLM fills a draft, not a TripSpec
+**Status:** Accepted
+**Date:** 2026-09-21
+
+**Context:** A model asked to produce a full TripSpec will invent coordinates
+and compute dates, both of which it gets wrong.
+
+**Decision:** The model produces a `TripDraft` containing only place *names*
+and date *phrases*. `draft_builder` turns it into a TripSpec deterministically:
+names through the gazetteer, phrases in Python. Unknown fields are ignored, so
+a hallucinated lat/lon is discarded before it reaches planning.
+
+**Consequences:** Missing or ambiguous information becomes at most two
+clarifying questions rather than a guess. Defaults that are applied are
+returned as explicit `assumptions`. `TripDraft.model_json_schema()` is the
+schema for constrained decoding in NQ-029.
