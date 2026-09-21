@@ -49,7 +49,7 @@ def hhmm(minutes):
 
 async def main():
     async with AsyncSessionLocal() as db:
-        r = await plan(db, SPEC, persist=True)
+        r = await plan(db, SPEC, persist=False)
 
     print("=" * 68)
     print(f"  {SPEC.date}  {SPEC.start_time_local}-{SPEC.end_time_local}  "
@@ -105,3 +105,4 @@ async def main():
 
 
 asyncio.run(main())
+
