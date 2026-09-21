@@ -13,7 +13,9 @@ from __future__ import annotations
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
-
+from app.schemas.trip_draft import TripDraft
+from app.services.planning.draft_builder import build_tripspec
+from app.services.planning.orchestrator import plan_trip
 from app.api.deps import get_db
 from app.schemas.tripspec import TripSpec
 from app.services.planning.feasibility.engine import FeasibilityEngine
@@ -134,4 +136,37 @@ async def preview_feasibility(
         "feasibility": report.to_dict(),
         "semantic_warnings": [i.to_dict() for i in semantic.warnings],
         "note": "bounds only; POST /plan performs the full check",
+    }
+@router.post("/trip")
+async def create_trip(
+    spec: TripSpec,
+    db: AsyncSession = Depends(get_db),
+) -> dict:
+    """Multi-day. Each day planned independently, no POI repeated.
+    Takes ~15 s PER DAY."""
+    result = await plan_trip(db, spec, persist=True)
+    return {**result, "attribution": "(c) OpenStreetMap contributors, ODbL"}
+
+
+@router.post("/draft")
+async def plan_from_draft(
+    draft: TripDraft,
+    db: AsyncSession = Depends(get_db),
+) -> dict:
+    """For NQ-029. The LLM's TripDraft goes in; either clarifying questions
+    or a planned trip come out.
+
+    needs_clarification=true is a normal outcome, not an error: ask the user
+    the question(s) and resubmit the draft with the answer filled in.
+    """
+    built = await build_tripspec(db, draft)
+    if built.needs_clarification:
+        return built.to_dict()
+
+    result = await plan_trip(db, built.tripspec, persist=True)
+    return {
+        **result,
+        "assumptions": built.assumptions,
+        "tripspec": built.tripspec.model_dump(mode="json"),
+        "attribution": "(c) OpenStreetMap contributors, ODbL",
     }

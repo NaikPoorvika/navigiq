@@ -432,3 +432,54 @@ async def plan(
 
     result.timings_ms = t
     return result
+# --------------------------------------------------------------------------
+# Multi-day (Option B): independent days, no POI repeated across them.
+# --------------------------------------------------------------------------
+
+async def plan_trip(
+    db: AsyncSession,
+    spec: TripSpec,
+    *,
+    user_id=None,
+    persist: bool = True,
+) -> dict:
+    """Plan each day as its own single-day itinerary.
+
+    Days run SEQUENTIALLY because day N must exclude the POIs used on days
+    1..N-1. At ~15 s per day, 3 days is ~45 s - the arc-building fix matters
+    more here than anywhere.
+
+    A failed day does not abort the trip; each day reports its own result so
+    the UI can show a partial plan honestly.
+    """
+    used: list[int] = list(spec.constraints.avoid_poi_ids)
+    days_out: list[dict] = []
+
+    for number, day_date in enumerate(spec.day_dates, start=1):
+        day_spec = spec.model_copy(update={
+            "date": day_date,
+            "days": 1,
+            "constraints": spec.constraints.model_copy(
+                update={"avoid_poi_ids": list(used)}),
+        })
+
+        try:
+            r = await plan(db, day_spec, user_id=user_id, persist=persist)
+            entry = {"day": number, "date": day_date.isoformat(),
+                     **r.to_dict()}
+            if r.ok and r.itinerary:
+                used += [s["poi_id"] for s in r.itinerary["stops"]
+                         if s.get("poi_id")]
+        except PlanningError as exc:
+            entry = {"day": number, "date": day_date.isoformat(),
+                     "ok": False,
+                     "error": {"code": exc.code, "message": str(exc)}}
+
+        days_out.append(entry)
+
+    return {
+        "ok": all(d.get("ok") for d in days_out),
+        "days_planned": sum(1 for d in days_out if d.get("ok")),
+        "days_requested": spec.days,
+        "days": days_out,
+    }

@@ -132,6 +132,10 @@ class TripSpec(BaseModel):
 
     budget_inr: Annotated[int, Field(ge=0, le=100_000)] | None = None
     party_size: Annotated[int, Field(ge=1, le=10)] = 1
+        # Multiple independent days. Each day is planned separately from the same
+    # origin and time window, with no POI repeated across days. If budget_inr
+    # is given, it applies to EACH day, not the trip total.
+    days: Annotated[int, Field(ge=1, le=7)] = 1
 
     interests: Annotated[list[Interest], Field(min_length=1, max_length=8)]
     free_text_interests: list[str] = Field(default_factory=list)
@@ -165,6 +169,9 @@ class TripSpec(BaseModel):
     def start_datetime(self) -> datetime:
         return datetime.combine(self.date, datetime.min.time()) + timedelta(
             minutes=self.start_minute)
+    @property
+    def day_dates(self) -> list[date]:
+        return [self.date + timedelta(days=i) for i in range(self.days)]
 
     @property
     def must_interests(self) -> list[Interest]:
