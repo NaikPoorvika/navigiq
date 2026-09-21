@@ -27,7 +27,9 @@ from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.schemas.tripspec import TripSpec
-from app.services.costs.estimator import TransportMode, estimate_poi_cost
+from app.services.costs.estimator import (
+    TransportMode, estimate_poi_cost, mode_overhead_min,
+)
 from app.services.planning.feasibility.engine import (
     CandidateSummary, FeasibilityEngine,
 )
@@ -212,6 +214,26 @@ async def _hours_for_stops(
         ORDER BY poi_id, confidence DESC, (close_min - open_min) DESC
     """), {"ids": poi_ids, "dow": day_of_week})).all()
     return {r.poi_id: r for r in rows}
+
+async def _refetch_leg_seconds(routing, a, b, mode, depart_at) -> float | None:
+    """Re-derive one chosen leg with an independent /route call, so the
+    validator is not comparing the optimizer's travel time with itself.
+    Returns None if routing is unavailable - the rule is then skipped."""
+    try:
+        if mode == "walking":
+            r = await routing.get_route(a, b, mode="walking",
+                                        depart_at=depart_at,
+                                        include_geometry=False)
+        else:
+            overhead = mode_overhead_min(TransportMode(mode)) * 60
+            r = await routing.get_route(a, b, mode="driving",
+                                        depart_at=depart_at,
+                                        overhead_s=overhead,
+                                        include_geometry=False)
+        return r.duration_s
+    except (RoutingUnavailable, ValueError):
+        return None
+
 async def plan(
     db: AsyncSession,
     spec: TripSpec,
@@ -405,6 +427,11 @@ async def plan(
         this_idx = next((i for i, n in enumerate(nodes)
                          if n.poi_id == st.poi_id), 0)
         arc = arc_grid[prev_idx][this_idx]
+        refetched = (
+            await _refetch_leg_seconds(router.routing, points[prev_idx],
+                                       points[this_idx], st.mode_from_prev,
+                                       depart_at)
+            if arc and st.mode_from_prev else None)
         stop_facts.append(StopFacts(
             seq=st.seq, poi_id=st.poi_id, name=st.name, category=st.category,
             lat=p.get("lat", 0.0), lon=p.get("lon", 0.0),
@@ -416,8 +443,8 @@ async def plan(
                        else (1440 if h.is_24h else h.close_min)),
             hours_confidence=float(h.confidence) if h is not None else 0.0,
             indoor=bool(p.get("indoor")),
-            travel_s_from_prev=arc.duration_s if arc else None,
-            optimizer_travel_s_from_prev=st.travel_minutes_from_prev * 60,
+            travel_s_from_prev=refetched,
+            optimizer_travel_s_from_prev=arc.duration_s if arc else None,
             walk_m_from_prev=arc.walk_m if arc else 0.0,
             leg_cost_inr=arc.cost_inr if arc else 0,
         ))
