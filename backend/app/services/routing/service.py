@@ -22,6 +22,7 @@ from __future__ import annotations
 
 import json
 import math
+import os
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
@@ -34,9 +35,10 @@ import yaml
 CONFIG_PATH = (Path(__file__).resolve().parents[4]
                / "data" / "config" / "traffic_factors.yaml")
 
-OSRM_CAR_URL = "http://localhost:5000"
-OSRM_FOOT_URL = "http://localhost:5001"
-
+# From the environment so the same code works on the host (localhost) and
+# inside Docker Compose (service names osrm-car / osrm-foot).
+OSRM_CAR_URL = os.environ.get("OSRM_CAR_URL", "http://localhost:5000")
+OSRM_FOOT_URL = os.environ.get("OSRM_FOOT_URL", "http://localhost:5001")
 TIMEOUT_S = 4.0
 MAX_RETRIES = 2
 BREAKER_THRESHOLD = 5        # consecutive failures before opening
