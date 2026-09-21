@@ -25,3 +25,10 @@ psycopg[binary]>=3.3.0
 
 # NQ-023: CP-SAT constraint solver for itinerary optimization
 ortools>=9.10
+
+# NQ-011: read OpenStreetMap .pbf extracts (offline pipeline)
+osmium>=4.0,<5.0
+# NQ-011: parse data/mappings/osm_categories.yaml
+PyYAML>=6.0
+# draft_builder uses zoneinfo (Asia/Kolkata); Windows has no system tz database
+tzdata>=2024.1
