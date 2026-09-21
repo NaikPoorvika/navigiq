@@ -25,7 +25,7 @@ from app.geo.distance import haversine_km
 from app.services.poi.repository import POIRecord
 from app.services.recommendation.scoring import DIET_SATISFIES
 
-BOUNDARY_TOLERANCE_KM = 1e-6
+from app.geo.regions import BOUNDARY_TOLERANCE_KM  # noqa: E402 - one shared rule
 
 
 class Rule(str, Enum):
@@ -240,11 +240,11 @@ def validate(stops: list[PlannedStop], rules: TripRules, facts: dict[int, POIRec
     return report
 
 
-_NUM_RE = re.compile(r"(?<![\w.])(?:₹\s?)?\d[\d,]*(?:\.\d+)?(?:\s?(?:km|min|minutes|hours|%))?")
+_NUM_RE = re.compile(r"(?<![\w.])(?:₹\s?)?\d[\d,]*(?:\.\d+)?(?:\s?(?:km|minutes|mins|min|hours|%))?")
 
 
 def normalize_number(token: str) -> str:
-    return re.sub(r"[₹,\s]|km|minutes|min|hours|%", "", token)
+    return re.sub(r"[₹,\s]|km|minutes|mins|min|hours|%", "", token)
 
 
 def unsupported_numbers(text: str, fact_numbers: set[str]) -> list[str]:

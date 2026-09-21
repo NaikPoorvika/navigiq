@@ -54,8 +54,12 @@ def _owns(conv: Conversation, owner: Owner) -> bool:
 async def chat(db: AsyncSession, *, message: str, conversation_id: str | None, owner: Owner,
                role: Role, llm, gateway) -> AssistantResponse:
     conv = await load_or_create(db, conversation_id, owner)
+    # Read everything needed from the ORM object now: any rollback inside the
+    # agent expires it, and a later attribute access would lazy-load outside
+    # the async context.
+    conv_id = conv.id
     state = ConversationState.model_validate(conv.state or {})
-    agent = Agent(db=db, owner=owner, role=role, state=state, conversation_id=str(conv.id),
+    agent = Agent(db=db, owner=owner, role=role, state=state, conversation_id=str(conv_id),
                   llm=llm, gateway=gateway)
     try:
         response = await asyncio.wait_for(agent.run(message), timeout=AGENT_TIMEOUT_S)
@@ -67,18 +71,18 @@ async def chat(db: AsyncSession, *, message: str, conversation_id: str | None, o
                                  "That took too long, so I stopped. Please try again.", "error",
                                  data={"error": {"code": "TIMEOUT"}})
     try:
-        db.add(Message(conversation_id=conv.id, role="user", content=message[:2000]))
-        db.add(Message(conversation_id=conv.id, role="assistant", content=response.text[:4000],
+        db.add(Message(conversation_id=conv_id, role="user", content=message[:2000]))
+        db.add(Message(conversation_id=conv_id, role="assistant", content=response.text[:4000],
                        payload=response.model_dump(mode="json"), intent=response.intent,
                        trace_id=agent.trace.trace_id))
         await db.execute(text("UPDATE conversations SET state = CAST(:s AS jsonb), "
                               "summary = :sum, updated_at = now() WHERE id = :id"),
-                         {"s": state.model_dump_json(), "sum": state.summary[:500], "id": conv.id})
+                         {"s": state.model_dump_json(), "sum": state.summary[:500], "id": conv_id})
         await db.commit()
     except Exception:  # noqa: BLE001
         await db.rollback()
         response.warnings.append(ERROR_MESSAGES["DATABASE_UNAVAILABLE"])
-    await persist_trace(db, agent.trace, conversation_id=conv.id, user_id=owner.user_id)
+    await persist_trace(db, agent.trace, conversation_id=conv_id, user_id=owner.user_id)
     return response
 
 

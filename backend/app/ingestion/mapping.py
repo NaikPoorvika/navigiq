@@ -91,6 +91,10 @@ class OSMMapping:
 
     def resolve(self, tags: dict, name: str | None, extent_m: float | None,
                 osm_type: str) -> MappingResult:
+        if not name or not name.strip():
+            # Every NavigIQ place has a name; an unnamed feature cannot be
+            # searched for, cited or shown on a card.
+            return MappingResult(None, None, drop_reason="missing_name")
         for rule in self.rules:
             if not all(_value_matches(tags.get(k), v) for k, v in rule.match):
                 continue

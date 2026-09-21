@@ -25,6 +25,7 @@ from app.services.planning.modify import Modification, ModificationError
 from app.services.planning.store import Owner, PlanConflict, PlanNotFound
 
 router = APIRouter()
+HTTP_422 = 422   # Starlette renamed the constant; the number is the contract
 
 
 def _require_owner(who: Owner) -> None:
@@ -38,11 +39,11 @@ def _outcome_response(outcome) -> dict:
     if outcome.status == "ok":
         return {"ok": True, **d}
     if outcome.status == "invalid_request":
-        raise api_error(status.HTTP_422_UNPROCESSABLE_ENTITY, "SEMANTIC_INVALID",
+        raise api_error(HTTP_422, "SEMANTIC_INVALID",
                         "The request contradicts itself.",
                         errors=(outcome.semantic or {}).get("errors"), trip_spec=d["trip_spec"])
     if outcome.status == "validation_failed":
-        raise api_error(status.HTTP_422_UNPROCESSABLE_ENTITY, "VALIDATION_FAILED",
+        raise api_error(HTTP_422, "VALIDATION_FAILED",
                         "No plan passed independent validation, so none is shown.",
                         validator_report=outcome.validator)
     feas = outcome.feasibility or {}
@@ -101,7 +102,7 @@ def _mods(ops: list[dict]) -> list[Modification]:
     try:
         return [Modification.model_validate(o) for o in ops]
     except ValidationError as exc:
-        raise api_error(status.HTTP_422_UNPROCESSABLE_ENTITY, "INVALID_MODIFICATION",
+        raise api_error(HTTP_422, "INVALID_MODIFICATION",
                         "; ".join(e["msg"] for e in exc.errors()[:3]))
 
 
@@ -115,7 +116,7 @@ async def _modify(itinerary_id: int, body: ModifyBody, db, who, hypothetical: bo
     except PlanConflict as exc:
         raise api_error(status.HTTP_409_CONFLICT, "CONFLICT", str(exc))
     except ModificationError as exc:
-        raise api_error(status.HTTP_422_UNPROCESSABLE_ENTITY, "INVALID_MODIFICATION", str(exc))
+        raise api_error(HTTP_422, "INVALID_MODIFICATION", str(exc))
     outcome = _outcome_response(res["outcome"])
     return {"summary": res["summary"], "version_no": res.get("version_no"),
             "variant_id": res.get("variant_id"), "comparison": res.get("comparison"),
@@ -167,7 +168,7 @@ async def restore(itinerary_id: int, version_no: int, db: AsyncSession = Depends
     except PlanConflict as exc:
         raise api_error(status.HTTP_409_CONFLICT, "CONFLICT", str(exc))
     if res["status"] != "ok":
-        raise api_error(status.HTTP_422_UNPROCESSABLE_ENTITY, "VALIDATION_FAILED",
+        raise api_error(HTTP_422, "VALIDATION_FAILED",
                         "That version no longer passes today's checks.",
                         validator_report=res.get("validator_report"))
     return res

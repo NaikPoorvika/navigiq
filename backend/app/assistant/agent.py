@@ -116,8 +116,10 @@ class Agent:
         self.trace.enter(state)
         self.current = state
 
-    async def tool(self, name: str, **args: Any) -> Any:
-        res = await self.registry.call(name, args, self.ctx)
+    async def tool(self, tool_name: str, /, **args: Any) -> Any:
+        # Positional-only: tools such as resolve_poi_name take an argument
+        # that is itself called `name`.
+        res = await self.registry.call(tool_name, args, self.ctx)
         if not res.ok:
             raise ToolFailure(res)
         return res.data

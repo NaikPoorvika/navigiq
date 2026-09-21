@@ -8,7 +8,9 @@ never disagree about whether a place is inside 90 km.
 
 Boundary rule (documented in data/config/geography.yaml): inclusive.
   89.9 km -> inside     90.0 km -> inside     90.1 km -> outside
-A 1 mm tolerance absorbs floating-point noise at exactly 90.0 km.
+A 10 cm tolerance absorbs floating-point noise and the 7-decimal (~1 cm)
+precision at which coordinates are stored, so a place at exactly 90.0 km is
+not excluded by rounding. (Found by tests/unit/test_ingestion.py.)
 """
 from __future__ import annotations
 
@@ -21,7 +23,7 @@ from geographiclib.geodesic import Geodesic
 
 from app.core.paths import config_path
 
-BOUNDARY_TOLERANCE_KM = 1e-6
+BOUNDARY_TOLERANCE_KM = 1e-4
 
 
 class RegionBucket(str, Enum):

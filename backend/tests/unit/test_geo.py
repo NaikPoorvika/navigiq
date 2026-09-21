@@ -10,7 +10,7 @@ from hypothesis import given, settings as hsettings, strategies as st
 from app.geo import haversine_km
 from app.geo.distance import destination_point
 from app.geo.regions import (
-    RegionBucket, destination_point_geodesic, distance_from_center_km, geo_config, geodesic_km,
+    BOUNDARY_TOLERANCE_KM, RegionBucket, destination_point_geodesic, distance_from_center_km, geo_config, geodesic_km,
     in_envelope, region_bucket,
 )
 
@@ -97,7 +97,13 @@ def test_envelope_decision_matches_distance(bearing, km):
     lat, lon = destination_point_geodesic(CFG.center_lat, CFG.center_lon, bearing, km)
     d = distance_from_center_km(lat, lon)
     assert math.isclose(d, km, abs_tol=1e-6)
-    assert in_envelope(d) == (km <= 90.0 + 1e-6)
+    assert in_envelope(d) == (km <= 90.0 + BOUNDARY_TOLERANCE_KM)
+
+
+def test_tolerance_is_centimetres_not_metres():
+    assert BOUNDARY_TOLERANCE_KM <= 0.001
+    assert in_envelope(90.0 + BOUNDARY_TOLERANCE_KM / 2)
+    assert not in_envelope(90.0 + 0.01)
 
 
 def test_geodesic_symmetry():

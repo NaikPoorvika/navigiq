@@ -133,7 +133,7 @@ async def put_prefs(body: PreferencesArgs, user: User = Depends(current_user),
     try:
         return await interactions.update_preferences(db, Owner(user.id, None), patch)
     except interactions.InteractionError as exc:
-        raise api_error(status.HTTP_422_UNPROCESSABLE_ENTITY, "INVALID_PREFERENCES", str(exc))
+        raise api_error(422, "INVALID_PREFERENCES", str(exc))
 
 
 @me_extra.get("/saved")
