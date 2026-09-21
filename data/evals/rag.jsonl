@@ -1,0 +1,120 @@
+{"id": "g001", "split": "dev", "q": "Who built the original Bangalore Fort and when?", "gold": ["Bangalore Fort", "History of Bengaluru"], "terms": ["1537", "Kempe Gowda"]}
+{"id": "g002", "split": "test", "q": "When did Hyder Ali rebuild Bangalore Fort in stone?", "gold": ["Bangalore Fort"], "terms": ["1761"]}
+{"id": "g003", "split": "dev", "q": "Which goddess is worshipped during the Karaga festival?", "gold": ["Bangalore Karaga"], "terms": ["Draupadi"]}
+{"id": "g004", "split": "test", "q": "Where in the city does the Karaga festival take place?", "gold": ["Bangalore Karaga", "Dharmaraya Swamy Temple"], "terms": ["Thigalarpete"]}
+{"id": "g005", "split": "dev", "q": "What year was Bannerghatta National Park declared a national park?", "gold": ["Bannerghatta National Park"], "terms": ["1974"]}
+{"id": "g006", "split": "test", "q": "When was the Bannerghatta zoo separated from the national park?", "gold": ["Bannerghatta Biological Park", "Bannerghatta National Park"], "terms": ["2002"]}
+{"id": "g007", "split": "dev", "q": "Which is the largest lake in Bengaluru?", "gold": ["Bellandur Lake"], "terms": ["largest"]}
+{"id": "g008", "split": "test", "q": "Where is the city aquarium and when was it established?", "gold": ["Bengaluru Aquarium"], "terms": ["1983", "Cubbon Park"]}
+{"id": "g009", "split": "dev", "q": "When was Bangalore Palace completed?", "gold": ["Bengaluru Palace"], "terms": ["1874"]}
+{"id": "g010", "split": "test", "q": "Who commissioned the Bangalore Palace?", "gold": ["Bengaluru Palace"], "terms": ["Maharaja of Mysore"]}
+{"id": "g011", "split": "dev", "q": "What is the Town Hall of Bengaluru officially named after?", "gold": ["Bengaluru Town Hall"], "terms": ["Puttanna Chetty"]}
+{"id": "g012", "split": "test", "q": "Which dish is Bisi Bele Bhat and where is it said to come from?", "gold": ["Bisi Bele Bhat"], "terms": ["Mysore Palace"]}
+{"id": "g013", "split": "dev", "q": "What is Brigade Road known for?", "gold": ["Brigade Road"], "terms": ["shopping"]}
+{"id": "g014", "split": "test", "q": "How old is the rock formation at Bugle Rock?", "gold": ["Bugle Rock"], "terms": ["3,000 million"]}
+{"id": "g015", "split": "dev", "q": "What is Central Tiffin Room famous for?", "gold": ["Central Tiffin Room"], "terms": ["Masala Dosa"]}
+{"id": "g016", "split": "test", "q": "Why is Channapatna called the toy town?", "gold": ["Channapatna toys", "Channapatna"], "terms": ["wooden toys"]}
+{"id": "g017", "split": "dev", "q": "What is Chickpet known for?", "gold": ["Chickpet"], "terms": ["cloth"]}
+{"id": "g018", "split": "test", "q": "Who is Chowdiah Memorial Hall built as a tribute to?", "gold": ["Chowdiah Memorial Hall"], "terms": ["Chowdiah"]}
+{"id": "g019", "split": "dev", "q": "How long is Church Street and what does it connect?", "gold": ["Church Street, Bengaluru"], "terms": ["750"]}
+{"id": "g020", "split": "test", "q": "What is sold on Commercial Street?", "gold": ["Commercial Street, Bengaluru"], "terms": ["clothes"]}
+{"id": "g021", "split": "dev", "q": "What is the official name of Cubbon Park?", "gold": ["Cubbon Park"], "terms": ["Sri Chamarajendra Park"]}
+{"id": "g022", "split": "test", "q": "When was Cubbon Park created and under whom?", "gold": ["Cubbon Park"], "terms": ["1870", "Sankey"]}
+{"id": "g023", "split": "dev", "q": "Who is Cunningham Road named after?", "gold": ["Cunningham Road"], "terms": ["Francis Cunningham"]}
+{"id": "g024", "split": "test", "q": "Which society is housed in Daly Memorial Hall?", "gold": ["Daly Memorial Hall"], "terms": ["Mythic Society"]}
+{"id": "g025", "split": "dev", "q": "Who built the first mud fort at Devanahalli?", "gold": ["Devanahalli Fort"], "terms": ["Malla Byre Gowda"]}
+{"id": "g026", "split": "test", "q": "How high is Devarayanadurga?", "gold": ["Devarayanadurga"], "terms": ["1204"]}
+{"id": "g027", "split": "dev", "q": "How old is the Big Banyan Tree and how much land does it cover?", "gold": ["Dodda Alada Mara"], "terms": ["400", "3 acres"]}
+{"id": "g028", "split": "test", "q": "Which deity does the Bull Temple honour?", "gold": ["Dodda Basavana Gudi"], "terms": ["Nandi"]}
+{"id": "g029", "split": "dev", "q": "When was East Parade Church consecrated?", "gold": ["East Parade Church"], "terms": ["1865"]}
+{"id": "g030", "split": "test", "q": "Who founded Electronic City?", "gold": ["Electronic City"], "terms": ["KEONICS"]}
+{"id": "g031", "split": "dev", "q": "What was Freedom Park before it became a park?", "gold": ["Freedom Park, Bengaluru"], "terms": ["Central Jail"]}
+{"id": "g032", "split": "test", "q": "Who is Fraser Town named after?", "gold": ["Fraser Town, Bengaluru"], "terms": ["Stuart Mitford Fraser"]}
+{"id": "g033", "split": "dev", "q": "What is Gandhi Bazaar known for?", "gold": ["Gandhi Bazaar"], "terms": ["flower"]}
+{"id": "g034", "split": "test", "q": "What is unusual about the Gavipuram cave temple?", "gold": ["Gavi Gangadhareshwara Temple"], "terms": ["stone discs"]}
+{"id": "g035", "split": "dev", "q": "Which two deities are worshipped together at Ghati Subramanya?", "gold": ["Ghati Subramanya"], "terms": ["Narasimha"]}
+{"id": "g036", "split": "test", "q": "When was the Government Museum in Bengaluru established?", "gold": ["Government Museum, Bengaluru", "Sandesh Museum of Communication"], "terms": ["1865"]}
+{"id": "g037", "split": "dev", "q": "What does the HAL Aerospace Museum show?", "gold": ["HAL Aerospace Museum"], "terms": ["aircraft"]}
+{"id": "g038", "split": "test", "q": "When was Hesaraghatta Lake created and on which river?", "gold": ["Hesaraghatta Lake"], "terms": ["1894", "Arkavathy"]}
+{"id": "g039", "split": "dev", "q": "What is the oldest inscription found in Bengaluru?", "gold": ["History of Bengaluru"], "terms": ["Hebbal-Kittayya"]}
+{"id": "g040", "split": "test", "q": "When was Holy Trinity Church built and for whom?", "gold": ["Holy Trinity Church, Bengaluru"], "terms": ["1851"]}
+{"id": "g041", "split": "dev", "q": "What is the Indian Music Experience Museum?", "gold": ["Indian Music Experience Museum"], "terms": ["interactive music museum"]}
+{"id": "g042", "split": "test", "q": "Which deities is the ISKCON temple in Bengaluru dedicated to?", "gold": ["ISKCON Temple, Bengaluru"], "terms": ["Radha Krishna"]}
+{"id": "g043", "split": "dev", "q": "What is Jakkur best known for?", "gold": ["Jakkur"], "terms": ["Aerodrome"]}
+{"id": "g044", "split": "test", "q": "What can you see at Janapada Loka?", "gold": ["Janapada Loka"], "terms": ["folk"]}
+{"id": "g045", "split": "dev", "q": "What is the Kadalekai Parishe?", "gold": ["Kadalekai Parishe"], "terms": ["groundnut"]}
+{"id": "g046", "split": "test", "q": "What does Kadu in Kadu Malleshwara mean?", "gold": ["Kadu Malleshwara Temple"], "terms": ["forest"]}
+{"id": "g047", "split": "dev", "q": "What language is spoken in Karnataka and how many native speakers does it have?", "gold": ["Kannada"], "terms": ["44 million"]}
+{"id": "g048", "split": "test", "q": "How many galleries does Karnataka Chitrakala Parishath have?", "gold": ["Karnataka Chitrakala Parishath"], "terms": ["18"]}
+{"id": "g049", "split": "dev", "q": "When was Kempe Gowda I born?", "gold": ["Kempe Gowda I"], "terms": ["1510"]}
+{"id": "g050", "split": "test", "q": "How far is the airport from the city?", "gold": ["Kempegowda International Airport"], "terms": ["35 km"]}
+{"id": "g051", "split": "dev", "q": "Where is the Kempegowda Museum located?", "gold": ["Kempegowda Museum"], "terms": ["Mayo Hall"]}
+{"id": "g052", "split": "test", "q": "Which famous people dined at Koshy's?", "gold": ["Koshy's"], "terms": ["Nehru"]}
+{"id": "g053", "split": "dev", "q": "What is K R Market also called?", "gold": ["K. R. Market"], "terms": ["City Market"]}
+{"id": "g054", "split": "test", "q": "Who originally built Lalbagh?", "gold": ["Lal Bagh", "List of tourist attractions in Bengaluru"], "terms": ["Hyder Ali"]}
+{"id": "g055", "split": "dev", "q": "What does the word Lalbagh mean?", "gold": ["Lal Bagh", "Lalbagh"], "terms": ["red garden"]}
+{"id": "g056", "split": "test", "q": "When was Malleshwaram founded and by whom?", "gold": ["Malleshwaram"], "terms": ["1889"]}
+{"id": "g057", "split": "dev", "q": "Which rice dish did MTR popularise?", "gold": ["Mavalli Tiffin Rooms"], "terms": ["rava idli"]}
+{"id": "g058", "split": "test", "q": "What does Mekedatu mean?", "gold": ["Mekedatu"], "terms": ["goat"]}
+{"id": "g059", "split": "dev", "q": "When was MG Road renamed?", "gold": ["M G Road, Bengaluru"], "terms": ["1948"]}
+{"id": "g060", "split": "test", "q": "What was MG Road called before independence?", "gold": ["M G Road, Bengaluru"], "terms": ["South Parade"]}
+{"id": "g061", "split": "dev", "q": "What is Mysore pak made of?", "gold": ["Mysore pak"], "terms": ["gram flour"]}
+{"id": "g062", "split": "test", "q": "How far is Nandi Hills from Bengaluru?", "gold": ["Nandi Hills, India"], "terms": ["60 km"]}
+{"id": "g063", "split": "dev", "q": "Which rivers originate in Nandi Hills?", "gold": ["Nandi Hills, India"], "terms": ["Arkavathy"]}
+{"id": "g064", "split": "test", "q": "When did the National Gallery of Modern Art in Bengaluru open?", "gold": ["National Gallery of Modern Art, Bengaluru"], "terms": ["2009"]}
+{"id": "g065", "split": "dev", "q": "What is the length of the Namma Metro network?", "gold": ["Namma Metro"], "terms": ["96.1"]}
+{"id": "g066", "split": "test", "q": "What kind of food did New Krishna Bhavan serve?", "gold": ["New Krishna Bhavan"], "terms": ["Udupi"]}
+{"id": "g067", "split": "dev", "q": "Which is the largest mall in Bangalore by area?", "gold": ["Phoenix Marketcity (Bengaluru)"], "terms": ["largest mall"]}
+{"id": "g068", "split": "test", "q": "Who built Orion Mall?", "gold": ["Orion Mall"], "terms": ["Brigade Group"]}
+{"id": "g069", "split": "dev", "q": "What did Plaza Theatre mostly screen?", "gold": ["Plaza Theatre (Bengaluru)"], "terms": ["Hollywood"]}
+{"id": "g070", "split": "test", "q": "How big is Puttenahalli lake in JP Nagar?", "gold": ["Puttenahalli Lake (JP Nagar)"], "terms": ["13 acres"]}
+{"id": "g071", "split": "dev", "q": "Which famous film was shot at Ramanagara?", "gold": ["Ramanagara"], "terms": ["Sholay"]}
+{"id": "g072", "split": "test", "q": "Who envisioned the Ranga Shankara theatre?", "gold": ["Ranga Shankara"], "terms": ["Arundathi Nag"]}
+{"id": "g073", "split": "dev", "q": "When was Russell Market built?", "gold": ["Russell Market"], "terms": ["1927"]}
+{"id": "g074", "split": "test", "q": "Who built Sankey Tank and why?", "gold": ["Sankey tank"], "terms": ["Sankey", "1882"]}
+{"id": "g075", "split": "dev", "q": "What does Sarakki mean?", "gold": ["Sarakki lake"], "terms": ["thousand birds"]}
+{"id": "g076", "split": "test", "q": "Why is Savandurga famous?", "gold": ["Savandurga"], "terms": ["monolith"]}
+{"id": "g077", "split": "dev", "q": "What are the two falls at Shivanasamudra called?", "gold": ["Shivanasamudra Falls"], "terms": ["Gagana Chukki", "Bhara Chukki"]}
+{"id": "g078", "split": "test", "q": "How tall is the Shiva statue at the Old Airport Road temple?", "gold": ["Shivoham Shiva Temple"], "terms": ["65"]}
+{"id": "g079", "split": "dev", "q": "How high is Skandagiri and what is it also called?", "gold": ["Skandagiri"], "terms": ["Kalavara Durga"]}
+{"id": "g080", "split": "test", "q": "Which architectural style is St Mark's Cathedral?", "gold": ["St. Mark's Cathedral, Bengaluru"], "terms": ["English Baroque"]}
+{"id": "g081", "split": "dev", "q": "Which church in the state was first made a minor basilica?", "gold": ["St. Mary's Basilica, Bengaluru"], "terms": ["minor basilica"]}
+{"id": "g082", "split": "test", "q": "Which is the oldest hotel in the city?", "gold": ["Taj West End Bangalore"], "terms": ["oldest hotel"]}
+{"id": "g083", "split": "dev", "q": "Where does T G Halli reservoir get its water?", "gold": ["Thippagondanahalli Reservoir"], "terms": ["Arkavathy"]}
+{"id": "g084", "split": "test", "q": "What is TK falls also called?", "gold": ["Thottikallu"], "terms": ["SwarnaMukhi"]}
+{"id": "g085", "split": "dev", "q": "When was Tipu Sultan's Summer Palace completed?", "gold": ["Tipu Sultan's Summer Palace"], "terms": ["1791"]}
+{"id": "g086", "split": "test", "q": "Who started building Tipu's summer palace?", "gold": ["Tipu Sultan's Summer Palace"], "terms": ["Hyder Ali"]}
+{"id": "g087", "split": "dev", "q": "How far is Turahalli forest from the city?", "gold": ["Turahalli Forest"], "terms": ["20 km"]}
+{"id": "g088", "split": "test", "q": "How big is Ulsoor Lake?", "gold": ["Ulsoor Lake"], "terms": ["123.6"]}
+{"id": "g089", "split": "dev", "q": "Whose works are shown at Venkatappa Art Gallery?", "gold": ["Venkatappa Art Gallery"], "terms": ["Venkatappa"]}
+{"id": "g090", "split": "test", "q": "When was Vidhana Soudha completed and in what style?", "gold": ["Vidhana Soudha"], "terms": ["1956", "Neo-Dravidian"]}
+{"id": "g091", "split": "dev", "q": "When was Vidyarthi Bhavan founded?", "gold": ["Vidyarthi Bhavan", "Gandhi Bazaar"], "terms": ["1943"]}
+{"id": "g092", "split": "test", "q": "Who inaugurated the Visvesvaraya museum?", "gold": ["Visvesvaraya Industrial and Technological Museum"], "terms": ["Prime Minister"]}
+{"id": "g093", "split": "dev", "q": "How many stalls are there on VV Puram food street?", "gold": ["VV Puram Food Street"], "terms": ["20"]}
+{"id": "g094", "split": "test", "q": "When was Whitefield established and for whom?", "gold": ["Whitefield, Bengaluru"], "terms": ["1882", "Anglo Indians"]}
+{"id": "g095", "split": "dev", "q": "How far is Wonderla from Bengaluru?", "gold": ["Wonderla"], "terms": ["28"]}
+{"id": "g096", "split": "test", "q": "Which is the oldest part of Bengaluru?", "gold": ["Yelahanka"], "terms": ["oldest part"]}
+{"id": "g097", "split": "dev", "q": "What does the Kempegowda statue at the airport represent?", "gold": ["Statue of Prosperity"], "terms": ["Kempe Gowda"]}
+{"id": "g098", "split": "test", "q": "When was the Queen Victoria statue unveiled?", "gold": ["Statue of Queen Victoria, Bengaluru"], "terms": ["1906"]}
+{"id": "g099", "split": "dev", "q": "Which bird sanctuary near Ramanagara protects vultures?", "gold": ["Ramadevarabetta Vulture Sanctuary"], "terms": ["vulture"]}
+{"id": "g100", "split": "test", "q": "Which trees do I see in Lalbagh's glasshouse?", "gold": [], "terms": []}
+{"id": "g101", "split": "dev", "q": "What is ragi mudde?", "gold": ["Ragi mudde"], "terms": ["finger millet"]}
+{"id": "g102", "split": "test", "q": "What are the types of Karnataka cuisine?", "gold": ["Karnataka cuisine"], "terms": ["Udupi"]}
+{"id": "g103", "split": "dev", "q": "Where did masala dosa originate?", "gold": ["Masala dosa"], "terms": ["Madras"]}
+{"id": "g104", "split": "test", "q": "How large is Yele Mallappa Shetty Lake?", "gold": ["Yele Mallappa Shetty Lake"], "terms": ["490 acres"]}
+{"id": "g105", "split": "dev", "q": "When was Bangalore Club founded?", "gold": ["Bangalore Club"], "terms": ["1868"]}
+{"id": "g106", "split": "test", "q": "How much money did Winston Churchill owe the Bangalore Club?", "gold": ["Bangalore Club"], "terms": ["13"]}
+{"id": "g107", "split": "dev", "q": "What was the name Bengaluru first recorded as, and when?", "gold": ["History of Bengaluru"], "terms": ["890"]}
+{"id": "g108", "split": "test", "q": "What share of Bengaluru's population are migrants?", "gold": ["Culture of Bengaluru"], "terms": ["51%"]}
+{"id": "g109", "split": "dev", "q": "Where are the Makalidurga fort and temple?", "gold": ["Makalidurga"], "terms": ["Doddaballapura"]}
+{"id": "g110", "split": "test", "q": "Which temple at Nandi village is the oldest in the Nolambavadi style?", "gold": ["Bhoganandishwara Temple"], "terms": ["Bhoganandiswara"]}
+{"id": "u001", "split": "dev", "q": "What is the Wi-Fi password at Cubbon Park?", "gold": [], "terms": []}
+{"id": "u002", "split": "test", "q": "Who won the IPL in 2031?", "gold": [], "terms": []}
+{"id": "u003", "split": "dev", "q": "How many parking spots does Nandi Hills have today?", "gold": [], "terms": []}
+{"id": "u004", "split": "test", "q": "What is today's entry ticket price for the aquarium?", "gold": [], "terms": []}
+{"id": "u005", "split": "dev", "q": "What is the phone number of Koshy's?", "gold": [], "terms": []}
+{"id": "u006", "split": "test", "q": "Which celebrity lives in Lavelle Road?", "gold": [], "terms": []}
+{"id": "u007", "split": "dev", "q": "What is the recipe for Mysore pak with jaggery and coconut milk?", "gold": [], "terms": []}
+{"id": "u008", "split": "test", "q": "Is the Bangalore Palace haunted?", "gold": [], "terms": []}
+{"id": "u009", "split": "dev", "q": "What time does the metro stop running on Sundays?", "gold": [], "terms": []}
+{"id": "u010", "split": "test", "q": "Who designed the Lalbagh flower show of 2019?", "gold": [], "terms": []}

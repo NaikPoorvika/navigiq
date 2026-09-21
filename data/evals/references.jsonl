@@ -1,0 +1,50 @@
+{"id": "r001", "split": "dev", "text": "tell me more about the second one", "expect": 2}
+{"id": "r002", "split": "dev", "text": "the first one looks good", "expect": 1}
+{"id": "r003", "split": "dev", "text": "what about the last one", "expect": 4}
+{"id": "r004", "split": "dev", "text": "is the museum open today", "expect": 2}
+{"id": "r005", "split": "dev", "text": "tell me about that cafe", "expect": "ambiguous"}
+{"id": "r006", "split": "dev", "text": "option 3 please", "expect": 3}
+{"id": "r007", "split": "dev", "text": "save it", "focus": 4, "expect": 4}
+{"id": "r008", "split": "dev", "text": "how far is it", "expect": "ambiguous"}
+{"id": "r009", "split": "dev", "text": "more about Corner Cafe", "expect": 3}
+{"id": "r010", "split": "dev", "text": "the park one", "expect": 4}
+{"id": "r011", "split": "dev", "text": "number 2", "expect": 2}
+{"id": "r012", "split": "dev", "text": "is that place kid friendly", "focus": 2, "expect": 2}
+{"id": "r013", "split": "dev", "text": "the fifth one", "expect": "none"}
+{"id": "r014", "split": "dev", "text": "the third suggestion", "expect": 3}
+{"id": "r015", "split": "dev", "text": "doosra wala", "expect": 2}
+{"id": "r016", "split": "dev", "text": "tell me about the gallery", "expect": "none"}
+{"id": "r017", "split": "dev", "text": "remove the second stop", "plan": true, "expect": 2}
+{"id": "r018", "split": "dev", "text": "replace the museum", "plan": true, "expect": 2}
+{"id": "r019", "split": "dev", "text": "drop the coffee bar", "plan": true, "expect": 3}
+{"id": "r020", "split": "dev", "text": "the shopping bit", "plan": true, "expect": 4}
+{"id": "r021", "split": "dev", "text": "the last stop", "plan": true, "expect": 4}
+{"id": "r022", "split": "dev", "text": "stop 1", "plan": true, "expect": 1}
+{"id": "r023", "split": "dev", "text": "museum wala", "plan": true, "expect": 2}
+{"id": "r024", "split": "dev", "text": "the garden", "plan": true, "expect": 1}
+{"id": "r025", "split": "dev", "text": "Quiet Cafe sounds nice, tell me more", "expect": 1}
+{"id": "r026", "split": "dev", "text": "this one", "focus": 1, "expect": 1}
+{"id": "r027", "split": "dev", "text": "the one with the lake", "expect": "none"}
+{"id": "r028", "split": "dev", "text": "the 2nd", "expect": 2}
+{"id": "r029", "split": "dev", "text": "pehla wala", "expect": 1}
+{"id": "r030", "split": "dev", "text": "tell me about the cafe", "expect": "ambiguous"}
+{"id": "q001", "split": "test", "text": "the second place", "expect": 2}
+{"id": "q002", "split": "test", "text": "what's the first like", "expect": 1}
+{"id": "q003", "split": "test", "text": "is the last one open late", "expect": 4}
+{"id": "q004", "split": "test", "text": "how much is the museum", "expect": 2}
+{"id": "q005", "split": "test", "text": "that cafe", "expect": "ambiguous"}
+{"id": "q006", "split": "test", "text": "option 4", "expect": 4}
+{"id": "q007", "split": "test", "text": "save this place", "focus": 3, "expect": 3}
+{"id": "q008", "split": "test", "text": "Lake View Park details", "expect": 4}
+{"id": "q009", "split": "test", "text": "the 3rd one", "expect": 3}
+{"id": "q010", "split": "test", "text": "the seventh option", "expect": "none"}
+{"id": "q011", "split": "test", "text": "teesra wala", "expect": 3}
+{"id": "q012", "split": "test", "text": "remove the museum", "plan": true, "expect": 2}
+{"id": "q013", "split": "test", "text": "swap the third stop", "plan": true, "expect": 3}
+{"id": "q014", "split": "test", "text": "the street one", "plan": true, "expect": 4}
+{"id": "q015", "split": "test", "text": "the first stop", "plan": true, "expect": 1}
+{"id": "q016", "split": "test", "text": "the cafe in the plan", "plan": true, "expect": 3}
+{"id": "q017", "split": "test", "text": "is it free", "focus": 2, "expect": 2}
+{"id": "q018", "split": "test", "text": "that one", "expect": "ambiguous"}
+{"id": "q019", "split": "test", "text": "tell me more about Test Museum", "expect": 2}
+{"id": "q020", "split": "test", "text": "the park", "expect": 4}

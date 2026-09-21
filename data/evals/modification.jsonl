@@ -1,0 +1,110 @@
+{"id": "d001", "split": "dev", "text": "remove the second stop", "expect": [{"op": "remove_stop", "target_seq": 2}]}
+{"id": "d002", "split": "dev", "text": "drop the museum", "expect": [{"op": "remove_stop", "target_seq": 2}]}
+{"id": "d003", "split": "dev", "text": "skip the last one", "expect": [{"op": "remove_stop", "target_seq": 4}]}
+{"id": "d004", "split": "dev", "text": "get rid of the coffee place", "expect": [{"op": "remove_stop", "target_seq": 3}]}
+{"id": "d005", "split": "dev", "text": "take out Commercial Street", "expect": [{"op": "remove_stop", "target_seq": 4}]}
+{"id": "d006", "split": "dev", "text": "replace the museum with a gallery", "expect": [{"op": "replace_stop", "target_seq": 2, "category": "gallery"}]}
+{"id": "d007", "split": "dev", "text": "swap the first stop for a lake", "expect": [{"op": "replace_stop", "target_seq": 1, "category": "lake"}]}
+{"id": "d008", "split": "dev", "text": "replace the cafe", "expect": [{"op": "replace_stop", "target_seq": 3}]}
+{"id": "d009", "split": "dev", "text": "make it cheaper", "expect": [{"op": "set_budget", "amount": 900}]}
+{"id": "d010", "split": "dev", "text": "keep it under 800", "expect": [{"op": "set_budget", "amount": 800}]}
+{"id": "d011", "split": "dev", "text": "our budget is now 2000", "expect": [{"op": "set_budget", "amount": 2000}]}
+{"id": "d012", "split": "dev", "text": "start at 11 am", "expect": [{"op": "set_start_time", "time": "11:00"}]}
+{"id": "d013", "split": "dev", "text": "end by 5 pm", "expect": [{"op": "set_end_time", "time": "17:00"}]}
+{"id": "d014", "split": "dev", "text": "start two hours later", "expect": [{"op": "shift_time", "minutes": 120}]}
+{"id": "d015", "split": "dev", "text": "let's begin an hour earlier", "expect": [{"op": "shift_time", "minutes": -60}]}
+{"id": "d016", "split": "dev", "text": "fewer stops please", "expect": [{"op": "set_stop_count", "count": 3}]}
+{"id": "d017", "split": "dev", "text": "add one more stop", "expect": [{"op": "set_stop_count", "count": 5}]}
+{"id": "d018", "split": "dev", "text": "just 2 stops", "expect": [{"op": "set_stop_count", "count": 2}]}
+{"id": "d019", "split": "dev", "text": "make it more relaxed", "expect": [{"op": "set_pace", "pace": "relaxed"}]}
+{"id": "d020", "split": "dev", "text": "pack more in, faster pace", "expect": [{"op": "set_pace", "pace": "quick"}]}
+{"id": "d021", "split": "dev", "text": "add somewhere for dinner", "expect": [{"op": "add_meal", "meal": "dinner"}]}
+{"id": "d022", "split": "dev", "text": "add a lunch stop", "expect": [{"op": "add_meal", "meal": "lunch"}]}
+{"id": "d023", "split": "dev", "text": "add Cubbon Park", "expect": [{"op": "add_poi", "poi_name": "cubbon park"}]}
+{"id": "d024", "split": "dev", "text": "please add a visit to Bangalore Palace", "expect": [{"op": "add_poi", "poi_name": "bangalore palace"}]}
+{"id": "d025", "split": "dev", "text": "no more museums", "expect": [{"op": "avoid_category", "category": "museum"}]}
+{"id": "d026", "split": "dev", "text": "avoid temples in the plan", "expect": [{"op": "avoid_category", "category": "temple"}]}
+{"id": "d027", "split": "dev", "text": "make it more romantic", "expect": [{"op": "add_interest", "interest": "romantic"}]}
+{"id": "d028", "split": "dev", "text": "more nature please", "expect": [{"op": "add_interest", "interest": "nature"}]}
+{"id": "d029", "split": "dev", "text": "move the plan to Jayanagar", "expect": [{"op": "set_area", "area": "jayanagar"}]}
+{"id": "d030", "split": "dev", "text": "indoors only, it's raining", "expect": [{"op": "set_indoor_preference", "preference": "indoor"}]}
+{"id": "d031", "split": "dev", "text": "keep it outdoors", "expect": [{"op": "set_indoor_preference", "preference": "outdoor"}]}
+{"id": "d032", "split": "dev", "text": "give 30 minute buffers between stops", "expect": [{"op": "set_transition_buffer", "minutes": 30}]}
+{"id": "d033", "split": "dev", "text": "I'm tired, reduce the plan", "expect": [{"op": "set_stop_count", "count": 3}, {"op": "set_pace", "pace": "relaxed"}]}
+{"id": "d034", "split": "dev", "text": "remove the cafe and make it cheaper", "expect": [{"op": "remove_stop", "target_seq": 3}, {"op": "set_budget", "amount": 900}]}
+{"id": "d035", "split": "dev", "text": "start at 10 and finish by 4", "expect": [{"op": "set_start_time", "time": "10:00"}, {"op": "set_end_time", "time": "16:00"}]}
+{"id": "d036", "split": "dev", "text": "cut the garden", "expect": [{"op": "remove_stop", "target_seq": 1}]}
+{"id": "d037", "split": "dev", "text": "delete stop 3", "expect": [{"op": "remove_stop", "target_seq": 3}]}
+{"id": "d038", "split": "dev", "text": "replace number 4 with a market", "expect": [{"op": "replace_stop", "target_seq": 4, "category": "market"}]}
+{"id": "d039", "split": "dev", "text": "too expensive", "expect": [{"op": "set_budget", "amount": 900}]}
+{"id": "d040", "split": "dev", "text": "we need to be back by 6", "expect": [{"op": "set_end_time", "time": "18:00"}]}
+{"id": "d041", "split": "dev", "text": "can we start at 9:30", "expect": [{"op": "set_start_time", "time": "09:30"}]}
+{"id": "d042", "split": "dev", "text": "make it shorter", "expect": [{"op": "set_stop_count", "count": 3}]}
+{"id": "d043", "split": "dev", "text": "lighter please, we have elders", "expect": [{"op": "set_stop_count", "count": 3}, {"op": "set_pace", "pace": "relaxed"}]}
+{"id": "d044", "split": "dev", "text": "add coffee somewhere", "expect": [{"op": "add_meal", "meal": "coffee"}]}
+{"id": "d045", "split": "dev", "text": "add breakfast at the start", "expect": [{"op": "add_meal", "meal": "breakfast"}]}
+{"id": "d046", "split": "dev", "text": "skip all malls", "expect": [{"op": "avoid_category", "category": "mall"}]}
+{"id": "d047", "split": "dev", "text": "make it more cultural", "expect": [{"op": "add_interest", "interest": "cultural"}]}
+{"id": "d048", "split": "dev", "text": "shift it to Malleshwaram instead", "expect": [{"op": "set_area", "area": "malleshwaram"}]}
+{"id": "d049", "split": "dev", "text": "remove the cafe", "ctx": "two_cafes", "expect": [], "clarify": true}
+{"id": "d050", "split": "dev", "text": "replace that cafe with a park", "ctx": "two_cafes", "expect": [], "clarify": true}
+{"id": "d051", "split": "dev", "text": "hata do museum wala", "expect": [{"op": "remove_stop", "target_seq": 2}]}
+{"id": "d052", "split": "dev", "text": "isko sasta kar do", "expect": [{"op": "set_budget", "amount": 900}]}
+{"id": "d053", "split": "dev", "text": "2 ghante baad shuru karo", "expect": [{"op": "shift_time", "minutes": 120}]}
+{"id": "d054", "split": "dev", "text": "the museum can go", "expect": [{"op": "remove_stop", "target_seq": 2}]}
+{"id": "d055", "split": "dev", "text": "I don't want the shopping street", "expect": [{"op": "remove_stop", "target_seq": 4}]}
+{"id": "d056", "split": "dev", "text": "change the garden to a temple", "expect": [{"op": "replace_stop", "target_seq": 1, "category": "temple"}]}
+{"id": "d057", "split": "dev", "text": "can you swap stop 2", "expect": [{"op": "replace_stop", "target_seq": 2}]}
+{"id": "d058", "split": "dev", "text": "reduce it to 3 stops", "expect": [{"op": "set_stop_count", "count": 3}]}
+{"id": "d059", "split": "dev", "text": "a 10 minute gap between places is enough", "expect": [{"op": "set_transition_buffer", "minutes": 10}]}
+{"id": "d060", "split": "dev", "text": "add dessert at the end", "expect": [{"op": "prefer_category", "category": "dessert"}]}
+{"id": "d061", "split": "dev", "text": "less walking please", "expect": [{"op": "set_pace", "pace": "relaxed"}]}
+{"id": "d062", "split": "dev", "text": "start later, around 1 pm", "expect": [{"op": "set_start_time", "time": "13:00"}]}
+{"id": "d063", "split": "dev", "text": "we have only 1000 now", "expect": [{"op": "set_budget", "amount": 1000}]}
+{"id": "d064", "split": "dev", "text": "remove the first and the last", "expect": [{"op": "remove_stop", "target_seq": 1}, {"op": "remove_stop", "target_seq": 4}]}
+{"id": "d065", "split": "dev", "text": "wrap up by 3", "expect": [{"op": "set_end_time", "time": "15:00"}]}
+{"id": "d066", "split": "dev", "text": "no cafes", "expect": [{"op": "avoid_category", "category": "cafe"}]}
+{"id": "d067", "split": "dev", "text": "make it more kid friendly", "expect": [{"op": "add_interest", "interest": "kids"}]}
+{"id": "d068", "split": "dev", "text": "add a park", "expect": [{"op": "prefer_category", "category": "park"}]}
+{"id": "d069", "split": "dev", "text": "can we leave at 8 instead", "expect": [{"op": "set_start_time", "time": "08:00"}]}
+{"id": "d070", "split": "dev", "text": "remove Brahmin's Coffee Bar", "expect": [{"op": "remove_stop", "target_seq": 3}]}
+{"id": "e001", "split": "test", "text": "drop the second one", "expect": [{"op": "remove_stop", "target_seq": 2}]}
+{"id": "e002", "split": "test", "text": "lose the shopping bit", "expect": [{"op": "remove_stop", "target_seq": 4}]}
+{"id": "e003", "split": "test", "text": "replace the garden with a museum", "expect": [{"op": "replace_stop", "target_seq": 1, "category": "museum"}]}
+{"id": "e004", "split": "test", "text": "switch the coffee bar for a bakery", "expect": [{"op": "replace_stop", "target_seq": 3}]}
+{"id": "e005", "split": "test", "text": "can it be cheaper?", "expect": [{"op": "set_budget", "amount": 900}]}
+{"id": "e006", "split": "test", "text": "budget 600 max", "expect": [{"op": "set_budget", "amount": 600}]}
+{"id": "e007", "split": "test", "text": "start at noon", "expect": [{"op": "set_start_time", "time": "12:00"}]}
+{"id": "e008", "split": "test", "text": "finish by 7 pm", "expect": [{"op": "set_end_time", "time": "19:00"}]}
+{"id": "e009", "split": "test", "text": "push the start by an hour", "expect": [{"op": "shift_time", "minutes": 60}]}
+{"id": "e010", "split": "test", "text": "start 30 minutes earlier", "expect": [{"op": "shift_time", "minutes": -30}]}
+{"id": "e011", "split": "test", "text": "just three places", "expect": [{"op": "set_stop_count", "count": 3}]}
+{"id": "e012", "split": "test", "text": "one more stop please", "expect": [{"op": "set_stop_count", "count": 5}]}
+{"id": "e013", "split": "test", "text": "slower pace", "expect": [{"op": "set_pace", "pace": "relaxed"}]}
+{"id": "e014", "split": "test", "text": "add dinner", "expect": [{"op": "add_meal", "meal": "dinner"}]}
+{"id": "e015", "split": "test", "text": "add Ulsoor Lake to the plan", "expect": [{"op": "add_poi", "poi_name": "ulsoor lake"}]}
+{"id": "e016", "split": "test", "text": "no temples please", "expect": [{"op": "avoid_category", "category": "temple"}]}
+{"id": "e017", "split": "test", "text": "make it more peaceful", "expect": [{"op": "add_interest", "interest": "peaceful"}]}
+{"id": "e018", "split": "test", "text": "move it to Indiranagar", "expect": [{"op": "set_area", "area": "indiranagar"}]}
+{"id": "e019", "split": "test", "text": "everything indoors please", "expect": [{"op": "set_indoor_preference", "preference": "indoor"}]}
+{"id": "e020", "split": "test", "text": "20 min buffer between stops", "expect": [{"op": "set_transition_buffer", "minutes": 20}]}
+{"id": "e021", "split": "test", "text": "we're exhausted, fewer stops and slower", "expect": [{"op": "set_stop_count", "count": 3}, {"op": "set_pace", "pace": "relaxed"}]}
+{"id": "e022", "split": "test", "text": "remove the museum and add lunch", "expect": [{"op": "remove_stop", "target_seq": 2}, {"op": "add_meal", "meal": "lunch"}]}
+{"id": "e023", "split": "test", "text": "start at 11 and end at 5", "expect": [{"op": "set_start_time", "time": "11:00"}, {"op": "set_end_time", "time": "17:00"}]}
+{"id": "e024", "split": "test", "text": "delete the third stop", "expect": [{"op": "remove_stop", "target_seq": 3}]}
+{"id": "e025", "split": "test", "text": "replace stop 1 with a viewpoint", "expect": [{"op": "replace_stop", "target_seq": 1, "category": "viewpoint"}]}
+{"id": "e026", "split": "test", "text": "it's too pricey", "expect": [{"op": "set_budget", "amount": 900}]}
+{"id": "e027", "split": "test", "text": "we must be done by 4:30", "expect": [{"op": "set_end_time", "time": "16:30"}]}
+{"id": "e028", "split": "test", "text": "make it quicker", "expect": [{"op": "set_pace", "pace": "quick"}]}
+{"id": "e029", "split": "test", "text": "add snacks in between", "expect": [{"op": "add_meal", "meal": "snacks"}]}
+{"id": "e030", "split": "test", "text": "no malls or markets", "expect": [{"op": "avoid_category", "category": "mall"}]}
+{"id": "e031", "split": "test", "text": "remove the cafe", "ctx": "two_cafes", "expect": [], "clarify": true}
+{"id": "e032", "split": "test", "text": "mall wala hata do", "ctx": "with_mall", "expect": [{"op": "remove_stop", "target_seq": 4}]}
+{"id": "e033", "split": "test", "text": "thoda sasta karo", "expect": [{"op": "set_budget", "amount": 900}]}
+{"id": "e034", "split": "test", "text": "the garden has to go", "expect": [{"op": "remove_stop", "target_seq": 1}]}
+{"id": "e035", "split": "test", "text": "change the last stop to a temple", "expect": [{"op": "replace_stop", "target_seq": 4, "category": "temple"}]}
+{"id": "e036", "split": "test", "text": "only 2 stops", "expect": [{"op": "set_stop_count", "count": 2}]}
+{"id": "e037", "split": "test", "text": "add a gallery", "expect": [{"op": "prefer_category", "category": "gallery"}]}
+{"id": "e038", "split": "test", "text": "make it more adventurous", "expect": [{"op": "add_interest", "interest": "adventurous"}]}
+{"id": "e039", "split": "test", "text": "can we leave at 9 instead of 10", "expect": [{"op": "set_start_time", "time": "09:00"}]}
+{"id": "e040", "split": "test", "text": "remove Government Museum", "expect": [{"op": "remove_stop", "target_seq": 2}]}

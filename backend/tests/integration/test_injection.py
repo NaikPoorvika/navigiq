@@ -216,3 +216,12 @@ async def test_search_inputs_are_parameters_not_sql(async_client):
         assert r.status_code == 200, r.text
     r = await async_client.get("/api/v1/pois", params={"q": "Test Garden"})
     assert r.status_code == 200 and r.json()["items"]
+
+
+async def test_volatile_questions_are_not_answered_from_encyclopaedic_text(db):
+    # regression (answer evals): a years-old ticket price was quoted as today's
+    ans = await answer_question(db, "What is today's entry ticket price for Test Garden?")
+    assert ans.text == UNKNOWN and not ans.answerable
+    live = await answer_question(db, "What is today's entry ticket price for Test Garden?",
+                                 facts={"get_poi_cost": "estimated ₹0-₹100 per person"})
+    assert live.answerable and "100" in live.text

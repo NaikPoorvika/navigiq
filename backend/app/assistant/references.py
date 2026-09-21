@@ -25,6 +25,15 @@ CATEGORY_WORDS = {
     "viewpoint": "viewpoint", "hill": "hill", "waterfall": "waterfall", "bar": "nightlife",
     "pub": "nightlife", "dessert place": "dessert", "bakery": "dessert", "monument": "monument",
     "street food": "street_food", "food stall": "street_food", "zoo": "nature",
+    "coffee bar": "cafe", "shopping street": "walking_area", "street": "walking_area",
+    "walk": "walking_area", "neighbourhood": "neighborhood", "neighborhood": "neighborhood",
+}
+# Words that name a family of categories: "the shopping bit" is whichever
+# shopping-type stop the plan has.
+CATEGORY_GROUPS = {
+    "shopping": {"shopping", "mall", "market", "walking_area"},
+    "food": {"restaurant", "cafe", "street_food", "dessert"},
+    "restaurant": {"restaurant"},
 }
 
 
@@ -60,9 +69,13 @@ def resolve_reference(message: str, state: ConversationState, *,
     if re.search(r"\b(the )?(last|final) (one|stop|place|option)\b|\bthe last\b", t):
         return _by_position(pool, len(pool), source) if pool else Reference("none")
 
-    for word, category in sorted(CATEGORY_WORDS.items(), key=lambda kv: -len(kv[0])):
-        if re.search(rf"\b(the|that|this) {re.escape(word)}\b", t):
-            matches = [p for p in pool if p.category == category]
+    words = {**CATEGORY_WORDS, **{w: None for w in CATEGORY_GROUPS if w not in CATEGORY_WORDS}}
+    for word, category in sorted(words.items(), key=lambda kv: -len(kv[0])):
+        # "the museum", "that cafe", and Hindi "museum wala"
+        if re.search(rf"\b(the|that|this) {re.escape(word)}\b|\b{re.escape(word)} "
+                     rf"(wala|waala|wali|waali|one|bit|stop)\b", t):
+            wanted = CATEGORY_GROUPS.get(word, {category})
+            matches = [p for p in pool if p.category in wanted]
             if len(matches) == 1:
                 return Reference("resolved", matches[0], pool.index(matches[0]) + 1,
                                  source=source)

@@ -144,21 +144,96 @@ def passes(check: dict) -> bool:
             and check["citation_coverage"] >= 0.99 and bool(check["citations"]))
 
 
-def extractive(question: str, chunks: list[RetrievedChunk], max_sentences: int = 2) -> tuple[str, list[int]]:
+# Question shapes and the kind of sentence that answers them.
+_UNIT = r"\d[\d,.]*\s*-?\s*(?:km|kilomet|kilom|metres?|meters?|miles?|mi\b|acres?|hectares?|ha\b|" \
+        r"feet|ft\b|m\b|sq|square)"
+_ANSWER_TYPES = [
+    (re.compile(r"\b(when|what year|which year|since when|how old)\b"),
+     re.compile(r"\b(1[0-9]{3}|20[0-9]{2})\b|\b\d+\s*(?:-\s*)?(?:years?|centur)")),
+    (re.compile(r"\bhow (?:far|long|big|large|high|tall|wide|deep)\b|"
+                r"\bwhat (?:area|size|length|height)\b"), re.compile(_UNIT, re.I)),
+    (re.compile(r"\bhow (?:much|many)\b"), re.compile(r"\d")),
+    (re.compile(r"\b(famous|known|special|notable|popular) (for|about)\b|\bwhat is .* known\b"),
+     re.compile(r"\b(famous|known|notable|popular|renowned|celebrated)\b", re.I)),
+    (re.compile(r"\bwho\b"), re.compile(r"\b(?:by|founded|built|designed|named after|"
+                                        r"commissioned|established|started)\b")),
+    (re.compile(r"\bwhere\b"), re.compile(r"\b(?:located|situated|lies|near)\b")),
+]
+_TEMPLATE_SENTENCE = re.compile(r"\blisted by NavigIQ\b", re.I)
+# Question words and the stems that answer them in encyclopaedic prose.
+_SYNONYMS = {
+    "mean": ("mean", "translat", "literal", "lit", "refer", "named"),
+    "founded": ("found", "establish", "built", "start", "set up"),
+    "built": ("built", "construct", "establish", "commission", "erect"),
+    "show": ("show", "display", "exhibit", "house", "collection"),
+    "originate": ("origin", "source", "creat", "rise", "begin"),
+    "become": ("former", "earlier", "was the", "previous", "originally"),
+    "became": ("former", "earlier", "was the", "previous", "originally"),
+    "called": ("known", "name", "called", "also"),
+}
+
+
+def _stem_match(qw: str, words: set[str]) -> bool:
+    stems = _SYNONYMS.get(qw, (qw,))
+    for sw in words:
+        for st in stems:
+            if (len(st) >= 4 and sw.startswith(st)) or sw == st or \
+                    (len(sw) >= 5 and st.startswith(sw)):
+                return True
+    return False
+
+
+def _overlap(qwords: set[str], words: set[str]) -> int:
+    return sum(1 for w in qwords if _stem_match(w, words))
+
+
+def extractive(question: str, chunks: list[RetrievedChunk],
+               max_sentences: int = 2) -> tuple[str, list[int]]:
+    """Quote the sentences that answer the question, or nothing.
+
+    The question's words that are not the place's own name ("password",
+    "founded", "rivers") must appear in the chosen sentence, or the sentence
+    must have the shape the question asks for (a year for "when", a quantity
+    for "how far"). Otherwise the caller refuses rather than quoting an
+    unrelated sentence about the right place - found by the answer evals."""
     q = content_words(question)
+    entity: set[str] = set()
+    for c in chunks[:4]:
+        entity |= content_words(c.title)
+    focus = q - entity
+    ql = question.lower()
+    types = [ans for ask, ans in _ANSWER_TYPES if ask.search(ql)]
     scored = []
     for i, c in enumerate(chunks[:4], start=1):
         body = c.text.split(": ", 1)[-1]
-        for s in split_sentences(body):
+        # a chunk about the place the question names outranks a neighbour's
+        about = _overlap(q, content_words(c.title))
+        for j, s in enumerate(split_sentences(body)):
             s = s.strip()
-            if 30 <= len(s) <= 400:
-                scored.append((len(q & content_words(s)), -i, s, i))
-    scored.sort(reverse=True)
+            if not 30 <= len(s) <= 400 or _TEMPLATE_SENTENCE.search(s):
+                continue
+            words = content_words(s) | content_words(c.title)
+            f = _overlap(focus, content_words(s))
+            e = _overlap(q & entity, words)
+            typed = any(p.search(s) for p in types)
+            score = 2.0 * f + 0.5 * e + 1.0 * about + (1.5 if typed else 0.0) + \
+                (0.3 if j == 0 else 0.0) - 0.1 * i
+            scored.append((score, f, typed, e, s, i))
+    if not scored:
+        return "", []
+    scored.sort(key=lambda x: -x[0])
+    best = scored[0]
+    if focus and best[1] == 0 and not best[2]:
+        return "", []
+    if not focus and best[3] == 0:
+        return "", []
     picked, used = [], []
-    for overlap, _, s, i in scored:
-        if overlap == 0 and picked:
+    for _score, f, typed, e, s, i in scored:
+        # a second sentence must also answer the question, from the same source
+        # unless it shares the question's own words
+        if picked and f == 0 and not (typed and i == used[0]):
             break
-        if s not in picked:
+        if s not in [p.rsplit(" [", 1)[0] for p in picked]:
             picked.append(f"{s} [{i}]")
             used.append(i)
         if len(picked) >= max_sentences:
@@ -166,12 +241,27 @@ def extractive(question: str, chunks: list[RetrievedChunk], max_sentences: int =
     return " ".join(picked), sorted(set(used))
 
 
+# Facts that change (prices, today's hours, "right now") are never answered
+# from encyclopaedic text, which may be years old: only from the live fact
+# block the caller supplies (section 51, static vs volatile facts).
+VOLATILE = re.compile(r"\b(today'?s?|tonight|right now|currently|at the moment|this week|"
+                      r"open now|still open|entry fee|ticket price|tickets? cost|price|prices|"
+                      r"charges?|how much (?:is|are|does|do)|timings?|opening hours|"
+                      r"closing time|open today|closed today)\b", re.I)
+
+
 async def answer_question(db, question: str, *, llm=None, gateway=None,
                           facts: dict | None = None, entity_poi_ids: list[int] | None = None,
                           recorder=None, k: int = 6) -> GroundedAnswer:
+    facts_text = _facts_text(facts)
+    if VOLATILE.search(question):
+        if facts_text:
+            return GroundedAnswer(facts_text, [], True, "facts",
+                                  notes=["volatile fact: answered from live data only"])
+        return GroundedAnswer(UNKNOWN, [], False, "none",
+                              notes=["volatile fact: not answered from encyclopaedic text"])
     result = await retrieve(db, question, k=k, gateway=gateway, entity_poi_ids=entity_poi_ids)
     notes = list(result.notes)
-    facts_text = _facts_text(facts)
     if not relevant(question, result):
         if facts_text:
             return GroundedAnswer(facts_text, [], True, "facts", notes=notes)
