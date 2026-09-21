@@ -1,4 +1,5 @@
 ﻿# Import all the models here so that Alembic can read them
+from app.models.place import Place
 from app.db.base_class import Base
 from app.models.user import User
 from app.models.poi import (
