@@ -33,6 +33,19 @@ _ABBREV = re.compile(r"\b(lit|St|Dr|Mr|Mrs|Ms|Sri|Smt|e\.g|i\.e|c|ca|approx|No|N
                      r"Rs|Govt|Dept|Mt|[A-Z])\.", re.UNICODE)
 _SPLIT = re.compile(r"(?<=[.!?])(?:\s*\[\d{1,2}\])*\s+(?=[A-Z0-9\"“(])")
 _PROTECT = "․"   # one-dot leader: stands in for protected full stops
+_URL_RE = re.compile(r"(?:https?://|www\.)[^\s)\]>\"']+", re.I)
+# Passages that read like instructions to a model are withheld from generation
+# and from extractive answers. Prompts already mark retrieved text as data and
+# no tool is reachable from here; this is defence in depth (section 77).
+_INSTRUCTION_LIKE = re.compile(
+    r"\b(ignore|disregard|forget|override)\b.{0,40}\b(instructions?|rules|prompts?)\b"
+    r"|\bsystem prompt\b"
+    r"|\b(call|invoke|run|execute|use)\b.{0,30}\b(tool|function|shell|command)\b"
+    r"|\brm\s+-rf\b|\bdrop\s+table\b", re.I | re.S)
+
+
+def instruction_like(text: str) -> bool:
+    return bool(_INSTRUCTION_LIKE.search(text or ""))
 
 
 def split_sentences(text: str) -> list[str]:
@@ -116,9 +129,19 @@ def check_answer(text: str, chunks: list[RetrievedChunk], facts_text: str) -> di
     evidence_nums = {_norm_num(n) for n in _NUM_RE.findall(evidence)}
     answer_nums = [_norm_num(n) for n in _NUM_RE.findall(_CITE_RE.sub("", text))]
     unsupported = sorted({n for n in answer_nums if n not in evidence_nums})
+    known_urls = {c.source_url.rstrip("/.,") for c in chunks if c.source_url}
+    known_urls |= {u.rstrip("/.,") for u in _URL_RE.findall(evidence)}
+    fabricated_urls = sorted({u.rstrip("/.,") for u in _URL_RE.findall(text)} - known_urls)
     return {"citations": valid_cited, "fabricated_citations": fabricated,
             "citation_coverage": round(coverage, 3), "unsupported_numbers": unsupported,
+            "fabricated_urls": fabricated_urls, "instruction_like": instruction_like(text),
             "sentences": len(sentences)}
+
+
+def passes(check: dict) -> bool:
+    return (not check["fabricated_citations"] and not check["unsupported_numbers"]
+            and not check["fabricated_urls"] and not check["instruction_like"]
+            and check["citation_coverage"] >= 0.99 and bool(check["citations"]))
 
 
 def extractive(question: str, chunks: list[RetrievedChunk], max_sentences: int = 2) -> tuple[str, list[int]]:
@@ -153,7 +176,14 @@ async def answer_question(db, question: str, *, llm=None, gateway=None,
         if facts_text:
             return GroundedAnswer(facts_text, [], True, "facts", notes=notes)
         return GroundedAnswer(UNKNOWN, [], False, "none", notes=notes)
-    chunks = result.chunks
+    chunks = [c for c in result.chunks if not instruction_like(c.text)]
+    if len(chunks) < len(result.chunks):
+        notes.append(f"{len(result.chunks) - len(chunks)} passage(s) withheld: "
+                     "instruction-like text")
+    if not chunks:
+        if facts_text:
+            return GroundedAnswer(facts_text, [], True, "facts", notes=notes)
+        return GroundedAnswer(UNKNOWN, [], False, "none", notes=notes)
     if llm is not None and llm.available:
         sources = "\n\n".join(
             f"[{i}] {c.title}:\n<data>{untrusted(c.text, 1400)}</data>"
@@ -168,11 +198,8 @@ async def answer_question(db, question: str, *, llm=None, gateway=None,
             text, dropped = attach_citations(text, chunks)
             if dropped:
                 notes.append(f"{dropped} unsupported sentence(s) removed")
-            check = check_answer(text, chunks, facts_text) if text else {
-                "citations": [], "fabricated_citations": [], "citation_coverage": 0.0,
-                "unsupported_numbers": [], "sentences": 0}
-            if not check["fabricated_citations"] and not check["unsupported_numbers"] \
-                    and check["citation_coverage"] >= 0.99 and check["citations"]:
+            check = check_answer(text, chunks, facts_text)
+            if passes(check):
                 return GroundedAnswer(text, [chunks[n - 1].to_source(n) for n in check["citations"]],
                                       True, "llm", validation=check, notes=notes)
             notes.append(f"generated answer rejected by validation: {check}")

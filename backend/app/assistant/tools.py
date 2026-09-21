@@ -156,11 +156,11 @@ class ToolRegistry:
         except LimitExceeded:
             raise
         except Exception as exc:  # noqa: BLE001 - never leak internals to the model or user
+            from app.db.session import is_unavailable
             await _rollback(ctx.db)
-            ctx.trace.after_tool(name, h, "error", "TOOL_FAILED",
-                                 int((time.perf_counter() - t0) * 1000))
-            return ToolResult(name, False, None, "TOOL_FAILED",
-                              f"{name} failed ({type(exc).__name__})")
+            code = "DATABASE_UNAVAILABLE" if is_unavailable(exc) else "TOOL_FAILED"
+            ctx.trace.after_tool(name, h, "error", code, int((time.perf_counter() - t0) * 1000))
+            return ToolResult(name, False, None, code, f"{name} failed ({type(exc).__name__})")
 
     def _blocked(self, ctx: ToolContext, name: str, code: str, message: str) -> ToolResult:
         ctx.trace.after_tool(name, "-", "blocked", code, 0)

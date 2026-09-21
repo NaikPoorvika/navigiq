@@ -208,6 +208,13 @@ def test_areas_are_names_never_coordinates():
     assert extract_areas("nature places near lakes") == []
 
 
+@pytest.mark.parametrize("text", ["cafes in blr", "dinner in namma bengaluru",
+                                  "cafes near Bengaluru city", "parks in bangalore urban"])
+def test_the_city_itself_is_not_an_area(text):
+    # regression: these produced "couldn't find 'blr' on the map" warnings
+    assert extract_areas(text) == []
+
+
 def test_llm_cannot_introduce_ungrounded_numbers_or_dates():
     fields = {"interests": ["cafe"], "avoid_interests": []}
     llm = {"date_phrase": "25 December", "start_time": "09:00", "end_time": "21:00",

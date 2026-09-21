@@ -13,6 +13,7 @@ fact, ranking, schedule and check comes from deterministic services.
 """
 from __future__ import annotations
 
+import copy
 import hashlib
 import re
 from datetime import datetime
@@ -29,8 +30,9 @@ from app.assistant.response import (
 )
 from app.assistant.state import ConversationState, LastPOI, PendingClarification
 from app.assistant.tools import REGISTRY, Role, ToolContext, ToolRegistry, ToolResult
-from app.assistant.trace import MAX_CLARIFICATIONS, LimitExceeded, Trace
+from app.assistant.trace import MAX_CLARIFICATIONS, LimitExceeded, Trace, canonical_hash
 from app.domain.taxonomy import category_catalog, is_valid_category, is_valid_mood
+from app.knowledge.answer import instruction_like
 from app.llm.errors import LLMError
 from app.llm.prompts import EXPLAIN, INTENT, MODIFY, TOOL_SELECT, VOCABULARY, untrusted
 from app.nlu.lexicon import parse_interests
@@ -101,6 +103,7 @@ class Agent:
         self.trace = Trace()
         self.current: str | None = None
         self.llm_used = False
+        self._memo: dict[str, ToolResult] = {}
         seed = int(hashlib.sha256(f"{owner.user_id or owner.session_id}:{self.now.date()}:"
                                   f"{state.turn_count}".encode()).hexdigest()[:8], 16)
         self.ctx = ToolContext(db=db, owner=owner, role=role, trace=self.trace, llm=llm,
@@ -119,10 +122,22 @@ class Agent:
     async def tool(self, tool_name: str, /, **args: Any) -> Any:
         # Positional-only: tools such as resolve_poi_name take an argument
         # that is itself called `name`.
-        res = await self.registry.call(tool_name, args, self.ctx)
+        #
+        # Read-only tools are memoised for the turn: a workflow that asks the
+        # same question twice (classification and then the handler both
+        # resolving a bare place name) reuses the answer. Without this the
+        # identical-call limit, meant to stop loops, failed ordinary requests
+        # such as "evening" (found by the agent fuzz suite).
+        spec = self.registry.get(tool_name)
+        key = canonical_hash(tool_name, args) if spec is not None and spec.llm_selectable else None
+        res = self._memo.get(key) if key else None
+        if res is None:
+            res = await self.registry.call(tool_name, args, self.ctx)
+            if key:
+                self._memo[key] = res
         if not res.ok:
             raise ToolFailure(res)
-        return res.data
+        return copy.deepcopy(res.data) if key else res.data
 
     def record_llm(self, rec) -> None:
         self.trace.record_llm(rec)
@@ -391,7 +406,9 @@ class Agent:
             return fallback
         allowed = {str(len(items))} | set(re.findall(r"\d+", request)) | set(
             re.findall(r"\d+", fallback))
-        if not text or unsupported_numbers(text, allowed) or len(text) > 600:
+        if not text or unsupported_numbers(text, allowed) or len(text) > 600 or \
+                re.search(r"https?://|www\.", text, re.I) or instruction_like(text) or \
+                "data>" in text:
             return fallback
         names = {i["name"].lower() for i in items}
         quoted = re.findall(r"\*\*(.+?)\*\*", text)
@@ -715,8 +732,15 @@ class Agent:
             for call in calls[:2]:
                 if not isinstance(call, dict):
                     continue
-                r = await self.registry.call(str(call.get("tool", ""))[:60], call.get("args"),
-                                             self.ctx, from_llm=True)
+                try:
+                    r = await self.registry.call(str(call.get("tool", ""))[:60], call.get("args"),
+                                                 self.ctx, from_llm=True)
+                except LimitExceeded as exc:
+                    # The limit blocked the model's call; the user's question is
+                    # still answered from what was already gathered.
+                    logger.info("model_tool_call_blocked", limit=exc.limit,
+                                trace_id=str(self.trace.trace_id))
+                    return facts
                 if r.ok:
                     facts[r.tool] = _compact(r.data)
         return facts
@@ -1063,9 +1087,10 @@ class Agent:
 # --- helpers ---------------------------------------------------------------------------------------------
 
 def _is_db_error(exc: Exception) -> bool:
-    name = type(exc).__name__
-    return any(k in name for k in ("OperationalError", "InterfaceError", "ConnectionRefused",
-                                   "CannotConnectNow", "ConnectionDoesNotExist"))
+    from app.db.session import is_unavailable
+    if isinstance(exc, ToolFailure):
+        return exc.result.error_code == "DATABASE_UNAVAILABLE"
+    return is_unavailable(exc)
 
 
 def _compact(data: Any, limit: int = 1200) -> Any:

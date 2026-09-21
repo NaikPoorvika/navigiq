@@ -130,9 +130,8 @@ async def validation_error(request: Request, exc: RequestValidationError):
 @app.exception_handler(Exception)
 async def unhandled(request: Request, exc: Exception):
     logger.exception("unhandled_error", path=request.url.path, error=type(exc).__name__)
-    name = type(exc).__name__
-    if any(k in name for k in ("OperationalError", "InterfaceError", "ConnectionRefused",
-                               "CannotConnectNow", "TimeoutError")):
+    from app.db.session import is_unavailable
+    if is_unavailable(exc):
         return _error(503, "DATABASE_UNAVAILABLE", "NavigIQ's data is temporarily unavailable.")
     return _error(500, "INTERNAL", "Something went wrong on our side.")
 

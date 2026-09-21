@@ -42,6 +42,7 @@ AREA_STOP = {"the", "a", "an", "morning", "evening", "afternoon", "night", "toni
              "front", "person", "advance", "case", "which", "that", "this", "it", "there",
              "about", "least", "most", "rain", "peace", "search", "place", "places",
              "around", "outskirts", "nature", "view", "stock", "hand", "detail", "search of"}
+CITY_NAMES = {"bengaluru", "bangalore", "blr", "bengalooru", "bengaluru urban", "ooru"}
 AREA_TRIM = re.compile(r"\s+(for|with|and|but|or|to|under|below|within|by|at|on|from|in|"
                        r"tomorrow|today|tonight|please|this|next|between|budget|rs|around|"
                        r"after|before|till|until|me|us|we|i|if|because|that|which)\b.*$")
@@ -75,6 +76,8 @@ def extract_areas(text: str) -> list[str]:
         name = re.sub(r"^(the|a|an)\s+", "", name)
         if not name or name in AREA_STOP or len(name) < 3:
             continue
+        if re.sub(r"^namma\s+|\s+(city|urban)$", "", name) in CITY_NAMES:
+            continue                      # "in namma bengaluru", "blr": the whole city, not an area
         if parse_interests(name).interests and len(name.split()) <= 2 and not re.search(
                 r"(nagar|layout|palya|halli|pura|pet|road|circle|park|block|stage|city)$", name):
             continue                      # "in nature", "near lakes" are interests, not areas

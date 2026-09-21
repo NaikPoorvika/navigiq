@@ -17,12 +17,15 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 from app.config import settings
 from app.db.base import Base
 
-config.set_main_option("sqlalchemy.url", settings.DATABASE_URL)
+# Tests (and one-off maintenance) may target another database by passing
+# Config.attributes["database_url"]; everything else uses the app settings.
+config.set_main_option("sqlalchemy.url",
+                       config.attributes.get("database_url") or settings.DATABASE_URL)
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
 if config.config_file_name is not None:
-    fileConfig(config.config_file_name)
+    fileConfig(config.config_file_name, disable_existing_loggers=False)
 
 # add your model's MetaData object here
 # for 'autogenerate' support
