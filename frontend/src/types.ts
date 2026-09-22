@@ -70,6 +70,8 @@ export interface Stop extends PhotoFields {
   lon: number;
   /** False when the stop's opening hours are a category guess, not real data. */
   hours_verified?: boolean;
+  /** The road shape from the previous stop, as an encoded polyline. */
+  geometry?: string | null;
 }
 
 export interface Itinerary {

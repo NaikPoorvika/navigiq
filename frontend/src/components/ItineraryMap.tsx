@@ -1,6 +1,7 @@
 import { useEffect, useMemo } from "react";
 import L from "leaflet";
 import { MapContainer, Marker, Polyline, Popup, TileLayer, useMap } from "react-leaflet";
+import { decodePolyline } from "../lib/polyline";
 import { hhmm, type Itinerary } from "../types";
 
 type LatLng = [number, number];
@@ -43,6 +44,7 @@ export default function ItineraryMap({ itinerary }: { itinerary: Itinerary }) {
     [itinerary],
   );
   const start = points[0] ?? [12.9716, 77.5946];
+  const hasRoads = itinerary.stops.some((s) => Boolean(s.geometry));
 
   return (
     <div className="map-frame">
@@ -57,10 +59,15 @@ export default function ItineraryMap({ itinerary }: { itinerary: Itinerary }) {
           const from = points[i];
           if (!from) return null;
           const walking = s.mode_from_prev === "walking";
+          // The real road shape when the backend sent one; otherwise a
+          // straight line, which the caption below explains.
+          const shape: LatLng[] = s.geometry
+            ? decodePolyline(s.geometry)
+            : [from, [s.lat, s.lon]];
           return (
             <Polyline
               key={`leg-${s.seq}`}
-              positions={[from, [s.lat, s.lon]]}
+              positions={shape}
               pathOptions={{
                 color: LEG_COLOR[s.mode_from_prev ?? "auto"] ?? "#39412f",
                 weight: 4,
@@ -88,7 +95,9 @@ export default function ItineraryMap({ itinerary }: { itinerary: Itinerary }) {
         <FitBounds points={points} />
       </MapContainer>
       <p className="map-note">
-        Lines connect stops in order — they show the sequence, not the exact road route.
+        {hasRoads
+          ? "Routes follow real roads, from OpenStreetMap data."
+          : "Lines connect stops in order — they show the sequence, not the exact road route."}
       </p>
     </div>
   );
