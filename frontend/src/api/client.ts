@@ -106,6 +106,7 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
     }
     throw new PlanError(toApiError(res, body));
   }
+  if (res.status === 204) return undefined as T;   // No Content
   return res.json() as Promise<T>;
 }
 
@@ -163,4 +164,9 @@ export function getMe(): Promise<UserMe> {
 
 export function updateMe(patch: ProfilePatch): Promise<UserMe> {
   return request("/auth/users/me", { method: "PATCH", body: JSON.stringify(patch) });
+}
+
+/** Permanently delete the signed-in account. The password is asked again. */
+export function deleteMe(password: string): Promise<void> {
+  return request("/auth/users/me", { method: "DELETE", body: JSON.stringify({ password }) });
 }

@@ -66,6 +66,14 @@ class ProfileUpdate(BaseModel):
     vegetarian: bool | None = None
 
 
+class DeleteAccountRequest(BaseModel):
+    """Deleting an account is permanent, so the password is asked for again -
+    a signed-in device left unattended must not be enough."""
+    model_config = ConfigDict(extra="forbid")
+
+    password: str = Field(min_length=1, max_length=72)
+
+
 # Properties to return via API
 class UserResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)

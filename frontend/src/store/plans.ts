@@ -55,6 +55,11 @@ export function getPlan(id: string): SavedPlan | undefined {
   return plans.find((p) => p.id === id);
 }
 
+/** Forget every plan saved in this browser. */
+export function clearPlans(): void {
+  set([]);
+}
+
 export function deletePlan(id: string): void {
   set(plans.filter((p) => p.id !== id));
 }

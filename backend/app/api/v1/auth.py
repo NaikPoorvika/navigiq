@@ -1,17 +1,19 @@
 from typing import Any
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Response, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api import deps
 from app.core.region import in_region
-from app.core.security import create_access_token
+from app.core.security import create_access_token, verify_password
 from app.crud import crud_user
 from app.models.user import User
 from app.schemas.token import Token
-from app.schemas.user import ProfileUpdate, UserCreate, UserRegister, UserResponse
+from app.schemas.user import (
+    DeleteAccountRequest, ProfileUpdate, UserCreate, UserRegister, UserResponse,
+)
 
 router = APIRouter()
 
@@ -113,3 +115,50 @@ async def update_my_profile(
     await db.commit()
     await db.refresh(current_user)
     return current_user
+
+
+# Every foreign key that points at user.id, read from the database itself so a
+# table added later is handled without editing this list.
+_REFERENCES_TO_USER = text("""
+    SELECT c.conrelid::regclass::text AS tbl,
+           a.attname                  AS col,
+           c.confdeltype              AS on_delete,
+           NOT a.attnotnull           AS nullable
+    FROM pg_constraint c
+    JOIN pg_attribute a ON a.attrelid = c.conrelid AND a.attnum = ANY (c.conkey)
+    WHERE c.contype = 'f' AND c.confrelid = '"user"'::regclass
+""")
+
+
+@router.delete("/users/me", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_my_account(
+    body: DeleteAccountRequest,
+    db: AsyncSession = Depends(deps.get_db),
+    current_user: User = Depends(deps.get_current_active_user),
+) -> Response:
+    """Permanently delete the signed-in account and its profile.
+
+    Rows in other tables that point at the user are handled first:
+      - a foreign key the database already cascades or nulls is left to it
+      - a nullable one is set to NULL, detaching the row from the person
+      - a required one has its rows deleted
+    Today no plans are linked to accounts (planning works signed out). When
+    server-side saved plans arrive, their foreign key should CASCADE so a
+    user's plans are deleted with them.
+    """
+    if not verify_password(body.password, current_user.hashed_password):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Incorrect password")
+
+    user_id = current_user.id
+    for tbl, col, on_delete, nullable in (await db.execute(_REFERENCES_TO_USER)).all():
+        if on_delete in ("c", "n", "d"):          # cascade / set null / set default
+            continue
+        column = '"' + col.replace('"', '""') + '"'
+        if nullable:
+            await db.execute(text(f"UPDATE {tbl} SET {column} = NULL WHERE {column} = :id"), {"id": user_id})
+        else:
+            await db.execute(text(f"DELETE FROM {tbl} WHERE {column} = :id"), {"id": user_id})
+
+    await db.execute(text('DELETE FROM "user" WHERE id = :id'), {"id": user_id})
+    await db.commit()
+    return Response(status_code=status.HTTP_204_NO_CONTENT)

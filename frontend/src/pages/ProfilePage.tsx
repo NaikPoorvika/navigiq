@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
-import { Check, Loader2, LogOut } from "lucide-react";
+import { AlertTriangle, Check, Loader2, LogOut, Trash2 } from "lucide-react";
 import { getCategories, PlanError } from "../api/client";
 import PlaceSearch from "../components/PlaceSearch";
 import PreferenceCards from "../components/PreferenceCards";
 import { href, navigate } from "../lib/router";
-import { saveProfile, signOut, useAccount } from "../store/account";
+import { deleteAccount, saveProfile, signOut, useAccount } from "../store/account";
 import type { Category, Place } from "../types";
 
 export default function ProfilePage() {
@@ -16,6 +16,10 @@ export default function ProfilePage() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [status, setStatus] = useState<"idle" | "saving" | "saved">("idle");
   const [error, setError] = useState("");
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
+  const [deletePassword, setDeletePassword] = useState("");
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState("");
 
   useEffect(() => {
     getCategories().then((r) => setCategories(r.categories)).catch(() => setCategories([]));
@@ -51,6 +55,26 @@ export default function ProfilePage() {
     } catch (err) {
       setStatus("idle");
       setError(err instanceof PlanError ? err.message : "Couldn't save. Please try again.");
+    }
+  }
+
+  async function remove() {
+    if (!deletePassword) {
+      setDeleteError("Enter your password to confirm.");
+      return;
+    }
+    setDeleting(true);
+    setDeleteError("");
+    try {
+      await deleteAccount(deletePassword);
+      navigate("/");
+    } catch (err) {
+      setDeleteError(
+        err instanceof PlanError && err.code === "AUTH"
+          ? "That password isn't right."
+          : "Couldn't delete the account. Please try again.",
+      );
+      setDeleting(false);
     }
   }
 
@@ -91,6 +115,39 @@ export default function ProfilePage() {
           <LogOut size={15} /> Sign out
         </button>
       </div>
+
+      <section className="card danger-zone">
+        <h2 className="card-title">Delete account</h2>
+        <p className="muted">
+          Permanently removes your account and profile — name, home, interests and food
+          preference — from NavigIQ, and the plans saved in this browser. This can't be undone.
+        </p>
+        {!confirmingDelete ? (
+          <button type="button" className="btn-outline danger" onClick={() => setConfirmingDelete(true)}>
+            <Trash2 size={15} /> Delete my account
+          </button>
+        ) : (
+          <div className="confirm-delete step-enter">
+            <p className="warn"><AlertTriangle size={14} aria-hidden="true" /> Enter your password to confirm.</p>
+            <div className="field">
+              <label htmlFor="del-pw">Password</label>
+              <input id="del-pw" type="password" value={deletePassword} autoComplete="current-password"
+                     onChange={(e) => setDeletePassword(e.target.value)} disabled={deleting} />
+            </div>
+            {deleteError && <p className="field-error" role="alert">{deleteError}</p>}
+            <div className="profile-actions">
+              <button type="button" className="btn-danger" onClick={() => void remove()} disabled={deleting}>
+                {deleting ? <><Loader2 className="spin" size={16} /> Deleting…</> : "Delete permanently"}
+              </button>
+              <button type="button" className="btn-outline"
+                      onClick={() => { setConfirmingDelete(false); setDeletePassword(""); setDeleteError(""); }}
+                      disabled={deleting}>
+                Cancel
+              </button>
+            </div>
+          </div>
+        )}
+      </section>
     </div>
   );
 }

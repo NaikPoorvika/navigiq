@@ -147,3 +147,42 @@ async def test_profile_cannot_grant_superuser(client):
     headers = await token_for(client, new_email())
     r = await client.patch("/api/v1/auth/users/me", headers=headers, json={"is_superuser": True})
     assert r.status_code == 422
+
+
+# ------------------------------------------------------------ delete account
+
+async def delete_me(client, headers, password="secret123"):
+    return await client.request("DELETE", "/api/v1/auth/users/me",
+                                headers=headers, json={"password": password})
+
+
+@pytest.mark.asyncio
+async def test_delete_needs_the_right_password(client):
+    email = new_email()
+    headers = await token_for(client, email)
+    assert (await delete_me(client, headers, "wrongpass1")).status_code == 400
+    assert (await log_in(client, email)).status_code == 200      # still there
+
+
+@pytest.mark.asyncio
+async def test_deleted_account_is_gone(client):
+    email = new_email()
+    headers = await token_for(client, email)
+    assert (await delete_me(client, headers)).status_code == 204
+    assert (await log_in(client, email)).status_code == 400      # can't sign in
+    me = await client.get("/api/v1/auth/users/me", headers=headers)
+    assert me.status_code in (401, 404)                          # old token is useless
+
+
+@pytest.mark.asyncio
+async def test_email_can_be_reused_after_deletion(client):
+    email = new_email()
+    headers = await token_for(client, email)
+    await delete_me(client, headers)
+    assert (await sign_up(client, email)).status_code == 200
+
+
+@pytest.mark.asyncio
+async def test_delete_requires_a_token(client):
+    r = await client.request("DELETE", "/api/v1/auth/users/me", json={"password": "secret123"})
+    assert r.status_code == 401

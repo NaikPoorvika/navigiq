@@ -9,7 +9,7 @@ from pydantic import ValidationError
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
-from app.schemas.user import ProfileUpdate, UserRegister, UserResponse  # noqa: E402
+from app.schemas.user import DeleteAccountRequest, ProfileUpdate, UserRegister, UserResponse  # noqa: E402
 
 
 def test_signup_rejects_is_superuser():
@@ -70,3 +70,13 @@ def test_response_fills_missing_profile_values():
 
     r = UserResponse.model_validate(Row())
     assert r.interests == [] and r.vegetarian is False
+
+
+def test_delete_needs_a_password():
+    with pytest.raises(ValidationError):
+        DeleteAccountRequest(password="")
+
+
+def test_delete_rejects_extra_fields():
+    with pytest.raises(ValidationError):
+        DeleteAccountRequest(password="secret123", user_id="someone-else")

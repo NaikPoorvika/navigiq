@@ -76,3 +76,33 @@ test("signing up twice with the same email is refused", async ({ page }) => {
   }
   await expect(page.getByText(/already exists/i)).toBeVisible();
 });
+
+test("deleting the account needs the password, and then it's gone", async ({ page }) => {
+  const address = email();
+  await page.goto("/#/welcome");
+  await page.locator("#email").fill(address);
+  await page.locator("#pw").fill(password);
+  await page.locator("#confirm").fill(password);
+  await page.getByRole("button", { name: /create account/i }).click();
+  await expect(page.getByRole("heading", { name: /about yourself/i })).toBeVisible();
+
+  await page.goto("/#/profile");
+  await page.getByRole("button", { name: /delete my account/i }).click();
+
+  // Wrong password: refused, account kept.
+  await page.locator("#del-pw").fill("wrongpass1");
+  await page.getByRole("button", { name: /delete permanently/i }).click();
+  await expect(page.getByRole("alert")).toContainText("isn't right");
+
+  // Right password: deleted and signed out.
+  await page.locator("#del-pw").fill(password);
+  await page.getByRole("button", { name: /delete permanently/i }).click();
+  await expect(page.getByRole("link", { name: /sign in/i })).toBeVisible();
+
+  // The account really is gone.
+  await page.goto("/#/signin");
+  await page.locator("#si-email").fill(address);
+  await page.locator("#si-pw").fill(password);
+  await page.getByRole("button", { name: /sign in/i }).click();
+  await expect(page.getByRole("alert")).toContainText("don't match");
+});

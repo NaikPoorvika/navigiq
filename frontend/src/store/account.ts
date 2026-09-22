@@ -1,7 +1,8 @@
 import { useSyncExternalStore } from "react";
 import {
-  getMe, getToken, login, register, setToken, setUnauthorizedHandler, updateMe,
+  deleteMe, getMe, getToken, login, register, setToken, setUnauthorizedHandler, updateMe,
 } from "../api/client";
+import { clearPlans } from "./plans";
 import type { Place, UserMe } from "../types";
 
 /**
@@ -100,4 +101,14 @@ export async function saveProfile(changes: {
 export function signOut(): void {
   setToken(null);
   set({ profile: null, signedIn: false, ready: true });
+}
+
+/**
+ * Delete the account on the server, then everything this browser holds for
+ * it: the token and the plans saved here.
+ */
+export async function deleteAccount(password: string): Promise<void> {
+  await deleteMe(password);
+  clearPlans();
+  signOut();
 }

@@ -679,3 +679,15 @@ main { min-height: calc(100vh - 140px); }
 .credit-table { width: 100%; border-collapse: collapse; font-size: 14px; }
 .credit-table th { text-align: left; font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted-foreground); padding: 8px 8px 8px 0; }
 .credit-table td { padding: 9px 8px 9px 0; border-top: 1px solid var(--border); vertical-align: top; }
+
+/* ---------- delete account ---------- */
+.danger-zone { margin-top: 28px; border-color: #e6c3bd; }
+.danger-zone .muted { font-size: 14px; line-height: 1.55; margin: 0 0 14px; }
+.confirm-delete .warn { display: flex; align-items: center; gap: 6px; }
+.btn-danger {
+  display: inline-flex; align-items: center; gap: 7px; height: 44px; padding: 0 20px;
+  border: 0; border-radius: 12px; background: var(--destructive); color: #fff;
+  font-weight: 600; cursor: pointer;
+}
+.btn-danger:disabled { opacity: 0.6; cursor: default; }
+.btn-danger:focus-visible { outline: 2px solid var(--destructive); outline-offset: 2px; }
