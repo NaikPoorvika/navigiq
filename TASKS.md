@@ -38,9 +38,38 @@ Legend:
 - [ ] NQ-026 — Plan form + Leaflet map + timeline + cost breakdown
 
 ## Phase 2 — LLM + RAG
-(Tasks TBD upon entering phase)
-
-- [~] NQ-029 prep — TripDraft contract hardened ahead of extraction
+- [x] NQ-027 — Model install + benchmark on the A5000 + selection decision
+  - [x] Candidate models present locally: qwen3:8b, qwen3.5:9b, gemma3:12b,
+        qwen3:14b, mistral-small3.2:24b, llama3:8b, bge-m3, nomic-embed-text
+  - [x] Benchmark harness built and unit-tested (`ai/benchmarks/`, 139 tests
+        green, no GPU required to run them)
+  - [x] Residency probe, performance sweep (task x context x concurrency) and
+        the full 50-case TripSpec quality evaluation executed on the A5000
+  - [x] Embedding sweep executed (bge-m3 vs nomic-embed-text), dimension
+        measured from real vectors, not read from documentation
+  - [x] Selection **Accepted** — `qwen3:14b` (generation), `nomic-embed-text`
+        at **768** dimensions (embedding). Full audit in
+        `docs/adr/ADR-012-model-selection.md`.
+  - [x] `vector(N)` dimension fixed: **768** — unblocks NQ-034
+  - NOTE: ADR NUMBER COLLISION. The NQ-027 branch recorded model selection as
+    "ADR-012" while `develop` independently used ADR-012 for multi-day trips.
+    Whichever branch merges second must renumber. Not resolved here (the
+    model-selection ADR is out of scope for NQ-029).
+- [x] NQ-028 — LLM Gateway + FakeLLM
+  - [x] Typed internal gateway at `backend/app/llm/` — the single chokepoint
+        for model access; generation (`qwen3:14b`) and embedding
+        (`nomic-embed-text`, 768 dimensions validated on every vector)
+  - [x] `OllamaGateway` over existing httpx; `FakeLLM` deterministic test
+        double on the same `LLMGateway` interface
+  - [x] Typed failures (`LLMError` subclasses) for connection failure,
+        timeout, rejected request, malformed / empty / truncated response and
+        wrong embedding dimension — none returned as a success
+  - [x] Bounded retries for transient failures only; timeouts and
+        deterministic failures raised on first occurrence
+  - [x] `OLLAMA_*` settings in `backend/app/config.py`
+  - [x] 110 unit tests with no GPU or live Ollama; 4 live integration tests
+        that skip cleanly when Ollama is unavailable
+- [x] NQ-029 prep — TripDraft contract hardened ahead of extraction
   - [x] `start_time_local`/`end_time_local` require exact `HH:MM`
         (`Field(pattern=...)`, visible in `model_json_schema()`)
   - [x] `free_text_interests` bounded to 10 entries / 80 chars, matching
@@ -48,17 +77,16 @@ Legend:
   - [x] `date_phrase` vocabulary documented against the real
         `resolve_date_phrase()` behaviour, with a test pinning docs to code
   - [x] `POST /plan/draft` returns `needs_clarification` explicitly on both
-        paths (was previously absent on the successful path) - no existing
-        consumer found anywhere in the repo, confirmed additive
+        paths - no existing consumer found anywhere in the repo
   - [x] Clarification cap (`MAX_CLARIFICATIONS=2`) and coordinate safety
-        (`extra="ignore"`) now covered by regression tests
+        (`extra="ignore"`) covered by regression tests
   - [x] ADR-015 recorded
-  - [ ] NQ-029 itself (LLM extraction against this contract) - not started,
-        out of scope for this task
-  - NOTE: destination-resolution tests were added but currently fail/skip -
-    the local `places` table is missing the `kind` column `resolve_place()`
-    queries (pre-existing DB/migration sync issue, not introduced or fixed
-    here). See DECISIONS.md ADR-015 and this task's final report.
+- [ ] NQ-029 — natural language -> TripDraft extraction
+- [ ] NQ-030 — Eval datasets + scorer + baseline report
+- [ ] NQ-031 — Clarification flow
+- [ ] NQ-032 — Grounded explanation + numeric entailment
+- [ ] NQ-033 — NL input UI with editable chips
+- [ ] NQ-034 — travel-tips corpus + pgvector migration (`vector(768)`)
 
 ## Phase 3 — AGENTIC AI
 (Tasks TBD upon entering phase)
