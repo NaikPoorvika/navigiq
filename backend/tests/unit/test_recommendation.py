@@ -10,7 +10,7 @@ from app.services.poi.repository import HoursInterval, POIRecord
 from app.services.recommendation.scoring import (
     NEUTRAL, Anchor, NoveltyContext, Preferences, RecommendationRequest, budget_fit, config,
     geographic_relevance, hard_filter, interest_match, jaccard, mood_match, party_suitability,
-    reason_codes, score_poi, select_diverse, similarity_to, weather_fit,
+    score_poi, select_diverse, similarity_to, weather_fit,
 )
 
 

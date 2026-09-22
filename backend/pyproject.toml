@@ -30,3 +30,15 @@ test = [
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
+
+[tool.ruff]
+line-length = 110
+target-version = "py311"
+extend-exclude = [".venv", "alembic/versions"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W"]
+ignore = ["E501"]   # long SQL/regex lines are clearer unbroken
+
+[tool.coverage.run]
+source = ["app"]

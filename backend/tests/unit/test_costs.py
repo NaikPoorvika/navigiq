@@ -101,7 +101,7 @@ def test_trip_total_reconciles_with_line_items():
         {"mode": "walking", "distance_m": 800, "duration_s": 600},
     ]
     bd = estimate_trip_cost(stops, legs, party_size=1)
-    assert bd.total_inr == sum(l.amount_inr for l in bd.lines)
+    assert bd.total_inr == sum(ln.amount_inr for ln in bd.lines)
     assert bd.unknown_count == 1, "museum cost was unknown"
     d = bd.to_dict()
     assert d["basis"] == "estimate"

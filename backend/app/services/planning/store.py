@@ -255,6 +255,8 @@ async def list_plans(db: AsyncSession, owner: Owner, limit: int = 50) -> list[di
         "itinerary_id": r.id, "title": r.title, "status": r.status,
         "created_at": r.created_at.isoformat() if r.created_at else None,
         "version_no": r.version_no, "date": (r.itinerary or {}).get("date"),
+        "end_date": (r.itinerary or {}).get("end_date"),
+        "day_count": (r.itinerary or {}).get("day_count", 1),
         "stop_count": len((r.itinerary or {}).get("stops", [])),
         "stops_preview": [s["poi"]["name"] for s in (r.itinerary or {}).get("stops", [])][:4],
         "estimated_cost": ((r.itinerary or {}).get("summary") or {}).get("estimated_cost"),

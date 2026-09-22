@@ -178,6 +178,98 @@ def resolve_date(utterance: str, today: date) -> DateResolution | None:
     return None
 
 
+@dataclass(frozen=True)
+class DateRange:
+    """A multi-day span. `start` is None when only a length was given ("3 days")."""
+    start: date | None
+    end: date | None
+    days: int
+    phrase: str
+    rule: str
+
+
+# English counts take "day(s)"; Hindi / Kannada counts only their own word for
+# day, so "things to do day after tomorrow" is never a two-day trip.
+_N_DAYS = (r"(\d{1,2}|one|two|three|four|five|six|seven)[- ]?days?|"
+           r"(do|teen|char|chaar|paanch) din|(eradu|mooru|naalku|aidu) dina")
+_DAY_COUNT = {"do": 2, "teen": 3, "char": 4, "chaar": 4, "paanch": 5,
+              "eradu": 2, "mooru": 3, "naalku": 4, "aidu": 5}
+_RANGE_SEP = r"\s*(?:-|–|—|to|till|until|through|thru|and)\s*"
+
+
+def _joins_non_adjacent(m: re.Match) -> bool:
+    """"saturday and sunday" is a span; "monday and friday" is two separate days."""
+    return " and " in m[0] and (WEEKDAYS[m[2]] - WEEKDAYS[m[1]]) % 7 != 1
+
+
+def resolve_date_range(utterance: str, today: date) -> DateRange | None:
+    """Multi-day phrases. Conventions (docs/nlu_conventions.md):
+      "3 days" / "3-day trip" / "for three days"   -> 3 days from the start date given
+                                                      elsewhere (or unresolved start)
+      "friday to sunday" / "fri-sun"               -> next Friday .. the Sunday after
+      "10 to 12 october" / "oct 10 - oct 12"       -> those dates (rolled forward)
+      "whole weekend" / "both days this weekend"   -> Saturday .. Sunday of this weekend
+      "next weekend" alone stays one day (Saturday), as does "weekend".
+    "in 3 days" is a single date, never a span.
+    """
+    t = normalize_utterance(utterance)
+    month_names = "|".join(sorted(MONTHS, key=len, reverse=True))
+    wd_names = "|".join(sorted(WEEKDAYS, key=len, reverse=True))
+    ordinal = r"(?:st|nd|rd|th)?"
+
+    m = (re.search(_wb(rf"(\d{{1,2}}){ordinal}{_RANGE_SEP}(\d{{1,2}}){ordinal} (?:of )?"
+                       rf"({month_names})"), t))
+    if m:
+        mo = MONTHS[m[3]]
+        start, end = _roll_forward(today, mo, int(m[1])), _roll_forward(today, mo, int(m[2]))
+        if start and end and end >= start:
+            return DateRange(start, end, (end - start).days + 1, m[0], "day_range_month")
+    m = (re.search(_wb(rf"({month_names}) (\d{{1,2}}){ordinal}{_RANGE_SEP}"
+                       rf"(?:({month_names}) )?(\d{{1,2}}){ordinal}"), t)
+         or None)
+    if m:
+        mo1 = MONTHS[m[1]]
+        mo2 = MONTHS[m[3]] if m[3] else mo1
+        start = _roll_forward(today, mo1, int(m[2]))
+        end = _roll_forward(start or today, mo2, int(m[4])) if start else None
+        if start and end and end >= start:
+            return DateRange(start, end, (end - start).days + 1, m[0], "month_day_range")
+    m = re.search(_wb(rf"(\d{{1,2}}){ordinal} (?:of )?({month_names}){_RANGE_SEP}"
+                      rf"(\d{{1,2}}){ordinal} (?:of )?({month_names})"), t)
+    if m:
+        start = _roll_forward(today, MONTHS[m[2]], int(m[1]))
+        end = _roll_forward(start or today, MONTHS[m[4]], int(m[3])) if start else None
+        if start and end and end >= start:
+            return DateRange(start, end, (end - start).days + 1, m[0], "day_month_range")
+    m = re.search(_wb(rf"(?:from |this |coming )?({wd_names}){_RANGE_SEP}"
+                      rf"(?:this |the )?({wd_names})"), t)
+    if m and not _joins_non_adjacent(m):
+        start = this_weekday(today, WEEKDAYS[m[1]])
+        end = start + timedelta(days=(WEEKDAYS[m[2]] - WEEKDAYS[m[1]]) % 7)
+        if end > start:
+            return DateRange(start, end, (end - start).days + 1, m[0], "weekday_range")
+    m = re.search(_wb(r"(?:(?:the )?(?:whole|entire|full) weekend|all weekend|"
+                      r"both days (?:of )?(?:this |the )?weekend|(?:this |the )?weekend,? both days|"
+                      r"saturday and sunday|sat and sun|sat-sun|sat sun)"), t)
+    if m:
+        start = today if today.weekday() == 5 else this_weekday(today, 5)
+        if today.weekday() == 6:
+            return None
+        return DateRange(start, start + timedelta(days=1), 2, m[0], "whole_weekend")
+    m = re.search(_wb(rf"(?<!in )(?<!in a )(?:for |a |an |over )?(?:the )?(?:next )?"
+                      rf"(?:{_N_DAYS})(?: (?:trip|itinerary|plan|getaway|"
+                      rf"break|holiday|vacation|visit|stay|tour))?(?! (?:from now|later|ago|"
+                      rf"back|before|a week))"), t)
+    if m:
+        raw = m[1] or m[2] or m[3]
+        n = int(raw) if raw.isdigit() else (_DAY_COUNT.get(raw) or WORD_NUMBERS.get(raw))
+        if isinstance(n, int) and n >= 2:
+            start = today if "next" in m[0] else None
+            return DateRange(start, start + timedelta(days=n - 1) if start else None, n, m[0],
+                             "n_days")
+    return None
+
+
 def _roll_forward(today: date, month: int, day: int) -> date | None:
     try:
         candidate = date(today.year, month, day)
@@ -230,7 +322,7 @@ def resolve_time_window(utterance: str) -> TimeWindow | None:
                           rf"\s*{_H}\s*(?:-|to|till|until|and|upto|up to|tak|se|inda|rinda|ninda)\s*"
                           rf"(?:around|about)?\s*{_H}(?![\d/\-])")
     for m in range_re.finditer(t):
-        if re.match(r"\s*(rs|inr|rupees|km|kms|people|persons|friends|stops|hours|hrs)",
+        if re.match(r"\s*(rs|inr|rupees|km|kms|people|persons|friends|stops|hours|hrs)\b",
                     t[m.end():m.end() + 10]):
             continue
         if _looks_like_money(t, m.start()):

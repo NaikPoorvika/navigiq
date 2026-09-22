@@ -13,7 +13,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import api_error, current_user, get_db, optional_user, owner
 from app.assistant.tools import RecommendArgs
-from app.domain.taxonomy import Category, Mood, PartyType, category_catalog
+from app.domain.taxonomy import Category, Mood, category_catalog
 from app.models.user import User
 from app.services import interactions
 from app.services.collections import definitions, list_collections

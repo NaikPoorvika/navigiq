@@ -26,6 +26,7 @@ class ParsedMods:
     add_poi_name: str | None = None
     area_name: str | None = None
     matched: bool = False
+    day: int | None = None
 
 
 def _target(message: str, state: ConversationState, pm: ParsedMods) -> int | None:
@@ -67,6 +68,41 @@ def _targets(message: str, state: ConversationState, pm: ParsedMods) -> list[int
     return [seq] if seq else []
 
 
+_ORDINAL_DAYS = {"first": 1, "second": 2, "third": 3, "fourth": 4, "fifth": 5, "sixth": 6,
+                 "seventh": 7, "1st": 1, "2nd": 2, "3rd": 3, "4th": 4, "5th": 5, "6th": 6,
+                 "7th": 7, "one": 1, "two": 2, "three": 3, "four": 4, "five": 5, "six": 6,
+                 "seven": 7}
+DAY_RE = re.compile(r"\b(?:on |for |of |in )?(?:the )?(?:day (\d|one|two|three|four|five|six|seven)"
+                    r"|(first|second|third|fourth|fifth|sixth|seventh|1st|2nd|3rd|4th|5th|6th|7th"
+                    r"|last|final) day)(?:'s)?\b")
+
+
+def day_scope(message: str, state: ConversationState) -> tuple[int | None, str]:
+    """The trip day a change is about ("day 2", "the last day"), and the message
+    without that phrase. Only for multi-day plans."""
+    days = state.active_stop_days
+    if not days or max(days) < 2:
+        return None, message
+    t = normalize_utterance(message)
+    m = DAY_RE.search(t)
+    if not m:
+        return None, message
+    word = m.group(1) or m.group(2)
+    n = max(days) if word in ("last", "final") else (
+        int(word) if word.isdigit() else _ORDINAL_DAYS.get(word))
+    if not n:
+        return None, message
+    return n, (t[:m.start()] + " " + t[m.end():]).strip()
+
+
+def _day_state(state: ConversationState, day: int) -> tuple[ConversationState, list[int]]:
+    """The state narrowed to one day's stops, and each one's trip-wide seq."""
+    idx = [i for i, d in enumerate(state.active_stop_days) if d == day]
+    sub = state.model_copy(update={"active_stops": [state.active_stops[i] for i in idx],
+                                   "active_stop_days": [day] * len(idx)})
+    return sub, [i + 1 for i in idx]
+
+
 def _new_category(t: str) -> str | None:
     """The category a replacement asks for: "with a gallery", "for a lake", "to a temple"."""
     m = re.search(r"\b(?:with|for|to|into) (?:a |an |some )?(.+)$", t)
@@ -89,11 +125,37 @@ def _poi_name(phrase: str) -> str | None:
 
 
 def parse_modifications(message: str, state: ConversationState, *,
-                        current_cost: int | None = None) -> ParsedMods:
+                        current_cost: int | None = None,
+                        day_costs: dict[int, int] | None = None) -> ParsedMods:
+    """Rule-parse a change. For a multi-day trip, a named day ("make day 2
+    cheaper") scopes the change: stop references are looked up among that
+    day's stops (returned as trip-wide numbers) and every other operation
+    carries `day`."""
+    day, message = day_scope(message, state)
+    if day is not None:
+        day_state, global_seq = _day_state(state, day)
+        pm = _parse(message, day_state, (day_costs or {}).get(day, current_cost))
+        for o in pm.operations:
+            if o.get("target_seq"):
+                o["target_seq"] = global_seq[o["target_seq"] - 1]
+            else:
+                o["day"] = day
+        pm.day = day
+        return pm
+    days = state.active_stop_days
+    if days and max(days) > 1:
+        # A change to the whole trip: stop counts are per day.
+        per_day = max(days.count(d) for d in set(days))
+        return _parse(message, state, current_cost, n_stops=per_day)
+    return _parse(message, state, current_cost)
+
+
+def _parse(message: str, state: ConversationState, current_cost: int | None,
+           n_stops: int | None = None) -> ParsedMods:
     t = normalize_utterance(message)
     pm = ParsedMods()
     ops = pm.operations
-    n_stops = len(state.active_stops)
+    n_stops = len(state.active_stops) if n_stops is None else n_stops
 
     replace = REPLACE_RE.search(t) and not re.search(r"\b(start|end|time|budget|pace|area)\b", t)
     if REMOVE_RE.search(t) and not replace:

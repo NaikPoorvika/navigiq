@@ -122,7 +122,7 @@ TRIPSPEC = Prompt(
 )
 
 MODIFY = Prompt(
-    task="modification_extract", version="2.0",
+    task="modification_extract", version="2.1",
     system=(
         "Translate a request to change a day plan into operations from a CLOSED list. Use "
         "stop numbers from the current plan for target_seq. Operations: remove_stop(target_seq), "
@@ -131,7 +131,9 @@ MODIFY = Prompt(
         "set_stop_count(count), set_pace(pace), set_area(area), avoid_area(area), "
         "avoid_category(category), prefer_category(category), add_interest(interest), "
         "remove_interest(interest), set_indoor_preference(preference), "
-        "set_transition_buffer(minutes), add_meal(meal). Times are 24h HH:MM. Set "
+        "set_transition_buffer(minutes), add_meal(meal). Times are 24h HH:MM. In a "
+        "multi-day trip the stop numbers are trip-wide; set day (1-based) only when the "
+        "request is about one whole day, e.g. 'make day 2 cheaper'. Set "
         "is_hypothetical true for 'what if' questions. If the request is ambiguous about which "
         "stop, set needs_clarification true.\n" + DATA_RULE),
     user_template=("Current plan stops:\n{stops}\nPlan budget: {budget}\n"
@@ -156,7 +158,8 @@ MODIFY = Prompt(
             "interest": {"type": ["string", "null"]},
             "preference": {"type": ["string", "null"], "enum": ["indoor", "outdoor", "any", None]},
             "meal": {"type": ["string", "null"], "enum": [
-                "breakfast", "lunch", "dinner", "snacks", "coffee", None]}},
+                "breakfast", "lunch", "dinner", "snacks", "coffee", None]},
+            "day": {"type": ["integer", "null"]}},
             "required": ["op"]}},
         "is_hypothetical": {"type": "boolean"},
         "needs_clarification": {"type": "boolean"}},

@@ -22,7 +22,7 @@ from datetime import datetime
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.domain.taxonomy import (
-    FOOD_CATEGORIES, MEAL_CATEGORIES, PartyType, category_catalog, is_valid_category,
+    MEAL_CATEGORIES, PartyType, category_catalog, is_valid_category,
     is_valid_mood,
 )
 from app.geo.distance import haversine_km
@@ -108,6 +108,9 @@ class PlanDirectives:
     replacement_category: str | None = None
     scope: str | None = None                                   # force local/city/regional
     max_stops_override: int | None = None
+    # Places already used on another day of the same trip. Transient: never
+    # written into the spec, so a later change to that day frees them again.
+    exclude_ids: list[int] = field(default_factory=list)
 
 
 def _split_interests(spec: TripSpec) -> tuple[list[str], list[str]]:
@@ -199,7 +202,8 @@ async def plan(db: AsyncSession, spec: TripSpec, *, now: datetime | None = None,
     rain = weather.wet if weather.available else None
     req = RecommendationRequest(
         interests=interests, moods=moods, avoid_interests=list(spec.avoid_interests),
-        exclude_ids=list(set(spec.exclude_poi_ids) | set(must_ids)),
+        exclude_ids=sorted(set(spec.exclude_poi_ids) | set(must_ids)
+                           | set(directives.exclude_ids)),
         party_type=_party_type(spec), party_size=party,
         budget_per_person=(budget // party) if budget is not None else None,
         scope=scope if scope != "local" else None,
@@ -262,7 +266,6 @@ async def plan(db: AsyncSession, spec: TripSpec, *, now: datetime | None = None,
     max_hop = planning_cfg["max_hop_km_escape"] if is_escape else planning_cfg["max_hop_km_city"]
 
     # --- feasibility --------------------------------------------------------------------------------------
-    window = spec.window_minutes
     bounds = [StopBound(p.poi.name, _visit(p.poi, pace["visit"]), p.poi.cost[0],
                         _open_in_window(p.poi, spec)) for p in must_scored]
     min_visit_any = min((_visit(s.poi, pace["visit"]) for s in cluster), default=20)
@@ -325,6 +328,7 @@ async def plan(db: AsyncSession, spec: TripSpec, *, now: datetime | None = None,
     facts = None
     report = None
     rules = rules_for(spec, max_hop_km=max_hop)
+    rules.exclude_ids |= set(directives.exclude_ids)
     for name, result in ([("cpsat", opt)] if opt.is_solution and opt.stops else []) + (
             [("greedy", greedy)] if greedy.is_solution and greedy.stops else []):
         planned = [PlannedStop(s.seq, s.poi_id, s.arrive_min, s.depart_min) for s in result.stops]
@@ -644,8 +648,10 @@ def explanation_facts(itinerary: dict) -> dict:
             "arrive": st["arrive"], "depart": st["depart"],
             "estimated_cost_typical": st["estimated_cost"]["typical"],
             "reason_codes": st["reason_codes"], "region": st["poi"]["region_bucket"],
-            "locality": st["poi"]["locality"],
+            "locality": st["poi"]["locality"], "day": st.get("day"),
         })
+        if st.get("day"):
+            numbers.add(str(st["day"]))
         numbers.update({str(st["seq"]), st["arrive"], st["depart"],
                         str(st["estimated_cost"]["typical"]), str(st["visit_minutes"])})
         numbers.update(st["arrive"].split(":") + st["depart"].split(":"))
@@ -657,6 +663,12 @@ def explanation_facts(itinerary: dict) -> dict:
         numbers.add(str(s["budget"]))
     numbers.update(itinerary["start_time"].split(":") + itinerary["end_time"].split(":"))
     numbers.update({itinerary["start_time"], itinerary["end_time"]})
+    for d in itinerary.get("days") or []:
+        numbers.update({str(d["day"]), d["start_time"], d["end_time"]})
+        numbers.update(d["start_time"].split(":") + d["end_time"].split(":"))
+    if itinerary.get("day_count"):
+        numbers.add(str(itinerary["day_count"]))
     return {"stops": stops, "summary": s, "date": itinerary["date"],
+            "end_date": itinerary.get("end_date"),
             "window": [itinerary["start_time"], itinerary["end_time"]],
             "transition_note": itinerary["transition_note"], "allowed_numbers": sorted(numbers)}

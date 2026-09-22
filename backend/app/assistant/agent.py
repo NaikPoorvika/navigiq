@@ -865,17 +865,23 @@ class Agent:
         if status == "ok":
             it = outcome["itinerary"]
             self.state.set_plan(it["itinerary_id"], it["version_no"],
-                                [_poi_last(s["poi"]) for s in it["stops"]], outcome["trip_spec"])
+                                [_poi_last(s["poi"]) for s in it["stops"]], outcome["trip_spec"],
+                                days=_stop_days(it))
             self.state.remember_results([_poi_last(s["poi"]) for s in it["stops"]], None)
             text = _plan_sentence(it)
             self.goto("EXPLAIN")
+            suggestions = ([Suggestion(label="Make day 1 cheaper", message="Make day 1 cheaper"),
+                            Suggestion(label="Relax day 2", message="Make day 2 more relaxed"),
+                            Suggestion(label="Romantic last day",
+                                       message="Make the last day more romantic")]
+                           if it.get("kind") == "trip" else
+                           [Suggestion(label="Make it cheaper", message="Make this cheaper"),
+                            Suggestion(label="More relaxed", message="Make it more relaxed"),
+                            Suggestion(label="Add dinner", message="Add somewhere for dinner")])
             return self.respond(intent, text, "itinerary", data={
                 "itinerary": it, "trip_spec": outcome["trip_spec"],
                 "assumptions": outcome["assumptions"], "validator_report": outcome["validator_report"]},
-                warnings=warnings,
-                suggestions=[Suggestion(label="Make it cheaper", message="Make this cheaper"),
-                             Suggestion(label="More relaxed", message="Make it more relaxed"),
-                             Suggestion(label="Add dinner", message="Add somewhere for dinner")])
+                warnings=warnings, suggestions=suggestions)
         if status == "infeasible":
             feas = outcome.get("feasibility") or {}
             text = feas.get("message") or ERROR_MESSAGES["PLAN_INFEASIBLE"]
@@ -900,12 +906,16 @@ class Agent:
         view = await self.tool("get_itinerary", itinerary_id=self.state.active_itinerary_id)
         cost = view["itinerary"]["summary"]["estimated_cost"]["typical"]
         self.state.active_stops = [_poi_last(s["poi"]) for s in view["itinerary"]["stops"]]
-        pm = parse_modifications(message, self.state, current_cost=cost)
+        self.state.active_stop_days = _stop_days(view["itinerary"])
+        day_costs = {d["day"]: d["summary"]["estimated_cost"]["typical"]
+                     for d in view["itinerary"].get("days") or []}
+        pm = parse_modifications(message, self.state, current_cost=cost, day_costs=day_costs)
         ops = list(pm.operations)
         if pm.add_poi_name:
             found = await self.tool("resolve_poi_name", name=pm.add_poi_name)
             if found["resolved"]:
-                ops.append({"op": "add_poi", "poi_id": found["poi_id"]})
+                ops.append({"op": "add_poi", "poi_id": found["poi_id"],
+                            **({"day": pm.day} if pm.day else {})})
             else:
                 self.goto("CLARIFY")
                 return None, self.respond(intent, f"I couldn't find “{pm.add_poi_name}”. Which place "
@@ -920,7 +930,10 @@ class Agent:
                 return None, self.respond(intent, "Which stop do you mean?", "clarification",
                                           suggestions=[Suggestion(label=o, message=o) for o in opts])
         if not ops and self.llm_ok:
-            stops = "\n".join(f"{i + 1}. {s.name} ({s.category})"
+            days = self.state.active_stop_days
+            stops = "\n".join(f"{i + 1}. {s.name} ({s.category}"
+                              + (f", day {days[i]})" if len(days) == len(self.state.active_stops)
+                                 and max(days) > 1 else ")")
                               for i, s in enumerate(self.state.active_stops))
             try:
                 res = await self.llm.run(MODIFY, recorder=self.record_llm, stops=stops,
@@ -999,7 +1012,8 @@ class Agent:
                                 "restore it.", "feasibility_error", data=res)
         it = res["itinerary"]
         self.state.set_plan(it["itinerary_id"], it["version_no"],
-                            [_poi_last(s["poi"]) for s in it["stops"]], self.state.current_trip_spec or {})
+                            [_poi_last(s["poi"]) for s in it["stops"]], self.state.current_trip_spec or {},
+                            days=_stop_days(it))
         self.goto("VALIDATE")
         self.goto("COMPLETE")
         return self.respond(intent, f"Restored version {target} as version {it['version_no']}.",
@@ -1031,10 +1045,13 @@ class Agent:
         self.goto("VALIDATE")
         cmp = out["comparison"]
         delta = cmp["estimated_cost"]["delta"]
+        changed = cmp.get("changed_days")
+        where = (f" Only day{'s' * (len(changed) > 1)} {', '.join(map(str, changed))} "
+                 f"change{'s' * (len(changed) == 1)}." if changed else "")
         text = (f"Here's the what-if next to your current plan: {cmp['stop_count']['variant']} stops, "
                 f"estimated ₹{cmp['estimated_cost']['variant']} "
-                f"({'+' if delta >= 0 else '−'}₹{abs(delta)}). Your current plan is unchanged "
-                f"until you apply it.")
+                f"({'+' if delta >= 0 else '−'}₹{abs(delta)}).{where} Your current plan is "
+                f"unchanged until you apply it.")
         self.goto("EXPLAIN")
         return self.respond(intent, text, "itinerary_comparison", data={
             "current": out["previous_itinerary"], "variant": outcome["itinerary"],
@@ -1051,10 +1068,13 @@ class Agent:
         view = await self.tool("get_itinerary", itinerary_id=self.state.active_itinerary_id)
         it = view["itinerary"]
         lines = []
+        prev_day = None
         for s in it["stops"]:
             why = ", ".join(s.get("why") or [reason_text(r) for r in s["reason_codes"][:2]]) or \
                 "fits your time window and budget"
-            lines.append(f"{s['arrive']} {s['poi']['name']}: {why.lower()}.")
+            day = f"Day {s['day']}, " if s.get("day") and s["day"] != prev_day else ""
+            prev_day = s.get("day")
+            lines.append(f"{day}{s['arrive']} {s['poi']['name']}: {why.lower()}.")
         text = ("Each stop was chosen by NavigIQ's planner for how well it matches your request, its "
                 "opening hours and budget, and how close the stops are to each other. "
                 + " ".join(lines) + " " + it["transition_note"])
@@ -1134,7 +1154,32 @@ def _weather_sentence(w: dict) -> str:
     return f"{cond} in {w.get('area', 'Bengaluru')} on {w['date']}{temp}{prob}. Source: Open-Meteo."
 
 
+def _stop_days(it: dict) -> list[int]:
+    return [s.get("day", 1) for s in it.get("stops", [])]
+
+
+def _trip_sentence(it: dict) -> str:
+    from app.services.planning.trips import day_label
+    from datetime import date as _date
+    s = it["summary"]
+    cost = s["estimated_cost"]
+    money = ("mostly free" if cost["max"] == 0 else
+             f"an estimated ₹{cost['min']}–₹{cost['max']} in total for {s['party_size']} "
+             f"{'person' if s['party_size'] == 1 else 'people'}")
+    days = "; ".join(f"day {d['day']} " + (
+        f"around {' & '.join(d['localities'][:2])}" if d["localities"]
+        else f"for {' & '.join(c.lower() for c in d['categories'][:2]) or 'a free day'}")
+        for d in it["days"])
+    return (f"Here's your {it['day_count']}-day trip, "
+            f"{day_label(_date.fromisoformat(it['date']))} to "
+            f"{day_label(_date.fromisoformat(it['end_date']))}: {s['stop_count']} stops — {days}. "
+            f"That's {money} (excluding transport), and no place repeats. "
+            f"{it['transition_note']}")
+
+
 def _plan_sentence(it: dict) -> str:
+    if it.get("kind") == "trip":
+        return _trip_sentence(it)
     s = it["summary"]
     n = s["stop_count"]
     cost = s["estimated_cost"]

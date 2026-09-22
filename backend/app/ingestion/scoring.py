@@ -92,7 +92,7 @@ def quality(*, prominence_score: float, confidence: float, category: str, name_q
     return round(min(1.0, score), 3), parts
 
 
-import re as _re
+import re as _re  # noqa: E402 - kept beside the patterns that use it
 
 # Places that exist on the map but are not somewhere a visitor can go:
 # schools, clubs, offices, hospitals... They stay searchable by name but are

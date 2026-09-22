@@ -29,9 +29,12 @@ from app.nlu.lexicon import parse_interests
 from app.nlu.quantities import parse_budget, parse_party, parse_radius_km, parse_stop_count
 from app.nlu.text import WORD_NUMBERS, normalize_utterance
 from app.nlu.timeparse import (
-    minute_of_day, resolve_date, resolve_duration, resolve_time_window, round_up_to_quarter,
+    minute_of_day, resolve_date, resolve_date_range, resolve_duration, resolve_time_window,
+    round_up_to_quarter,
 )
-from app.schemas.tripspec import TripSpec, is_controlled_interest, minutes_to_hhmm
+from app.schemas.tripspec import (
+    MAX_TRIP_DAYS, TripSpec, is_controlled_interest, minutes_to_hhmm,
+)
 
 # The name is captured inside a lookahead so matches can overlap: in "from now
 # near Jayanagar" both "from ..." and "near Jayanagar" are considered.
@@ -212,7 +215,22 @@ def rule_fields(text: str, today: date, now_min: int) -> tuple[dict, dict]:
     d = resolve_date(text, today)
     if d:
         f["date"] = d.value
-    tw = resolve_time_window(text)
+    span = resolve_date_range(text, today)
+    time_text = text
+    if span:
+        # A span says which days; the daily window defaults to a full day, so
+        # the planner need not ask for one.
+        time_text = t.replace(span.phrase, " ")
+        start = span.start or f.get("date") or (
+            today if now_min < 16 * 60 else date.fromordinal(today.toordinal() + 1))
+        days = min(span.days, MAX_TRIP_DAYS)
+        if span.days > MAX_TRIP_DAYS:
+            extra["notes"] = [f"Trips are limited to {MAX_TRIP_DAYS} days, so this covers "
+                              f"the first {MAX_TRIP_DAYS}"]
+        f["date"] = start
+        f["end_date"] = date.fromordinal(start.toordinal() + days - 1)
+        extra["has_time_info"] = True
+    tw = resolve_time_window(time_text)
     if tw:
         extra["has_time_info"] = True
         if tw.start_min is not None:
@@ -410,6 +428,12 @@ async def extract_trip_spec(text: str, *, now: datetime, llm=None, use_llm: bool
             ex.llm_error = exc.code
             ex.notes.append("Language model unavailable - used rule-based understanding")
     data = base.model_dump() if base is not None else {}
+    if (base is not None and base.end_date and base.date and "date" in fields
+            and "end_date" not in fields):
+        # A follow-up that moves the start keeps the trip's length.
+        fields["end_date"] = date.fromordinal(fields["date"].toordinal()
+                                              + (base.end_date - base.date).days)
+    ex.notes += extra.get("notes", [])
     for k, v in fields.items():
         if v in (None, [], ""):
             continue
@@ -436,7 +460,7 @@ def _safe_spec(data: dict, ex: Extraction) -> TripSpec:
     except Exception:  # noqa: BLE001
         pass
     for key in ("end_time", "start_time", "desired_stop_count", "max_stop_count",
-                "budget_total", "budget_per_person", "date"):
+                "budget_total", "budget_per_person", "end_date", "date"):
         if key in data:
             trial = {k: v for k, v in data.items() if k != key}
             try:

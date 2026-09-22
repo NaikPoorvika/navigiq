@@ -117,6 +117,38 @@ async def weather(on: date | None = None, area: Annotated[str | None, Query(max_
                            WeatherArgs(on=on, area=area))
 
 
+def time_of_day(minute: int) -> str:
+    """Day parts used by the home screen; same boundaries as docs/nlu_conventions.md."""
+    if 5 * 60 <= minute < 12 * 60:
+        return "morning"
+    if 12 * 60 <= minute < 16 * 60 + 30:
+        return "afternoon"
+    if 16 * 60 + 30 <= minute < 21 * 60:
+        return "evening"
+    return "night"
+
+
+@router.get("/context")
+async def context() -> dict:
+    """The real context the home screen may use: the IST clock and, when the
+    provider answers, the next few hours of weather. Never invented: weather
+    comes back `available: false` rather than a guess."""
+    from app.geo.regions import geo_config
+    from app.nlu.timeparse import now_ist
+    from app.services.weather.client import get_window
+    now = now_ist()
+    minute = now.hour * 60 + now.minute
+    cfg = geo_config()
+    w = await get_window(cfg.center_lat, cfg.center_lon, now.date(), now.hour,
+                         min(23, now.hour + 3))
+    return {
+        "now": now.isoformat(timespec="minutes"), "date": now.date().isoformat(),
+        "weekday": now.strftime("%A"), "is_weekend": now.weekday() >= 5,
+        "time_of_day": time_of_day(minute), "city": "Bengaluru", "timezone": "Asia/Kolkata",
+        "weather": w.to_dict(),
+    }
+
+
 me_extra = APIRouter()
 
 

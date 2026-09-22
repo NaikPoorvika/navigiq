@@ -32,6 +32,7 @@ class ConversationState(BaseModel):
     active_itinerary_id: int | None = None
     active_version_no: int | None = None
     active_stops: list[LastPOI] = Field(default_factory=list)       # seq order
+    active_stop_days: list[int] = Field(default_factory=list)       # trips: day of each stop
     pending_variant_id: int | None = None
     last_pois: list[LastPOI] = Field(default_factory=list)          # most recent results, in order
     last_focus_poi: LastPOI | None = None                           # "it", "that place"
@@ -67,9 +68,10 @@ class ConversationState(BaseModel):
                         f"plan: {self.active_itinerary_id or 'none'}")
 
     def set_plan(self, itinerary_id: int, version_no: int, stops: list[LastPOI],
-                 spec: dict[str, Any]) -> None:
+                 spec: dict[str, Any], days: list[int] | None = None) -> None:
         self.active_itinerary_id = itinerary_id
         self.active_version_no = version_no
         self.active_stops = stops
+        self.active_stop_days = list(days or [])
         self.current_trip_spec = spec
         self.pending_variant_id = None

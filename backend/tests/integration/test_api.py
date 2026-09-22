@@ -446,3 +446,13 @@ async def test_assistant_requires_identity_and_owns_conversations(async_client):
     other = await async_client.post("/api/v1/assistant/chat", headers=h2,
                                     json={"message": "hi", "conversation_id": c["conversation_id"]})
     assert other.status_code == 404
+
+
+async def test_context_is_real_or_says_unavailable(async_client):
+    r = await async_client.get("/api/v1/context")
+    assert r.status_code == 200
+    body = r.json()
+    assert body["time_of_day"] in ("morning", "afternoon", "evening", "night")
+    assert body["timezone"] == "Asia/Kolkata" and body["city"] == "Bengaluru"
+    # weather is off in tests: it must say so rather than invent conditions
+    assert body["weather"]["available"] is False and body["weather"]["condition"] == "unknown"

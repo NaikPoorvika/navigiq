@@ -54,8 +54,8 @@ class CostBreakdown:
             "basis": "estimate",
             "unknown_cost_items": self.unknown_count,
             "lines": [
-                {"label": l.label, "amount_inr": l.amount_inr, "basis": l.basis}
-                for l in self.lines
+                {"label": ln.label, "amount_inr": ln.amount_inr, "basis": ln.basis}
+                for ln in self.lines
             ],
         }
 
@@ -88,7 +88,7 @@ def estimate_leg_cost(
     if mode in (TransportMode.WALKING, TransportMode.BIKE):
         return 0
 
-    
+
 
     if mode == TransportMode.OWN_CAR:
         c = cfg["own_car"]

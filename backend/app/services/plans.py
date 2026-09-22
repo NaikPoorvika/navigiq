@@ -12,8 +12,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.nlu.timeparse import now_ist
 from app.schemas.tripspec import TripSpec, migrate_tripspec
-from app.services.planning import store
-from app.services.planning.engine import PlanDirectives, PlanOutcome, plan
+from app.services.planning import store, trips
+from app.services.planning.engine import PlanOutcome, plan
 from app.services.planning.modify import (
     Applied, CurrentStop, Modification, ModificationError, apply_modifications, area_ref,
 )
@@ -43,7 +43,10 @@ async def create_plan(db: AsyncSession, spec: TripSpec, owner: Owner, *,
                       now: datetime | None = None, persist: bool = True) -> PlanOutcome:
     async def persist_fn(outcome: PlanOutcome) -> dict:
         return await store.create(db, outcome, owner)
-    return await plan(db, spec, now=now or now_ist(), persist_fn=persist_fn if persist else None)
+    fn = persist_fn if persist else None
+    if spec.is_trip:
+        return await trips.plan_trip(db, spec, now=now or now_ist(), persist_fn=fn)
+    return await plan(db, spec, now=now or now_ist(), persist_fn=fn)
 
 
 def _current_stops(view: dict) -> list[CurrentStop]:
@@ -56,22 +59,29 @@ async def modify_plan(db: AsyncSession, itinerary_id: int, owner: Owner,
                       expected_version_no: int | None = None,
                       now: datetime | None = None) -> dict:
     view = await store.get_plan(db, itinerary_id, owner)
-    spec = migrate_tripspec(view["trip_spec"])
-    stops = _current_stops(view)
-    applied: Applied = apply_modifications(spec, stops, mods)
-    new_spec = applied.spec
-    notes: list[str] = []
-    if applied.area_to_resolve:
-        new_spec, notes = await resolve_areas(db, new_spec, [applied.area_to_resolve])
-    outcome = await plan(db, new_spec, now=now or now_ist(), directives=applied.directives)
-    outcome.notes = notes + outcome.notes
+    if trips.is_trip_itinerary(view["itinerary"]):
+        outcome, summary = await trips.modify_trip(db, view, mods, now=now or now_ist(),
+                                                   resolve_location=resolve_location)
+    else:
+        if any(m.day not in (None, 1) for m in mods):
+            raise ModificationError("this plan is a single day")
+        spec = migrate_tripspec(view["trip_spec"])
+        stops = _current_stops(view)
+        applied: Applied = apply_modifications(spec, stops, mods)
+        new_spec = applied.spec
+        notes: list[str] = []
+        if applied.area_to_resolve:
+            new_spec, notes = await resolve_areas(db, new_spec, [applied.area_to_resolve])
+        outcome = await plan(db, new_spec, now=now or now_ist(), directives=applied.directives)
+        outcome.notes = notes + outcome.notes
+        summary = applied.summary
     op_record = {"operations": [m.model_dump(mode="json", exclude_none=True) for m in mods],
-                 "summary": applied.summary}
-    result = {"status": outcome.status, "outcome": outcome, "summary": applied.summary,
+                 "summary": summary}
+    result = {"status": outcome.status, "outcome": outcome, "summary": summary,
               "previous": view}
     if not outcome.ok:
         return result
-    label = "; ".join(applied.summary) or "Modified"
+    label = "; ".join(summary) or "Modified"
     if hypothetical:
         pending = [v for v in await store.list_versions(db, itinerary_id, owner)
                    if v["kind"] == "variant" and v["variant_status"] == "pending"]
@@ -103,15 +113,18 @@ async def restore_version(db: AsyncSession, itinerary_id: int, version_no: int,
         raise PlanConflict("that version is already current")
     spec = migrate_tripspec(old["trip_spec"])
     it = old["itinerary"]
-    planned = [PlannedStop(s["seq"], s["poi"]["id"], s["arrive_min"], s["depart_min"])
-               for s in it["stops"]]
-    facts = await load_facts(db, [p.poi_id for p in planned], spec.date)
-    geo_hop = 25.0 if any(s["poi"].get("recommended_as_primary_destination") for s in it["stops"]) \
-        else 12.0
-    report = validate(planned, rules_for(spec, max_hop_km=geo_hop), facts)
-    if not report.valid:
-        return {"status": "validation_failed", "validator_report": report.to_dict()}
-    outcome = PlanOutcome(status="ok", spec=spec, itinerary=it, validator=report.to_dict(),
+    if trips.is_trip_itinerary(it):
+        report_dict = await trips.revalidate_trip(db, it)
+    else:
+        planned = [PlannedStop(s["seq"], s["poi"]["id"], s["arrive_min"], s["depart_min"])
+                   for s in it["stops"]]
+        facts = await load_facts(db, [p.poi_id for p in planned], spec.date)
+        geo_hop = 25.0 if any(s["poi"].get("recommended_as_primary_destination")
+                              for s in it["stops"]) else 12.0
+        report_dict = validate(planned, rules_for(spec, max_hop_km=geo_hop), facts).to_dict()
+    if not report_dict["valid"]:
+        return {"status": "validation_failed", "validator_report": report_dict}
+    outcome = PlanOutcome(status="ok", spec=spec, itinerary=it, validator=report_dict,
                           optimizer={"used": "restore"}, weather=it.get("weather"))
     ids = await store.add_version(db, itinerary_id, owner, outcome, reason="restore",
                                   change_operation={"restored_version": version_no},
@@ -129,7 +142,11 @@ def compare_itineraries(a: dict, b: dict) -> dict:
         sa[i]["arrive"] != sb[i]["arrive"] or sa[i]["depart"] != sb[i]["depart"])]
     ca = a["summary"]["estimated_cost"]["typical"]
     cb = b["summary"]["estimated_cost"]["typical"]
+    days = trips.compare_days(a, b) if (trips.is_trip_itinerary(a)
+                                        or trips.is_trip_itinerary(b)) else None
     return {
+        "days": days,
+        "changed_days": [d["day"] for d in days if d["changed"]] if days else None,
         "added": added, "removed": removed, "retimed": retimed,
         "kept": [sb[i]["poi"]["name"] for i in sb if i in sa],
         "stop_count": {"current": len(sa), "variant": len(sb)},

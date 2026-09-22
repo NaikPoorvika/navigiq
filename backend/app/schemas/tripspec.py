@@ -40,6 +40,7 @@ BBOX_MIN_LON, BBOX_MAX_LON = 76.7, 78.5
 
 MIN_WINDOW_MIN = 60
 MAX_WINDOW_MIN = 16 * 60
+MAX_TRIP_DAYS = 7
 
 
 class Pace(str, Enum):
@@ -108,6 +109,9 @@ class TripSpec(BaseModel):
     # The field is named `date`, so the type is referenced through the module
     # to avoid the class attribute shadowing it during annotation evaluation.
     date: dt.date | None = None
+    # Multi-day trips: the last day, inclusive. None means a single day. Each
+    # day is planned separately with the same daily window (services/trips.py).
+    end_date: dt.date | None = None
     start_time: str | None = None                 # HH:MM, Asia/Kolkata
     end_time: str | None = None
 
@@ -190,6 +194,21 @@ class TripSpec(BaseModel):
         return None
 
     @property
+    def day_count(self) -> int:
+        if self.date is None or self.end_date is None:
+            return 1
+        return (self.end_date - self.date).days + 1
+
+    @property
+    def is_trip(self) -> bool:
+        return self.day_count > 1
+
+    def trip_dates(self) -> list[dt.date]:
+        if self.date is None:
+            return []
+        return [self.date + timedelta(days=i) for i in range(self.day_count)]
+
+    @property
     def is_plannable(self) -> bool:
         return (self.date is not None and self.start_minute is not None
                 and self.end_minute is not None)
@@ -240,6 +259,20 @@ class TripSpec(BaseModel):
                 raise ValueError(f"the time window must be at least {MIN_WINDOW_MIN} minutes")
             if span > MAX_WINDOW_MIN:
                 raise ValueError("the time window must not exceed 16 hours")
+        return self
+
+    @model_validator(mode="after")
+    def _trip_dates_sane(self) -> TripSpec:
+        if self.end_date is None:
+            return self
+        if self.date is None:
+            raise ValueError("end_date needs a start date")
+        if self.end_date < self.date:
+            raise ValueError("end_date must not be before date")
+        if (self.end_date - self.date).days + 1 > MAX_TRIP_DAYS:
+            raise ValueError(f"trips are limited to {MAX_TRIP_DAYS} days")
+        if self.end_date == self.date:
+            self.end_date = None
         return self
 
     @model_validator(mode="after")

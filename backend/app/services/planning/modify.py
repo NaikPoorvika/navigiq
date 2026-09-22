@@ -60,7 +60,7 @@ class Modification(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     op: ModOp
-    target_seq: int | None = Field(default=None, ge=1, le=12)
+    target_seq: int | None = Field(default=None, ge=1, le=60)   # trip-wide numbering can reach 7 x 8
     poi_id: int | None = Field(default=None, gt=0)
     amount: int | None = Field(default=None, ge=0, le=200_000)
     time: str | None = None
@@ -72,6 +72,9 @@ class Modification(BaseModel):
     interest: str | None = None
     preference: Literal["indoor", "outdoor", "any"] | None = None
     meal: Literal["breakfast", "lunch", "dinner", "snacks", "coffee"] | None = None
+    # Multi-day trips only: the day this applies to (1-based). With `day`,
+    # `target_seq` is that day's stop number; without it, the trip-wide one.
+    day: int | None = Field(default=None, ge=1, le=7)
 
     @model_validator(mode="after")
     def _check(self) -> Modification:

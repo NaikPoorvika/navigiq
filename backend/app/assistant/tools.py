@@ -598,7 +598,10 @@ async def h_validate_itinerary(ctx, a: ItineraryArgs):
     from app.services.planning import store
     from app.services.planning.validator.facts import load_facts, rules_for
     from app.services.planning.validator.itinerary import PlannedStop, validate
+    from app.services.planning.trips import is_trip_itinerary, revalidate_trip
     view = await store.get_plan(ctx.db, a.itinerary_id, ctx.owner, version_no=a.version_no)
+    if is_trip_itinerary(view["itinerary"]):
+        return await revalidate_trip(ctx.db, view["itinerary"])
     spec = migrate_tripspec(view["trip_spec"])
     stops = [PlannedStop(s["seq"], s["poi"]["id"], s["arrive_min"], s["depart_min"])
              for s in view["itinerary"]["stops"]]
