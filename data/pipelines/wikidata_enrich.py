@@ -51,7 +51,11 @@ WIKIDATA_API = "https://www.wikidata.org/w/api.php"
 # query. The query service can rate-limit to one request per minute.
 CACHE = Path("data/cache/wikidata_items.json")
 RETRIES = 4
-USER_AGENT = "NavigIQ/0.1 (Bengaluru trip planner, student project; contact via GitHub NaikPoorvika/navigiq)"
+# Wikimedia's User-Agent policy requires real contact details - a URL or an
+# email - or requests are refused with 403. Set WIKIMEDIA_CONTACT to add
+# your email; it is read from the environment so it isn't committed.
+CONTACT = os.environ.get("WIKIMEDIA_CONTACT", "https://github.com/NaikPoorvika/navigiq")
+USER_AGENT = f"NavigIQ/0.1 ({CONTACT}) python-httpx"
 
 CENTRE_LON, CENTRE_LAT = 77.5946, 12.9716
 RADIUS_KM = 60
