@@ -1,15 +1,18 @@
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, Request, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import jwt, JWTError
 from pydantic import ValidationError
 from sqlalchemy.ext.asyncio import AsyncSession
-from typing import AsyncGenerator
+from typing import TYPE_CHECKING, AsyncGenerator
 
 from app.config import settings
 from app.db.session import AsyncSessionLocal
 from app.models.user import User
 from app.schemas.token import TokenPayload
 from app.crud.crud_user import get_user_by_email
+
+if TYPE_CHECKING:  # avoids importing app.llm on every request path
+    from app.llm import LLMGateway
 
 reusable_oauth2 = OAuth2PasswordBearer(
     tokenUrl=f"/api/v1/auth/login/access-token"
@@ -18,6 +21,30 @@ reusable_oauth2 = OAuth2PasswordBearer(
 async def get_db() -> AsyncGenerator[AsyncSession, None]:
     async with AsyncSessionLocal() as session:
         yield session
+
+
+def get_llm_gateway(request: Request) -> "LLMGateway":
+    """The process-wide LLM gateway built at startup (NQ-028/NQ-029).
+
+    One gateway per process, not one per request: it owns a pooled httpx
+    client, and rebuilding it per request would drop connection reuse and
+    leak sockets.
+
+    Tests override this with a FakeLLM via `app.dependency_overrides`, so no
+    suite needs Ollama. It is deliberately NOT built lazily here - without
+    the lifespan having run, a missing gateway is a wiring problem and must
+    say so, rather than quietly opening a connection to a model server a
+    test never intended to call.
+    """
+    gateway = getattr(request.app.state, "llm_gateway", None)
+    if gateway is None:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail={"error": {"code": "LLM_UNAVAILABLE",
+                              "message": "LLM gateway is not configured",
+                              "details": None}},
+        )
+    return gateway
 
 async def get_current_user(
     db: AsyncSession = Depends(get_db), token: str = Depends(reusable_oauth2)

@@ -11,12 +11,21 @@ code, never on the message text.
 """
 from __future__ import annotations
 
+from typing import Annotated
+
 from fastapi import APIRouter, Depends, HTTPException, status
+from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.schemas.trip_draft import TripDraft
 from app.services.planning.draft_builder import build_tripspec
 from app.services.planning.orchestrator import plan_trip
-from app.api.deps import get_db
+from app.api.deps import get_db, get_llm_gateway
+from app.llm import LLMError, LLMGateway, LLMTimeout, LLMUnavailable
+from app.llm.extraction import (
+    MAX_USER_REQUEST_CHARS,
+    TripDraftExtractionFailed,
+    extract_trip_draft,
+)
 from app.schemas.tripspec import TripSpec
 from app.services.planning.feasibility.engine import FeasibilityEngine
 from app.services.planning.orchestrator import (
@@ -176,4 +185,62 @@ async def plan_from_draft(
         "assumptions": built.assumptions,
         "tripspec": built.tripspec.model_dump(mode="json"),
         "attribution": "(c) OpenStreetMap contributors, ODbL",
+    }
+
+
+class ExtractRequest(BaseModel):
+    """One natural-language trip request. Bounded here so an oversized body
+    is a 422 from the schema rather than a truncated model context."""
+
+    text: Annotated[str, Field(min_length=1, max_length=MAX_USER_REQUEST_CHARS)]
+
+
+@router.post("/extract")
+async def extract_draft(
+    body: ExtractRequest,
+    gateway: LLMGateway = Depends(get_llm_gateway),
+) -> dict:
+    """NQ-029. Natural language in, a validated TripDraft out. No planning.
+
+    Extraction is separated from planning on purpose. The draft is returned
+    for the user to SEE and CORRECT (the editable chips of NQ-033) before
+    anything is planned, because the model's reading of a sentence is a
+    proposal, not a fact (ADR-002). Send the confirmed draft to
+    `POST /plan/draft` to actually plan it; that endpoint is unchanged.
+
+    Nothing here is authoritative: places stay names, dates stay phrases,
+    and any coordinate the model invents is dropped by the TripDraft schema
+    before this returns.
+
+    Failure codes:
+      EXTRACTION_FAILED     the model answered, but not with a valid draft.
+                            `reason` is invalid_json / not_an_object /
+                            schema_invalid; `fields` names the offending
+                            fields. No model or user text is echoed back
+      LLM_UNAVAILABLE       no model server reachable (503)
+      LLM_TIMEOUT           the model did not answer in time (504)
+      LLM_ERROR             any other gateway failure, including a response
+                            that was empty or hit the token cap (502)
+    """
+    try:
+        extraction = await extract_trip_draft(body.text, gateway=gateway)
+    except TripDraftExtractionFailed as exc:
+        raise _error("EXTRACTION_FAILED", exc.message,
+                     status.HTTP_422_UNPROCESSABLE_ENTITY,
+                     reason=exc.reason, fields=list(exc.details))
+    except LLMUnavailable as exc:
+        raise _error("LLM_UNAVAILABLE", exc.message,
+                     status.HTTP_503_SERVICE_UNAVAILABLE)
+    except LLMTimeout as exc:
+        raise _error("LLM_TIMEOUT", exc.message,
+                     status.HTTP_504_GATEWAY_TIMEOUT)
+    except LLMError as exc:
+        raise _error("LLM_ERROR", exc.message, status.HTTP_502_BAD_GATEWAY,
+                     llm_code=exc.code)
+
+    return {
+        "draft": extraction.draft.model_dump(mode="json"),
+        "model": extraction.model,
+        "prompt_version": extraction.prompt_version,
+        "latency_ms": round(extraction.latency_ms, 1),
     }

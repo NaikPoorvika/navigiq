@@ -1,0 +1,683 @@
+{
+  "meta": {
+    "task": "NQ-029",
+    "run_at": "2026-09-22T07:00:45+00:00",
+    "model": "qwen3:14b",
+    "num_ctx": 8192,
+    "prompt_version": "v1",
+    "ollama_host": "http://localhost:11434"
+  },
+  "summary": {
+    "cases": 26,
+    "schema_valid": 26,
+    "schema_validity_rate": 1.0,
+    "critical_field_checks": 54,
+    "critical_field_correct": 50,
+    "critical_field_accuracy": 0.9259259259259259,
+    "hallucination_cases": 7,
+    "hallucination_rate": 0.2692307692307692,
+    "coordinate_leak_cases": 0,
+    "coordinate_leakage_rate": 0.0,
+    "responses_with_a_time": 2,
+    "malformed_time_cases": 0,
+    "malformed_time_rate": 0.0,
+    "responses_with_a_date_phrase": 11,
+    "unsupported_date_phrase_cases": 2,
+    "unsupported_date_phrase_rate": 0.18181818181818182,
+    "failures_by_reason": {},
+    "latency_ms_mean": 507.23733461703745
+  },
+  "cases": [
+    {
+      "case_id": "01-simple-trip",
+      "case_class": "simple domestic trip",
+      "ok": true,
+      "failure_reason": null,
+      "checks": [
+        {
+          "field": "destination",
+          "ok": true,
+          "got": "'Mysore'"
+        }
+      ],
+      "hallucinated": [],
+      "coordinate_leak": false,
+      "malformed_times": [],
+      "unsupported_date_phrase": null,
+      "latency_ms": 812.4,
+      "raw": "{\"destination\": {\"name\": \"Mysore\"}}"
+    },
+    {
+      "case_id": "02-origin-destination",
+      "case_class": "origin + destination",
+      "ok": true,
+      "failure_reason": null,
+      "checks": [
+        {
+          "field": "origin",
+          "ok": true,
+          "got": "'Koramangala'"
+        },
+        {
+          "field": "destination",
+          "ok": true,
+          "got": "'Jayanagar'"
+        },
+        {
+          "field": "date_phrase",
+          "ok": true,
+          "got": "'Saturday' -> 2026-09-26"
+        }
+      ],
+      "hallucinated": [],
+      "coordinate_leak": false,
+      "malformed_times": [],
+      "unsupported_date_phrase": null,
+      "latency_ms": 547.3,
+      "raw": "{\"origin\": {\"name\": \"Koramangala\"}, \"destination\": {\"name\": \"Jayanagar\"}, \"date_phrase\": \"Saturday\"}"
+    },
+    {
+      "case_id": "03-missing-origin",
+      "case_class": "missing origin",
+      "ok": true,
+      "failure_reason": null,
+      "checks": [
+        {
+          "field": "destination",
+          "ok": true,
+          "got": "'Cubbon Park'"
+        },
+        {
+          "field": "date_phrase",
+          "ok": true,
+          "got": "'tomorrow' -> 2026-09-22"
+        }
+      ],
+      "hallucinated": [],
+      "coordinate_leak": false,
+      "malformed_times": [],
+      "unsupported_date_phrase": null,
+      "latency_ms": 483.1,
+      "raw": "{\"destination\": {\"name\": \"Cubbon Park\"}, \"date_phrase\": \"tomorrow\", \"transport\": [\"walking\"]}"
+    },
+    {
+      "case_id": "04-missing-destination",
+      "case_class": "missing destination",
+      "ok": true,
+      "failure_reason": null,
+      "checks": [
+        {
+          "field": "origin",
+          "ok": true,
+          "got": "'Indiranagar'"
+        },
+        {
+          "field": "date_phrase",
+          "ok": true,
+          "got": "'today' -> 2026-09-21"
+        },
+        {
+          "field": "interests",
+          "ok": true,
+          "got": "['cafe']"
+        }
+      ],
+      "hallucinated": [],
+      "coordinate_leak": false,
+      "malformed_times": [],
+      "unsupported_date_phrase": null,
+      "latency_ms": 554.0,
+      "raw": "{\"origin\": {\"name\": \"Indiranagar\"}, \"date_phrase\": \"today\", \"interests\": [{\"category\": \"cafe\"}]}"
+    },
+    {
+      "case_id": "05-explicit-date",
+      "case_class": "explicit date",
+      "ok": true,
+      "failure_reason": null,
+      "checks": [
+        {
+          "field": "date_phrase",
+          "ok": true,
+          "got": "'2026-10-05' -> 2026-10-05"
+        }
+      ],
+      "hallucinated": [],
+      "coordinate_leak": false,
+      "malformed_times": [],
+      "unsupported_date_phrase": null,
+      "latency_ms": 326.6,
+      "raw": "{\"date_phrase\": \"2026-10-05\"}"
+    },
+    {
+      "case_id": "06-relative-date",
+      "case_class": "relative date",
+      "ok": true,
+      "failure_reason": null,
+      "checks": [
+        {
+          "field": "origin",
+          "ok": true,
+          "got": "'Jayanagar'"
+        },
+        {
+          "field": "date_phrase",
+          "ok": true,
+          "got": "'day after tomorrow' -> 2026-09-23"
+        }
+      ],
+      "hallucinated": [],
+      "coordinate_leak": false,
+      "malformed_times": [],
+      "unsupported_date_phrase": null,
+      "latency_ms": 386.3,
+      "raw": "{\"origin\": {\"name\": \"Jayanagar\"}, \"date_phrase\": \"day after tomorrow\"}"
+    },
+    {
+      "case_id": "07-times",
+      "case_class": "time",
+      "ok": true,
+      "failure_reason": null,
+      "checks": [
+        {
+          "field": "origin",
+          "ok": true,
+          "got": "'HSR Layout'"
+        },
+        {
+          "field": "start_time_local",
+          "ok": true,
+          "got": "'09:00'"
+        },
+        {
+          "field": "end_time_local",
+          "ok": true,
+          "got": "'18:30'"
+        }
+      ],
+      "hallucinated": [],
+      "coordinate_leak": false,
+      "malformed_times": [],
+      "unsupported_date_phrase": null,
+      "latency_ms": 633.3,
+      "raw": "{\"origin\": {\"name\": \"HSR Layout\"}, \"start_time_local\": \"09:00\", \"end_time_local\": \"18:30\"}"
+    },
+    {
+      "case_id": "08-budget",
+      "case_class": "budget",
+      "ok": true,
+      "failure_reason": null,
+      "checks": [
+        {
+          "field": "origin",
+          "ok": true,
+          "got": "'Whitefield'"
+        },
+        {
+          "field": "budget_inr",
+          "ok": true,
+          "got": "2500"
+        }
+      ],
+      "hallucinated": [],
+      "coordinate_leak": false,
+      "malformed_times": [],
+      "unsupported_date_phrase": null,
+      "latency_ms": 401.5,
+      "raw": "{\"origin\": {\"name\": \"Whitefield\"}, \"budget_inr\": 2500}"
+    },
+    {
+      "case_id": "09-party-size",
+      "case_class": "party size",
+      "ok": true,
+      "failure_reason": null,
+      "checks": [
+        {
+          "field": "origin",
+          "ok": true,
+          "got": "'Malleshwaram'"
+        },
+        {
+          "field": "party_size",
+          "ok": true,
+          "got": "4"
+        }
+      ],
+      "hallucinated": [],
+      "coordinate_leak": false,
+      "malformed_times": [],
+      "unsupported_date_phrase": null,
+      "latency_ms": 368.4,
+      "raw": "{\"origin\": {\"name\": \"Malleshwaram\"}, \"party_size\": 4}"
+    },
+    {
+      "case_id": "10-multiple-interests",
+      "case_class": "multiple interests",
+      "ok": true,
+      "failure_reason": null,
+      "checks": [
+        {
+          "field": "origin",
+          "ok": true,
+          "got": "'Indiranagar'"
+        },
+        {
+          "field": "interests",
+          "ok": true,
+          "got": "['cafe', 'museum', 'restaurant']"
+        }
+      ],
+      "hallucinated": [],
+      "coordinate_leak": false,
+      "malformed_times": [],
+      "unsupported_date_phrase": null,
+      "latency_ms": 644.6,
+      "raw": "{\"origin\": {\"name\": \"Indiranagar\"}, \"interests\": [{\"category\": \"cafe\"}, {\"category\": \"museum\"}, {\"category\": \"restaurant\"}]}"
+    },
+    {
+      "case_id": "11-unmappable-interest",
+      "case_class": "unmappable interest",
+      "ok": true,
+      "failure_reason": null,
+      "checks": [
+        {
+          "field": "origin",
+          "ok": true,
+          "got": "'Koramangala'"
+        },
+        {
+          "field": "free_text_contains",
+          "ok": true,
+          "got": "['street photography']"
+        },
+        {
+          "field": "interests",
+          "ok": true,
+          "got": "[]"
+        }
+      ],
+      "hallucinated": [],
+      "coordinate_leak": false,
+      "malformed_times": [],
+      "unsupported_date_phrase": null,
+      "latency_ms": 417.2,
+      "raw": "{\"origin\": {\"name\": \"Koramangala\"}, \"free_text_interests\": [\"street photography\"]}"
+    },
+    {
+      "case_id": "12-transport",
+      "case_class": "transport",
+      "ok": true,
+      "failure_reason": null,
+      "checks": [
+        {
+          "field": "origin",
+          "ok": true,
+          "got": "'Basavanagudi'"
+        },
+        {
+          "field": "destination",
+          "ok": true,
+          "got": "'Lalbagh'"
+        },
+        {
+          "field": "transport",
+          "ok": true,
+          "got": "['auto']"
+        }
+      ],
+      "hallucinated": [],
+      "coordinate_leak": false,
+      "malformed_times": [],
+      "unsupported_date_phrase": null,
+      "latency_ms": 546.1,
+      "raw": "{\"origin\": {\"name\": \"Basavanagudi\"}, \"destination\": {\"name\": \"Lalbagh\"}, \"transport\": [\"auto\"]}"
+    },
+    {
+      "case_id": "13-vegetarian",
+      "case_class": "vegetarian preference",
+      "ok": true,
+      "failure_reason": null,
+      "checks": [
+        {
+          "field": "origin",
+          "ok": true,
+          "got": "'Rajajinagar'"
+        },
+        {
+          "field": "vegetarian",
+          "ok": true,
+          "got": "True"
+        }
+      ],
+      "hallucinated": [],
+      "coordinate_leak": false,
+      "malformed_times": [],
+      "unsupported_date_phrase": null,
+      "latency_ms": 368.0,
+      "raw": "{\"origin\": {\"name\": \"Rajajinagar\"}, \"vegetarian\": true}"
+    },
+    {
+      "case_id": "14-walking-limit",
+      "case_class": "walking constraint",
+      "ok": true,
+      "failure_reason": null,
+      "checks": [
+        {
+          "field": "origin",
+          "ok": true,
+          "got": "'Koramangala'"
+        },
+        {
+          "field": "max_walking_km",
+          "ok": true,
+          "got": "3.0"
+        }
+      ],
+      "hallucinated": [],
+      "coordinate_leak": false,
+      "malformed_times": [],
+      "unsupported_date_phrase": null,
+      "latency_ms": 401.0,
+      "raw": "{\"origin\": {\"name\": \"Koramangala\"}, \"max_walking_km\": 3}"
+    },
+    {
+      "case_id": "15-noisy",
+      "case_class": "noisy natural-language request",
+      "ok": true,
+      "failure_reason": null,
+      "checks": [
+        {
+          "field": "origin",
+          "ok": true,
+          "got": "'Koramangala'"
+        },
+        {
+          "field": "date_phrase",
+          "ok": true,
+          "got": "'Saturday' -> 2026-09-26"
+        },
+        {
+          "field": "start_time_local",
+          "ok": true,
+          "got": "'10:00'"
+        },
+        {
+          "field": "interests",
+          "ok": false,
+          "got": "['cafe', 'park']"
+        }
+      ],
+      "hallucinated": [
+        "transport",
+        "vegetarian",
+        "mode"
+      ],
+      "coordinate_leak": false,
+      "malformed_times": [],
+      "unsupported_date_phrase": null,
+      "latency_ms": 1736.9,
+      "raw": "{\n  \"origin\": {\n    \"name\": \"Koramangala\"\n  },\n  \"date_phrase\": \"Saturday\",\n  \"start_time_local\": \"10:00\",\n  \"interests\": [\n    {\n      \"category\": \"cafe\"\n    },\n    {\n      \"category\": \"park\"\n    }\n  ],\n  \"transport\": [\n    \"auto\"\n  ],\n  \"vegetarian\": false,\n  \"mode\": \"relaxed\"\n}"
+    },
+    {
+      "case_id": "16-incomplete",
+      "case_class": "incomplete request",
+      "ok": true,
+      "failure_reason": null,
+      "checks": [],
+      "hallucinated": [],
+      "coordinate_leak": false,
+      "malformed_times": [],
+      "unsupported_date_phrase": null,
+      "latency_ms": 66.6,
+      "raw": "{}"
+    },
+    {
+      "case_id": "17-ambiguous",
+      "case_class": "ambiguous wording",
+      "ok": true,
+      "failure_reason": null,
+      "checks": [
+        {
+          "field": "place_any",
+          "ok": true,
+          "got": "origin/destination=[None, 'MG Road']"
+        }
+      ],
+      "hallucinated": [
+        "date_phrase"
+      ],
+      "coordinate_leak": false,
+      "malformed_times": [],
+      "unsupported_date_phrase": "evening",
+      "latency_ms": 339.8,
+      "raw": "{\"destination\": {\"name\": \"MG Road\"}, \"date_phrase\": \"evening\"}"
+    },
+    {
+      "case_id": "18-indian-english",
+      "case_class": "multilingual / Indian-English phrasing",
+      "ok": true,
+      "failure_reason": null,
+      "checks": [
+        {
+          "field": "place_any",
+          "ok": true,
+          "got": "origin/destination=['Jayanagar', None]"
+        },
+        {
+          "field": "date_phrase",
+          "ok": true,
+          "got": "'coming Sunday' -> 2026-09-27"
+        },
+        {
+          "field": "party_size",
+          "ok": true,
+          "got": "3"
+        },
+        {
+          "field": "budget_inr",
+          "ok": false,
+          "got": "None"
+        }
+      ],
+      "hallucinated": [
+        "transport",
+        "mode"
+      ],
+      "coordinate_leak": false,
+      "malformed_times": [],
+      "unsupported_date_phrase": null,
+      "latency_ms": 783.8,
+      "raw": "{\"origin\": {\"name\": \"Jayanagar\"}, \"date_phrase\": \"coming Sunday\", \"party_size\": 3, \"transport\": [\"own_car\"], \"mode\": \"relaxed\"}"
+    },
+    {
+      "case_id": "19-coordinate-injection",
+      "case_class": "coordinate-injection attempt",
+      "ok": true,
+      "failure_reason": null,
+      "checks": [
+        {
+          "field": "place_any",
+          "ok": true,
+          "got": "origin/destination=['Koramangala', None]"
+        }
+      ],
+      "hallucinated": [],
+      "coordinate_leak": false,
+      "malformed_times": [],
+      "unsupported_date_phrase": null,
+      "latency_ms": 257.4,
+      "raw": "{\"origin\": {\"name\": \"Koramangala\"}}"
+    },
+    {
+      "case_id": "20-irrelevant-info",
+      "case_class": "irrelevant extra information",
+      "ok": true,
+      "failure_reason": null,
+      "checks": [
+        {
+          "field": "origin",
+          "ok": true,
+          "got": "'Indiranagar'"
+        },
+        {
+          "field": "date_phrase",
+          "ok": true,
+          "got": "'tomorrow' -> 2026-09-22"
+        },
+        {
+          "field": "interests",
+          "ok": true,
+          "got": "['cafe']"
+        }
+      ],
+      "hallucinated": [],
+      "coordinate_leak": false,
+      "malformed_times": [],
+      "unsupported_date_phrase": null,
+      "latency_ms": 566.6,
+      "raw": "{\"origin\": {\"name\": \"Indiranagar\"}, \"date_phrase\": \"tomorrow\", \"interests\": [{\"category\": \"cafe\"}]}"
+    },
+    {
+      "case_id": "21-unsupported-date",
+      "case_class": "unsupported date phrase (negative)",
+      "ok": true,
+      "failure_reason": null,
+      "checks": [
+        {
+          "field": "origin",
+          "ok": true,
+          "got": "'Koramangala'"
+        }
+      ],
+      "hallucinated": [
+        "date_phrase"
+      ],
+      "coordinate_leak": false,
+      "malformed_times": [],
+      "unsupported_date_phrase": "next week",
+      "latency_ms": 383.5,
+      "raw": "{\"origin\": {\"name\": \"Koramangala\"}, \"date_phrase\": \"next week\"}"
+    },
+    {
+      "case_id": "22-vague-time",
+      "case_class": "vague time (negative)",
+      "ok": true,
+      "failure_reason": null,
+      "checks": [
+        {
+          "field": "origin",
+          "ok": true,
+          "got": "'Koramangala'"
+        },
+        {
+          "field": "interests",
+          "ok": false,
+          "got": "[]"
+        }
+      ],
+      "hallucinated": [
+        "destination",
+        "date_phrase"
+      ],
+      "coordinate_leak": false,
+      "malformed_times": [],
+      "unsupported_date_phrase": null,
+      "latency_ms": 516.0,
+      "raw": "{\"origin\": {\"name\": \"Koramangala\"}, \"destination\": {\"name\": \"park\"}, \"date_phrase\": \"today\"}"
+    },
+    {
+      "case_id": "23-vague-budget",
+      "case_class": "vague budget (negative)",
+      "ok": true,
+      "failure_reason": null,
+      "checks": [
+        {
+          "field": "origin",
+          "ok": true,
+          "got": "'Jayanagar'"
+        }
+      ],
+      "hallucinated": [
+        "budget_inr"
+      ],
+      "coordinate_leak": false,
+      "malformed_times": [],
+      "unsupported_date_phrase": null,
+      "latency_ms": 360.1,
+      "raw": "{\"origin\": {\"name\": \"Jayanagar\"}, \"budget_inr\": 0}"
+    },
+    {
+      "case_id": "24-unsupported-transport",
+      "case_class": "unsupported transport (negative)",
+      "ok": true,
+      "failure_reason": null,
+      "checks": [
+        {
+          "field": "origin",
+          "ok": true,
+          "got": "'Majestic'"
+        },
+        {
+          "field": "destination",
+          "ok": true,
+          "got": "'Lalbagh'"
+        },
+        {
+          "field": "transport",
+          "ok": false,
+          "got": "['auto']"
+        }
+      ],
+      "hallucinated": [],
+      "coordinate_leak": false,
+      "malformed_times": [],
+      "unsupported_date_phrase": null,
+      "latency_ms": 564.5,
+      "raw": "{\"origin\": {\"name\": \"Majestic\"}, \"destination\": {\"name\": \"Lalbagh\"}, \"transport\": [\"auto\"]}"
+    },
+    {
+      "case_id": "25-uncountable-group",
+      "case_class": "uncountable group (negative)",
+      "ok": true,
+      "failure_reason": null,
+      "checks": [
+        {
+          "field": "origin",
+          "ok": true,
+          "got": "'Indiranagar'"
+        }
+      ],
+      "hallucinated": [
+        "party_size"
+      ],
+      "coordinate_leak": false,
+      "malformed_times": [],
+      "unsupported_date_phrase": null,
+      "latency_ms": 356.2,
+      "raw": "{\"origin\": {\"name\": \"Indiranagar\"}, \"party_size\": 2}"
+    },
+    {
+      "case_id": "26-countable-group",
+      "case_class": "countable group",
+      "ok": true,
+      "failure_reason": null,
+      "checks": [
+        {
+          "field": "origin",
+          "ok": true,
+          "got": "'Koramangala'"
+        },
+        {
+          "field": "party_size",
+          "ok": true,
+          "got": "2"
+        }
+      ],
+      "hallucinated": [],
+      "coordinate_leak": false,
+      "malformed_times": [],
+      "unsupported_date_phrase": null,
+      "latency_ms": 367.1,
+      "raw": "{\"origin\": {\"name\": \"Koramangala\"}, \"party_size\": 2}"
+    }
+  ]
+}

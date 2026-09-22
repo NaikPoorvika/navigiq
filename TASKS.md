@@ -81,7 +81,27 @@ Legend:
   - [x] Clarification cap (`MAX_CLARIFICATIONS=2`) and coordinate safety
         (`extra="ignore"`) covered by regression tests
   - [x] ADR-015 recorded
-- [ ] NQ-029 — natural language -> TripDraft extraction
+- [x] NQ-029 — natural language -> TripDraft extraction
+  - [x] `backend/app/llm/extraction.py` — the only place free text becomes
+        structured fields; consumes the NQ-028 `LLMGateway`, no second
+        Ollama client and no direct HTTP
+  - [x] Versioned prompt at `backend/app/llm/prompts/tripdraft_extraction_v1.md`
+        (under `backend/` because the image's build context is `backend/`),
+        with the closed enums injected from code so it cannot drift
+  - [x] Schema-constrained decoding via `TripDraft.model_json_schema()`
+  - [x] Refuses rather than repairs — typed `TripDraftExtractionFailed`
+        (`invalid_json` / `not_an_object` / `schema_invalid`); no fence
+        stripping, no field dropping, no fabricated defaults (ADR-016)
+  - [x] `POST /api/v1/plan/extract` — extraction only. `/plan/draft` and
+        `/plan` are unchanged and still need no model (ADR-002)
+  - [x] Gateway injected by FastAPI DI (`get_llm_gateway`, lifespan-owned,
+        `aclose()` on shutdown); tests inject `FakeLLM`, none need Ollama
+  - [x] 94 unit + endpoint tests; all 6 gateway failure modes covered
+  - [x] Real `qwen3:14b` eval, 26 cases, `ai/evals/nq029/`: schema validity
+        100%, critical-field accuracy 92.6%, coordinate leakage 0%,
+        malformed-time 0%, **hallucination 26.9%**, **unsupported date
+        phrase 18.2%** - the last two are recorded, not smoothed over
+  - [x] ADR-016 recorded
 - [ ] NQ-030 — Eval datasets + scorer + baseline report
 - [ ] NQ-031 — Clarification flow
 - [ ] NQ-032 — Grounded explanation + numeric entailment

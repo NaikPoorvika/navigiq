@@ -6,15 +6,25 @@ from app.config import settings
 from app.db.base import Base  # noqa: F401  registers all models
 from app.api.v1.router import api_router
 from app.core.logging import setup_logging
+from app.llm import build_llm_gateway
 
 # Setup structlog
 setup_logging()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Startup actions
-    yield
-    # Shutdown actions
+    # Startup actions.
+    #
+    # One LLM gateway per process (NQ-028), reached by request handlers
+    # through app.api.deps.get_llm_gateway. Constructing it does not talk to
+    # Ollama, so the API still starts - and the deterministic /plan path
+    # still works (ADR-002) - when no model server is running.
+    app.state.llm_gateway = build_llm_gateway(settings)
+    try:
+        yield
+    finally:
+        # Shutdown actions
+        await app.state.llm_gateway.aclose()
 
 app = FastAPI(
     title="NavigIQ API",

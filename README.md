@@ -80,6 +80,7 @@ OSRM graphs are built from the same `.pbf` — see `ENVIRONMENT.md`.
 |---|---|---|
 | POST | `/api/v1/plan` | One-day itinerary |
 | POST | `/api/v1/plan/trip` | Multi-day trip (independent days) |
+| POST | `/api/v1/plan/extract` | Natural language → TripDraft. Extraction only, no planning |
 | POST | `/api/v1/plan/draft` | LLM draft → clarifying questions or a planned trip |
 | POST | `/api/v1/plan/preview-feasibility` | Fast feasibility check, no optimization |
 | GET | `/api/v1/places/resolve?q=` | Place name → coordinates, with confidence |
@@ -88,9 +89,42 @@ OSRM graphs are built from the same `.pbf` — see `ENVIRONMENT.md`.
 | GET | `/api/v1/pois/{id}` | POI detail with opening hours |
 
 Errors carry a stable `code` (`INFEASIBLE`, `NO_CANDIDATES`,
-`ROUTING_UNAVAILABLE`, `SEMANTIC_INVALID`, `VALIDATION_FAILED`). Clients switch
-on the code, never on the message. Times are minutes since midnight; costs are
-integer rupees.
+`ROUTING_UNAVAILABLE`, `SEMANTIC_INVALID`, `VALIDATION_FAILED`,
+`EXTRACTION_FAILED`, `LLM_UNAVAILABLE`, `LLM_TIMEOUT`, `LLM_ERROR`). Clients
+switch on the code, never on the message. Times are minutes since midnight;
+costs are integer rupees.
+
+### Natural language → itinerary
+
+```
+"cafe and a park near Koramangala tomorrow"
+        │
+        │  POST /plan/extract      qwen3:14b, JSON-schema constrained
+        ▼
+   TripDraft                       names and phrases only. No coordinates,
+        │                          no resolved dates, nothing invented
+        │  the user sees and corrects it
+        │
+        │  POST /plan/draft        deterministic from here on
+        ▼
+   TripSpec → feasibility → optimizer → validator → itinerary
+```
+
+The model extracts **words**, never facts. Places stay names (`"Koramangala"`,
+not `12.93, 77.62`) and dates stay phrases (`"tomorrow"`, not `2026-09-23`);
+`TripDraft` has no coordinate field anywhere and ignores unknown ones, so a
+hallucinated lat/lon is dropped before planning ever sees it (ADR-002,
+ADR-013). The gazetteer resolves names and `resolve_date_phrase()` resolves
+phrases — in Python, not in the prompt.
+
+Extraction refuses rather than repairs: output that is not valid JSON or does
+not satisfy the schema returns 422 `EXTRACTION_FAILED` with a reason, never a
+salvaged half-draft (ADR-016). `/plan` and `/plan/draft` need no model at
+all, so planning keeps working when Ollama is down.
+
+The prompt is versioned at `backend/app/llm/prompts/`. Measured extraction
+quality — including where it falls short — is in `ai/evals/nq029/`, which
+also documents how to re-run it.
 
 ## Repository Structure
 - `/backend` — FastAPI app, SQLAlchemy models, Alembic migrations, tests

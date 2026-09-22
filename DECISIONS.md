@@ -231,3 +231,66 @@ logic, `resolve_place`, multi-day planning, or any deterministic service.
 table does not currently have the `kind` column `resolve_place()` (ADR-011)
 queries - a pre-existing environment/migration sync issue, unrelated to and
 not fixed by this decision. See TASKS.md and this task's final report.
+
+
+## ADR-016: Extraction refuses rather than repairs
+**Status:** Accepted
+**Date:** 2026-09-22
+
+**Context:** NQ-029 turns a user's sentence into a `TripDraft` (ADR-013)
+using the NQ-028 gateway and `TripDraft.model_json_schema()` for constrained
+decoding. Constrained decoding makes malformed output rare, not impossible:
+the model can still wrap its answer in a markdown fence, prepend "Sure!",
+return a JSON array, or emit a field value the schema rejects. Something has
+to decide what happens then, and the obvious-looking answer - strip the
+fence, hunt for the outermost braces, drop the offending field - is the
+wrong one.
+
+**Decision:** The extraction layer (`backend/app/llm/extraction.py`)
+converts the model's JSON into a `TripDraft` and does nothing else. If the
+text is not JSON, is not an object, or does not satisfy the schema, it
+raises a typed `TripDraftExtractionFailed` carrying a stable `reason`
+(`invalid_json` / `not_an_object` / `schema_invalid`) and the offending
+field paths. It never strips fences, never extracts a JSON substring, never
+drops a bad field to salvage the rest, and never substitutes a default.
+Gateway failures (`LLMUnavailable`, `LLMTimeout`, `LLMTruncated`,
+`LLMEmptyResponse`, `LLMMalformedResponse`, `LLMRequestRejected`) propagate
+unchanged rather than being re-wrapped.
+
+**Rejected - tolerant parsing ("strip the fence, then parse").** It is three
+lines and it works. It also makes a prompt regression invisible: the day the
+model starts fencing every response, every test still passes, the eval still
+reports 100% schema validity, and nobody learns anything. The repair would
+hide exactly the signal it is worth having. A stripped fence today is a
+salvaged half-object tomorrow.
+
+**Rejected - retrying with a "your JSON was invalid" follow-up turn.** NQ-028
+owns retry policy, and this would put a second, differently-shaped retry
+loop above it. It also doubles worst-case latency on the failure path and
+makes the eval's failure counts meaningless. If the prompt needs fixing, the
+fix belongs in the prompt.
+
+**Consequences:** `POST /api/v1/plan/extract` returns 422 `EXTRACTION_FAILED`
+with a reason rather than a plausible half-draft, 503/504 when the model is
+unreachable or slow, and 502 for other gateway failures. Malformed output is
+counted, not absorbed, so `ai/evals/nq029/` can measure it. The prompt lives
+in the repository at `backend/app/llm/prompts/tripdraft_extraction_v1.md` -
+under `backend/` rather than `ai/`, because the backend image's Docker build
+context is `backend/` and a prompt outside it would not ship. Its closed-enum
+lists are injected from `Category` / `TransportMode` / `PlanningMode` at
+render time so the prompt cannot drift from the code.
+
+**Measured, not assumed** (26 cases, `qwen3:14b`, prompt v1, full numbers in
+`ai/evals/nq029/results/report.md`): schema validity 100%, critical-field
+accuracy 92.6%, coordinate leakage 0%, malformed-time rate 0%. The two weak
+spots are real and are recorded rather than smoothed over: a 26.9%
+hallucination rate, concentrated in unrequested `transport` / `mode` /
+`vegetarian` / `budget_inr` values, and an 18.2% unsupported-date-phrase
+rate, where the model copies wording such as "next week" or "evening" that
+`resolve_date_phrase()` cannot resolve. Both are prompt-quality problems
+that the architecture contains rather than correctness failures: the draft
+is shown to the user for correction before anything is planned, and an
+unresolvable phrase becomes a clarifying question. The prompt has
+deliberately NOT been tuned against this dataset, so the numbers are a
+measurement rather than a training score; tuning needs a held-out set and
+belongs to NQ-030.
