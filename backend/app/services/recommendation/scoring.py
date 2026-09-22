@@ -480,6 +480,7 @@ def reason_codes(poi: POIRecord, req: RecommendationRequest, c: dict[str, float]
 
 REASON_TEXT = {
     "UNDER_BUDGET": "Fits your budget", "FREE_ENTRY": "Free to visit",
+    "MEAL_STOP": "A meal stop in your time window",
     "GOOD_FOR_FAMILY": "Family friendly", "GOOD_FOR_KIDS": "Good with kids",
     "GOOD_FOR_COUPLES": "Nice for couples", "GOOD_FOR_GROUPS": "Good for groups",
     "GOOD_FOR_PARENTS": "Easy-going for parents", "GOOD_FOR_SOLO": "Good solo",

@@ -511,7 +511,21 @@ class Agent:
         name = re.sub(r"[?!.,]", " ", name)
         name = re.sub(r"\s+", " ", name).strip()
         generic = re.fullmatch(r"(it|this|that|this place|that place|this one|that one|"
-                               r"the (first|second|third|last) one|there|)", name)
+                               r"(the )?(first|second|third|fourth|fifth|last|1st|2nd|3rd|4th|"
+                               r"5th)( one| place| option| suggestion)?|(option|number|no) \d+|"
+                               r"there|)", name)
+        referring = re.search(r"\b(first|second|third|fourth|fifth|last|1st|2nd|3rd|4th|5th|"
+                              r"option|number|one|that|this|it|these|those)\b",
+                              normalize_utterance(message))
+        if referring and self.state.last_pois:
+            # "the first one", "option 2", "that cafe": a reference to what was
+            # just shown wins over a fuzzy name search ("first one" matched
+            # random POI names on the real inventory).
+            ref = resolve_reference(message, self.state)
+            if ref.status == "resolved":
+                return {"id": ref.poi.id}, None
+            if ref.status == "ambiguous" and ref.candidates:
+                return None, self._which_one(ref.candidates, intent)
         if name and not generic and len(name) >= 3:
             found = await self.tool("resolve_poi_name", name=name[:80])
             if found["resolved"]:
@@ -531,17 +545,20 @@ class Agent:
         if ref.status == "resolved":
             return {"id": ref.poi.id}, None
         if ref.status == "ambiguous" and ref.candidates:
-            options = [{"poi_id": c.id, "name": c.name} for c in ref.candidates[:4]]
-            self.state.pending_clarification = PendingClarification(
-                kind="which_place", question="Which one do you mean?",
-                options=[o["name"] for o in options],
-                context={"intent": intent, "ids": [o["poi_id"] for o in options]})
-            self.goto("CLARIFY")
-            return None, self.respond(intent, "Which one do you mean?", "clarification",
-                                      data={"options": options},
-                                      suggestions=[Suggestion(label=o["name"], message=o["name"])
-                                                   for o in options])
+            return None, self._which_one(ref.candidates, intent)
         return None, None
+
+    def _which_one(self, candidates: list[LastPOI], intent: str) -> AssistantResponse:
+        options = [{"poi_id": c.id, "name": c.name} for c in candidates[:4]]
+        self.state.pending_clarification = PendingClarification(
+            kind="which_place", question="Which one do you mean?",
+            options=[o["name"] for o in options],
+            context={"intent": intent, "ids": [o["poi_id"] for o in options]})
+        self.goto("CLARIFY")
+        return self.respond(intent, "Which one do you mean?", "clarification",
+                            data={"options": options},
+                            suggestions=[Suggestion(label=o["name"], message=o["name"])
+                                         for o in options])
 
     DETAILS_STRIP = (r"\b(tell me (more )?about|tell me more|more about|what is|what's|info(rmation)? "
                      r"(on|about)|details (of|about|on)|is|are|it|open|today|now|tomorrow|opening "

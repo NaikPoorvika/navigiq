@@ -59,7 +59,9 @@ SOLVE_WORK_LIMIT = 1.0          # deterministic-time budget: reproducible under 
 COMPACTNESS_WEIGHT = 200.0  # 1 km of hop costs ~0.02 of a stop's score
 EARLY_START_WEIGHT = 20     # per minute of arrival after the window opens: an idle
                             # hour weighs about as much as 0.6 km of extra hops
-DEFAULT_CATEGORY_CAP = 2
+DEFAULT_CATEGORY_CAP = 2          # when the request names no categories at all
+UNREQUESTED_CATEGORY_CAP = 1      # otherwise: at most one stop of a category nobody asked for
+COVERAGE_WEIGHT = 40_000          # ~0.7 of a typical stop's score: cover each requested category
 MEAL_WINDOWS = {"breakfast": (7 * 60 + 30, 10 * 60 + 30), "lunch": (12 * 60, 15 * 60),
                 "dinner": (19 * 60, 22 * 60)}
 
@@ -225,8 +227,16 @@ async def plan(db: AsyncSession, spec: TripSpec, *, now: datetime | None = None,
     if need_meal and not any(s.poi.category in MEAL_CATEGORIES for s in pool):
         meal_req = RecommendationRequest(**{**req.__dict__, "interests": ["restaurant", "cafe"],
                                             "moods": [], "limit": 12})
-        pool += [s for s in (await recommend(db, meal_req)).items
-                 if s.poi.id not in {p.poi.id for p in pool}]
+        seen = {p.poi.id for p in pool}
+        for s in (await recommend(db, meal_req)).items:
+            if s.poi.id in seen:
+                continue
+            # Scored against the user's request, not the meal search, so a
+            # lunch stop never outranks what was actually asked for.
+            meal = score_poi(s.poi, req)
+            meal.reasons = ["MEAL_STOP"] + [r for r in meal.reasons
+                                            if not r.startswith("MATCHES_")][:2]
+            pool.append(meal)
     must_scored = [score_poi(p, req) for p in musts.values()]
     out.candidates_considered = len(pool) + len(must_scored)
     t["candidates"] = int((time.perf_counter() - t0) * 1000)
@@ -237,6 +247,18 @@ async def plan(db: AsyncSession, spec: TripSpec, *, now: datetime | None = None,
     if is_escape:
         out.notes.append("This works better as the main destination for the day, so the plan "
                          "is built around it.")
+        if center is not None and len(cluster) < 8:
+            # A day built around one escape should not be one stop and an idle
+            # afternoon: add the best places near it, scored against the
+            # user's own request so they rank below what was asked for.
+            fill = RecommendationRequest(**{
+                **req.__dict__, "interests": [], "moods": [], "scope": None, "limit": 15,
+                "anchor": Anchor("escape", center[0], center[1],
+                                 planning_cfg["cluster_radius_km_escape"])})
+            seen = {s.poi.id for s in cluster} | {m.poi.id for m in must_scored}
+            extra = [score_poi(s.poi, req) for s in (await recommend(db, fill)).items
+                     if s.poi.id not in seen]
+            cluster += extra[:max(0, CANDIDATE_CAP - len(cluster) - len(must_scored))]
     max_hop = planning_cfg["max_hop_km_escape"] if is_escape else planning_cfg["max_hop_km_city"]
 
     # --- feasibility --------------------------------------------------------------------------------------
@@ -264,11 +286,14 @@ async def plan(db: AsyncSession, spec: TripSpec, *, now: datetime | None = None,
         max_stops = max(min_stops, min(max_stops, min_stops)) if not spec.max_stop_count \
             else min(spec.max_stop_count, min_stops)
     max_stops = max(max_stops, len(must_scored))
-    caps = _category_caps(spec, cluster)
+    caps = _category_caps(spec, cluster, max_stops, must_scored)
     common = dict(start_min=spec.start_minute, end_min=spec.end_minute, budget_inr=budget,
                   max_walk_m=10 ** 9, requirements=[], mode=spec.pace.value,
                   visit_multiplier=1.0, min_visit_minutes=1, category_caps=caps,
-                  compactness_weight=COMPACTNESS_WEIGHT, early_start_weight=EARLY_START_WEIGHT)
+                  compactness_weight=COMPACTNESS_WEIGHT, early_start_weight=EARLY_START_WEIGHT,
+                  coverage_categories=[i for i in spec.interests if is_valid_category(i)
+                                       and not category_catalog()[i].theme],
+                  coverage_weight=COVERAGE_WEIGHT)
     attempts = []
     opt = optimize(nodes, arcs, **common, max_stops=max_stops, min_stops=min_stops,
                    meal_required=need_meal, meal_windows=meal_windows,
@@ -370,12 +395,17 @@ def _meal_needs(spec: TripSpec) -> tuple[bool, list[tuple[int, int]]]:
     return bool(windows), windows
 
 
-def _category_caps(spec: TripSpec, cluster: list[Scored]) -> dict[str, int]:
+def _category_caps(spec: TripSpec, cluster: list[Scored], max_stops: int = 5,
+                   musts: list[Scored] | None = None) -> dict[str, int]:
     requested = {i for i in spec.interests if is_valid_category(i)}
+    other = UNREQUESTED_CATEGORY_CAP if requested else DEFAULT_CATEGORY_CAP
+    # Several requested categories share the day: "a garden, a museum and a
+    # cafe" should not become three cafes.
+    share = max(1, min(3, -(-max_stops // len(requested)))) if requested else 3
     caps = {}
     for s in cluster:
         c = s.poi.category
-        caps[c] = 3 if c in requested else DEFAULT_CATEGORY_CAP
+        caps[c] = share if c in requested else other
     for c in ("restaurant", "nightlife", "mall"):
         if c in caps:
             caps[c] = min(caps[c], 2 if c in requested else 1)
@@ -383,6 +413,11 @@ def _category_caps(spec: TripSpec, cluster: list[Scored]) -> dict[str, int]:
     for c in ("hill", "adventure", "nature", "farm"):
         if c in caps:
             caps[c] = 1
+    # Places the user must keep (named stops, or the stops a modification
+    # leaves in place) always fit: a cap never makes a kept plan infeasible.
+    for m in musts or []:
+        c = m.poi.category
+        caps[c] = max(caps.get(c, 0), sum(1 for x in musts if x.poi.category == c))
     return caps
 
 
@@ -443,7 +478,19 @@ def choose_cluster(pool: list[Scored], musts: list[Scored], anchor, scope: str, 
 
     members = sorted((s for s in pool if keep(s)), key=lambda s: (-s.score, s.poi.id))
     slots = max(0, CANDIDATE_CAP - len(musts))
-    chosen = members[:slots]
+    # Stratified: the best few of every requested category are candidates
+    # even when one category's places all score higher (cheap cafes with
+    # verified hours can otherwise crowd the garden out of the problem).
+    requested = [i for i in spec.interests if is_valid_category(i)]
+    reserved: list[Scored] = []
+    if requested:
+        per = max(2, slots // (2 * len(requested)))
+        for c in dict.fromkeys(requested):
+            reserved += [s for s in members if s.poi.category == c][:per]
+    reserved = reserved[:slots]
+    taken = {s.poi.id for s in reserved}
+    chosen = reserved + [s for s in members if s.poi.id not in taken][:slots - len(reserved)]
+    chosen.sort(key=lambda s: (-s.score, s.poi.id))
     meals = [s for s in members[slots:] if s.poi.category in MEAL_CATEGORIES][:3]
     if meals and not any(s.poi.category in MEAL_CATEGORIES for s in chosen):
         chosen = chosen[: max(0, slots - len(meals))] + meals

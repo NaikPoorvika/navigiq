@@ -176,6 +176,8 @@ def optimize(
     min_visit_minutes: int = 15,
     early_start_weight: int = 0,
     deterministic_limit: float | None = None,
+    coverage_categories: list[str] | None = None,
+    coverage_weight: int = 0,
 ) -> OptimizerResult:
     """Solve. nodes[0] is the origin; arcs maps (i, j) -> OptimizerArc.
 
@@ -354,6 +356,17 @@ def optimize(
         # Hop distance in units of 100 m. A coherence preference, not time.
         obj.append(-sum(lit * int(round(arcs[(i, j)].distance_km * 10 * compactness_weight))
                         for (i, j), lit in arc_lit.items()))
+    if coverage_categories and coverage_weight > 0:
+        # Each category the user asked for earns a bonus the first time it
+        # appears, so "a garden and a museum" does not become two museums
+        # and two cafes just because those scored slightly higher.
+        for c in dict.fromkeys(coverage_categories):
+            members = [i for i in range(1, n) if nodes[i].category == c]
+            if not members:
+                continue
+            cov = m.NewBoolVar(f"cover_{c}")
+            m.Add(cov <= sum(visit[i] for i in members))
+            obj.append(coverage_weight * cov)
     m.Maximize(sum(obj))
 
     # --- solve -------------------------------------------------------------

@@ -390,6 +390,9 @@ async def test_assistant_discovery_flows_without_llm(async_client):
     assert diff["data"]["meta"]["overlap_with_previous"] <= 0.2
     details = await chat(async_client, "tell me more about the first one", h, cid)
     assert details["ui"]["type"] == "poi_details"
+    # regression: the reference wins over a fuzzy name search for "first one"
+    shown = diff["data"]["items"] or items       # the last list actually shown
+    assert details["data"]["poi"]["id"] == shown[0]["id"]
 
 
 async def test_assistant_planning_modify_and_what_if_without_llm(async_client):
