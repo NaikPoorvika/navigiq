@@ -82,6 +82,7 @@ class Stop:
     lat: float | None = None
     lon: float | None = None
     cost_basis: str = "poi_specific"
+    hours_verified: bool | None = None
 
 
 @dataclass
@@ -122,6 +123,7 @@ class OptimizerResult:
                     "arrive_min": s.arrive_min, "depart_min": s.depart_min,
                     "visit_minutes": s.visit_minutes, "cost_inr": s.cost_inr,
                     "cost_basis": s.cost_basis,
+                    "hours_verified": s.hours_verified,
                     "mode_from_prev": s.mode_from_prev,
                     "travel_minutes_from_prev": s.travel_minutes_from_prev,
                     "lat": s.lat, "lon": s.lon,
@@ -376,7 +378,9 @@ def optimize(
             cost_inr=node.cost_inr,
             mode_from_prev=arc.mode if arc else None,
             travel_minutes_from_prev=arc.duration_min if arc else 0,
-            lat=node.lat, lon=node.lon, cost_basis=node.cost_basis,
+            lat=node.lat, lon=node.lon,
+            cost_basis=node.cost_basis,
+            hours_verified=node.hours_confidence >= 0.5,
         ))
         result.total_cost_inr += node.cost_inr + (arc.cost_inr if arc else 0)
         result.total_walk_m += arc.walk_m if arc else 0

@@ -1,41 +1,71 @@
-import type { ApiError, Category, PlanResponse, TripSpec } from "../types";
+import type {
+  ApiError, Category, FieldIssue, PlanResponse, PoiDetail, PoiSummary,
+  ResolveResult, TripSpec,
+} from "../types";
 
+// Relative: Vite proxies /api to the backend (see vite.config.ts).
 const BASE = "/api/v1";
 
-/** Thrown for any non-2xx. Carries the backend's stable error code. */
+/** Any failed request. Carries the backend's stable error code. */
 export class PlanError extends Error {
-  code: string;
-  details?: ApiError["details"];
+  code: ApiError["code"];
+  details: ApiError["details"];
 
   constructor(err: ApiError) {
     super(err.message);
+    this.name = "PlanError";
     this.code = err.code;
-    this.details = err.details;
+    this.details = err.details ?? null;
   }
 }
 
+function toApiError(res: Response, body: unknown): ApiError {
+  const detail = (body as { detail?: unknown } | null)?.detail;
+
+  // NavigIQ's own error envelope: { detail: { error: { code, message, details } } }
+  if (detail && typeof detail === "object" && !Array.isArray(detail) && "error" in detail) {
+    return (detail as { error: ApiError }).error;
+  }
+
+  // FastAPI's request validation: { detail: [ { loc, msg } ] }
+  if (Array.isArray(detail)) {
+    const errors: FieldIssue[] = detail.map((d: { loc?: unknown[]; msg?: string }) => ({
+      field: (d.loc ?? []).slice(1).join("."),
+      message: d.msg ?? "Invalid value",
+    }));
+    return {
+      code: "SEMANTIC_INVALID",
+      message: "Some of the details aren't valid.",
+      details: { errors },
+    };
+  }
+
+  return { code: "UNKNOWN", message: `${res.status} ${res.statusText}` };
+}
+
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
-  const res = await fetch(`${BASE}${path}`, {
-    headers: { "Content-Type": "application/json" },
-    ...init,
-  });
+  let res: Response;
+  try {
+    res = await fetch(`${BASE}${path}`, {
+      headers: { "Content-Type": "application/json" },
+      ...init,
+    });
+  } catch {
+    throw new PlanError({
+      code: "NETWORK",
+      message: "Can't reach the NavigIQ server.",
+    });
+  }
 
   if (!res.ok) {
-    let body: { detail?: { error?: ApiError } } = {};
+    let body: unknown = null;
     try {
       body = await res.json();
     } catch {
-      throw new PlanError({
-        code: "UNKNOWN",
-        message: `${res.status} ${res.statusText}`,
-      });
+      /* non-JSON error body */
     }
-    const err = body.detail?.error;
-    throw new PlanError(
-      err ?? { code: "UNKNOWN", message: `${res.status} ${res.statusText}` },
-    );
+    throw new PlanError(toApiError(res, body));
   }
-
   return res.json() as Promise<T>;
 }
 
@@ -43,38 +73,30 @@ export function getCategories(): Promise<{ categories: Category[] }> {
   return request("/pois/categories");
 }
 
-/**
- * Plan a trip. TAKES ABOUT 15 SECONDS - arc building dominates. Show staged
- * progress, not a spinner.
- *
- * Throws PlanError with a stable code:
- *   INFEASIBLE (409)          details.suggested_relaxations are actionable
- *   NO_CANDIDATES (404)       no POIs match a requested category
- *   ROUTING_UNAVAILABLE (503) OSRM down; no itinerary rather than a guess
- *   SEMANTIC_INVALID (422)    the request contradicts itself
- */
+/** Place name -> coordinates. Act on `confidence`: low means ask the user. */
+export function resolvePlace(q: string): Promise<ResolveResult> {
+  return request(`/places/resolve?q=${encodeURIComponent(q)}&limit=5`);
+}
+
+/** Plan one day. Takes a few seconds - show progress, not a bare spinner. */
 export function createPlan(spec: TripSpec): Promise<PlanResponse> {
   return request("/plan", { method: "POST", body: JSON.stringify(spec) });
 }
 
-export function getPoi(id: number): Promise<{ lat: number; lon: number }> {
-  return request(`/pois/${id}`);
+/** Places near a point. Categories match through links (a lake can be a sunset spot). */
+export function searchPois(p: {
+  lat: number; lon: number; radiusKm?: number; categories?: string[]; limit?: number;
+}): Promise<{ count: number; results: PoiSummary[] }> {
+  const q = new URLSearchParams({
+    lat: String(p.lat),
+    lon: String(p.lon),
+    radius_km: String(p.radiusKm ?? 3),
+    limit: String(p.limit ?? 12),
+  });
+  for (const c of p.categories ?? []) q.append("category", c);
+  return request(`/pois/search?${q.toString()}`);
 }
 
-/**
- * The plan response carries poi_id but no coordinates, so each stop needs a
- * second call before it can be plotted.
- *
- * TODO(A1): add lat/lon to the stop payload - two lines server-side, saves
- * one round trip per stop.
- */
-export async function attachCoordinates<T extends { poi_id: number }>(
-  stops: T[],
-): Promise<(T & { lat: number; lon: number })[]> {
-  const details = await Promise.all(stops.map((s) => getPoi(s.poi_id)));
-  return stops.map((s, i) => ({
-    ...s,
-    lat: details[i].lat,
-    lon: details[i].lon,
-  }));
+export function getPoi(id: number): Promise<PoiDetail> {
+  return request(`/pois/${id}`);
 }

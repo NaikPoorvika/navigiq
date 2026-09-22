@@ -46,6 +46,10 @@ class POISummary:
     close_min: int | None
     is_24h: bool | None
     curated: bool
+    image_url: str | None = None
+    image_credit: str | None = None
+    image_license: str | None = None
+    image_source_url: str | None = None
 
     def to_dict(self) -> dict:
         return {
@@ -76,6 +80,10 @@ class POISummary:
                 and float(self.hours_confidence) >= HOURS_CONFIDENCE_THRESHOLD
             ),
             "curated": self.curated,
+            "image_url": self.image_url,
+            "image_credit": self.image_credit,
+            "image_license": self.image_license,
+            "image_source_url": self.image_source_url,
         }
 
 
@@ -125,7 +133,8 @@ SELECT
         WHEN h.is_24h THEN true
         ELSE (:minute)::int >= h.open_min AND (:minute)::int < h.close_min
     END AS open_at_requested,
-    p.curated
+    p.curated,
+    p.image_url, p.image_credit, p.image_license, p.image_source_url
 FROM pois p
 CROSS JOIN origin
 JOIN poi_categories c ON c.id = p.primary_category
@@ -210,6 +219,8 @@ async def search_pois(
             hours_confidence=r.hours_confidence,
             open_min=r.open_min, close_min=r.close_min, is_24h=r.is_24h,
             curated=r.curated,
+            image_url=r.image_url, image_credit=r.image_credit,
+            image_license=r.image_license, image_source_url=r.image_source_url,
         )
         for r in result
     ]
@@ -218,7 +229,7 @@ async def search_pois(
 async def get_poi_detail(db: AsyncSession, poi_id: int) -> dict | None:
     """Full POI record including the week's opening hours."""
     row = (await db.execute(text("""
-        SELECT p.id, p.name, p.description, c.key AS category,
+        SELECT p.id, p.name, p.description, c.key AS category,p.image_url, p.image_credit, p.image_license, p.image_source_url,
                ST_Y(p.geom::geometry) AS lat, ST_X(p.geom::geometry) AS lon,
                p.area, p.prominence, p.prominence_parts,
                p.cost_estimate_inr, c.typical_cost_inr,
@@ -274,6 +285,11 @@ async def get_poi_detail(db: AsyncSession, poi_id: int) -> dict | None:
             }
             for h in hours
         ],
+        "image_url": row.image_url,
+        "image_credit": row.image_credit,
+        "image_license": row.image_license,
+        "image_source_url": row.image_source_url,
+
     }
 
 

@@ -480,6 +480,10 @@ async def plan(
 
     result.ok = True
     result.itinerary = opt.to_dict()
+    for stop in result.itinerary["stops"]:
+        p = by_id.get(stop["poi_id"], {})
+        for key in ("image_url", "image_credit", "image_license", "image_source_url"):
+            stop[key] = p.get(key)
     result.itinerary["origin"] = {"name": spec.origin.name,
                                   "lat": spec.origin.lat,
                                   "lon": spec.origin.lon}

@@ -1,11 +1,10 @@
-// Mirrors the backend TripSpec (NQ-021) and plan response (NQ-025).
-// Times are MINUTES SINCE MIDNIGHT: arrive_min 902 = 15:02.
-// Costs are integer rupees. Everything is basis: "estimate".
+// Mirrors the NavigIQ backend API.
+// Times are MINUTES SINCE MIDNIGHT (902 = 15:02). Costs are integer rupees and
+// always estimates: category figures are "typical", never a venue's real price.
 
 export type Priority = "must" | "should" | "nice_to_have";
-
-export type TransportMode =
-  | "walking" | "auto" | "cab" | "own_car" | "bike";
+export type TransportMode = "walking" | "auto" | "cab" | "own_car" | "bike";
+export type PlanningMode = "balanced" | "quick" | "relaxed";
 
 export interface Category {
   key: string;
@@ -23,8 +22,14 @@ export interface Interest {
   priority: Priority;
 }
 
+export interface Place {
+  name?: string;
+  lat: number;
+  lon: number;
+}
+
 export interface TripSpec {
-  origin: { lat: number; lon: number; name?: string };
+  origin: Place;
   date: string;              // YYYY-MM-DD
   start_time_local: string;  // HH:MM
   end_time_local: string;
@@ -34,13 +39,22 @@ export interface TripSpec {
   transport: TransportMode[];
   constraints: {
     max_walking_km: number;
-    meal_required: boolean;
+    meal_required?: boolean;
     vegetarian?: boolean;
   };
-  mode: "balanced" | "quick" | "relaxed";
+  mode: PlanningMode;
+  days?: number;
 }
 
-export interface Stop {
+/** Real photo of a specific place, from Wikimedia Commons. Credit is required. */
+export interface PhotoFields {
+  image_url?: string | null;
+  image_credit?: string | null;
+  image_license?: string | null;
+  image_source_url?: string | null;
+}
+
+export interface Stop extends PhotoFields {
   seq: number;
   poi_id: number;
   name: string;
@@ -49,24 +63,26 @@ export interface Stop {
   depart_min: number;
   visit_minutes: number;
   cost_inr: number;
+  cost_basis: "poi_specific" | "category_estimate";
   mode_from_prev: string | null;
   travel_minutes_from_prev: number;
-  // Filled in by the client from /pois/{id} - the plan response does not
-  // include coordinates. See the note to A1.
-  lat?: number;
-  lon?: number;
+  lat: number;
+  lon: number;
+  /** False when the stop's opening hours are a category guess, not real data. */
+  hours_verified?: boolean;
 }
 
 export interface Itinerary {
   status: string;
-  optimizer: string;
   total_cost_inr: number;
   total_duration_min: number;
   total_walk_m: number;
-  objective_value: number;
-  solve_ms: number;
+  cost_note?: string;
+  estimated_cost_stops?: number;
   unsatisfied_must: string[];
+  solve_ms: number;
   stops: Stop[];
+  origin: Place;
   itinerary_id?: number;
 }
 
@@ -76,16 +92,15 @@ export interface Weather {
   max_precip_mm: number;
   mean_temp_c: number | null;
   condition: string;
-  source: string;
+  degraded_reason?: string | null;
 }
 
 export interface PlanResponse {
   ok: boolean;
   itinerary: Itinerary;
   weather: Weather;
-  validator_report: { valid: boolean; rules_run: string[]; findings: unknown[] };
   relaxations_applied: string[];
-  semantic_warnings: { code: string; field: string; message: string }[];
+  semantic_warnings: FieldIssue[];
   timings_ms: Record<string, number>;
   attribution: string;
 }
@@ -98,16 +113,97 @@ export interface Relaxation {
   action: string;
 }
 
-/** The backend returns a stable `code`. Switch on that, never on message. */
-export interface ApiError {
-  code: string;
+export interface FieldIssue {
+  code?: string;
+  field: string;
   message: string;
-  details?: {
-    violated?: string[];
-    bounds?: Record<string, number>;
-    suggested_relaxations?: Relaxation[];
-    errors?: { code: string; field: string; message: string }[];
-  };
+}
+
+export type ErrorCode =
+  | "INFEASIBLE"
+  | "SEMANTIC_INVALID"
+  | "NO_CANDIDATES"
+  | "ROUTING_UNAVAILABLE"
+  | "VALIDATION_FAILED"
+  | "NETWORK"
+  | "UNKNOWN";
+
+export interface ApiErrorDetails {
+  violated?: string[];
+  bounds?: Record<string, unknown>;
+  suggested_relaxations?: Relaxation[];
+  errors?: FieldIssue[];
+  reason?: string;
+}
+
+/** Switch on `code`, never on `message`. */
+export interface ApiError {
+  code: ErrorCode;
+  message: string;
+  details?: ApiErrorDetails | null;
+}
+
+export interface PoiSummary extends PhotoFields {
+  id: number;
+  name: string;
+  category: string;
+  matched_category: string;
+  lat: number;
+  lon: number;
+  distance_m: number;
+  cost_estimate_inr: number | null;
+  category_typical_inr: number;
+  visit_minutes: number;
+  indoor: boolean | null;
+  hours_confidence: number | null;
+  hours_verified: boolean;
+  curated: boolean;
+}
+
+export interface OpeningHours {
+  day_of_week: number;       // 0 = Monday
+  open_min: number;
+  close_min: number;
+  is_24h: boolean;
+  source: string;
+  confidence: number;
+  verified: boolean;
+}
+
+export interface PoiDetail extends PhotoFields {
+  id: number;
+  name: string;
+  description: string | null;
+  category: string;
+  secondary_categories: { category: string; weight: number }[];
+  lat: number;
+  lon: number;
+  cost_estimate_inr: number | null;
+  category_typical_inr: number;
+  cost_basis: string;
+  visit_minutes: number;
+  indoor: boolean | null;
+  curated: boolean;
+  source: string;
+  source_ref: string;
+  wikidata_id: string | null;
+  opening_hours: OpeningHours[];
+}
+
+export interface PlaceMatch {
+  name: string;
+  lat: number;
+  lon: number;
+  kind: string;
+  source: "place" | "poi";
+}
+
+export interface ResolveResult {
+  query: string;
+  match: PlaceMatch | null;
+  alternatives: PlaceMatch[];
+  confidence: "high" | "medium" | "low" | "none";
+  needs_clarification: boolean;
 }
 
 /** 902 -> "15:02" */
@@ -115,4 +211,25 @@ export function hhmm(minutes: number): string {
   const h = Math.floor(minutes / 60);
   const m = minutes % 60;
   return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
+}
+
+/** 1234 -> "1.2 km", 640 -> "640 m" */
+export function distanceLabel(m: number): string {
+  return m >= 1000 ? `${(m / 1000).toFixed(1)} km` : `${Math.round(m)} m`;
+}
+
+/** 167 -> "2 h 47 min" */
+export function durationLabel(minutes: number): string {
+  const h = Math.floor(minutes / 60);
+  const m = minutes % 60;
+  if (h === 0) return `${m} min`;
+  return m === 0 ? `${h} h` : `${h} h ${m} min`;
+}
+
+/** Category estimates are shown as typical, never as the venue's price. */
+export function costLabel(stop: Stop): string {
+  if (stop.cost_inr === 0) return "Free";
+  return stop.cost_basis === "category_estimate"
+    ? `≈ ₹${stop.cost_inr} typical`
+    : `₹${stop.cost_inr}`;
 }

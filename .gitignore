@@ -83,3 +83,5 @@ infrastructure/osrm-data/*.osrm*
 # NQ-018: OSRM graph artifacts, ~1.4 GB, rebuilt from the .pbf in ~35 s
 infrastructure/osrm-data/
 infrastructure/osrm-foot/
+
+data/cache/

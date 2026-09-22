@@ -1,30 +1,56 @@
-import React, { useState, useEffect } from 'react'
-import Map from './components/Map'
+import Shell from "./components/Shell";
+import { useRoute } from "./lib/router";
+import DiscoverPage from "./pages/DiscoverPage";
+import HomePage from "./pages/HomePage";
+import OnboardingPage from "./pages/OnboardingPage";
+import PlacePage from "./pages/PlacePage";
+import { PlansPage, SavedPlanPage } from "./pages/PlansPage";
+import PlanPage from "./pages/PlanPage";
+import ProfilePage from "./pages/ProfilePage";
+import SignInPage from "./pages/SignInPage";
+import CreditsPage from "./pages/CreditsPage";
+import { href } from "./lib/router";
+import "./App.css";
 
-function App() {
-  const [health, setHealth] = useState<any>(null)
+export default function App() {
+  const { parts, query } = useRoute();
+  const [section = "", id] = parts;
 
-  useEffect(() => {
-    // Test backend connection via proxy
-    fetch('/api/v1/health')
-      .then(res => res.json())
-      .then(data => setHealth(data))
-      .catch(err => console.error("Health check failed", err))
-  }, [])
+  // Sign-up and sign-in use their own full-screen layout.
+  if (section === "welcome") return <OnboardingPage />;
+  if (section === "signin") return <SignInPage />;
 
-  return (
-    <div className="app-container">
-      <header className="app-header">
-        <h1>NavigIQ - AI Planning</h1>
-        <div className="health-status">
-          Backend Status: {health ? health.status : 'Loading...'}
+  let page;
+  switch (section) {
+    case "":
+      page = <HomePage />;
+      break;
+    case "plan":
+      page = <PlanPage />;
+      break;
+    case "discover":
+      page = <DiscoverPage key={query.get("q") ?? ""} initialQuery={query.get("q") ?? ""} />;
+      break;
+    case "place":
+      page = <PlacePage key={id} id={Number(id)} />;
+      break;
+    case "plans":
+      page = id ? <SavedPlanPage key={id} id={id} /> : <PlansPage />;
+      break;
+    case "profile":
+      page = <ProfilePage />;
+      break;
+    case "credits":
+      page = <CreditsPage />;
+      break;
+    default:
+      page = (
+        <div className="page-narrow empty-state">
+          <h3>Page not found</h3>
+          <p><a href={href("/")}>Go home</a></p>
         </div>
-      </header>
-      <main className="app-main">
-        <Map />
-      </main>
-    </div>
-  )
-}
+      );
+  }
 
-export default App
+  return <Shell active={section}>{page}</Shell>;
+}
