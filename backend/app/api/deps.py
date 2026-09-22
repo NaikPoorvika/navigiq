@@ -8,6 +8,7 @@ never requires an account (section 70).
 """
 from __future__ import annotations
 
+import asyncio
 import re
 import time
 import uuid
@@ -83,16 +84,26 @@ def role_of(user: User | None) -> Role:
 
 
 class RateLimiter:
-    """Fixed-window counter per key, bounded in memory. Protects the costly
-    endpoints (assistant, auth) from abuse on a single workstation."""
+    """Fixed-window counter per key. Protects the costly endpoints (assistant,
+    auth) from abuse.
 
-    def __init__(self, limit: int, window_s: float, max_keys: int = 10_000) -> None:
+    With Redis the counter is shared, so the limit holds across several API
+    worker processes. Without Redis (disabled, or down) it falls back to a
+    bounded in-memory counter per process - still a limit, just per worker.
+    A Redis outage never fails a request and is not retried for a while.
+    """
+
+    REDIS_BACKOFF_S = 30.0
+
+    def __init__(self, name: str, limit: int, window_s: float, max_keys: int = 10_000) -> None:
+        self.name = name
         self.limit = limit
         self.window_s = window_s
         self.max_keys = max_keys
         self._hits: OrderedDict[str, tuple[float, int]] = OrderedDict()
+        self._redis_down_until = 0.0
 
-    def check(self, key: str) -> None:
+    def _memory_count(self, key: str) -> int:
         now = time.monotonic()
         start, count = self._hits.get(key, (now, 0))
         if now - start >= self.window_s:
@@ -102,13 +113,36 @@ class RateLimiter:
         self._hits.move_to_end(key)
         while len(self._hits) > self.max_keys:
             self._hits.popitem(last=False)
+        return count
+
+    async def _redis_count(self, key: str) -> int | None:
+        from app.config import settings
+        if not settings.REDIS_ENABLED or time.monotonic() < self._redis_down_until:
+            return None
+        from app.core.redis import redis_client
+        window = int(time.time() // self.window_s)
+        rk = f"navigiq:rl:{self.name}:{key}:{window}"
+        try:
+            pipe = redis_client.pipeline()
+            pipe.incr(rk)
+            pipe.expire(rk, int(self.window_s) + 5)
+            count, _ = await asyncio.wait_for(pipe.execute(), 0.5)
+            return int(count)
+        except Exception:  # noqa: BLE001 - degrade to the in-process counter
+            self._redis_down_until = time.monotonic() + self.REDIS_BACKOFF_S
+            return None
+
+    async def check(self, key: str) -> None:
+        count = await self._redis_count(key)
+        if count is None:
+            count = self._memory_count(key)
         if count > self.limit:
             raise api_error(status.HTTP_429_TOO_MANY_REQUESTS, "RATE_LIMITED",
                             "too many requests - please slow down")
 
 
-assistant_limiter = RateLimiter(limit=30, window_s=60)
-auth_limiter = RateLimiter(limit=20, window_s=60)
+assistant_limiter = RateLimiter("assistant", limit=30, window_s=60)
+auth_limiter = RateLimiter("auth", limit=20, window_s=60)
 
 
 def client_key(request: Request, user: User | None = None, sid: str | None = None) -> str:

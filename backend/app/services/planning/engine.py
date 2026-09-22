@@ -15,6 +15,7 @@ with the reasons, not a plan.
 """
 from __future__ import annotations
 
+import asyncio
 import time
 from dataclasses import dataclass, field
 from datetime import datetime
@@ -300,22 +301,25 @@ async def plan(db: AsyncSession, spec: TripSpec, *, now: datetime | None = None,
                   coverage_weight=COVERAGE_WEIGHT,
                   adjacent_same_penalty=ADJACENT_SAME_PENALTY)
     attempts = []
-    opt = optimize(nodes, arcs, **common, max_stops=max_stops, min_stops=min_stops,
-                   meal_required=need_meal, meal_windows=meal_windows,
-                   time_limit_s=SOLVE_TIME_LIMIT_S,
-                   deterministic_limit=SOLVE_WORK_LIMIT)
+    # CP-SAT is CPU-bound native code that releases the GIL: solving on a
+    # worker thread keeps the event loop serving other requests meanwhile.
+    opt = await asyncio.to_thread(
+        optimize, nodes, arcs, **common, max_stops=max_stops, min_stops=min_stops,
+        meal_required=need_meal, meal_windows=meal_windows,
+        time_limit_s=SOLVE_TIME_LIMIT_S, deterministic_limit=SOLVE_WORK_LIMIT)
     attempts.append(("cpsat", opt))
     if not opt.is_solution and need_meal:
-        opt = optimize(nodes, arcs, **common, max_stops=max_stops, min_stops=min_stops,
-                       meal_required=False, time_limit_s=SOLVE_TIME_LIMIT_S,
-                       deterministic_limit=SOLVE_WORK_LIMIT)
+        opt = await asyncio.to_thread(
+            optimize, nodes, arcs, **common, max_stops=max_stops, min_stops=min_stops,
+            meal_required=False, time_limit_s=SOLVE_TIME_LIMIT_S,
+            deterministic_limit=SOLVE_WORK_LIMIT)
         attempts.append(("cpsat_no_meal", opt))
         if opt.is_solution:
             out.notes.append("A meal stop didn't fit these constraints, so none is included")
     if not opt.is_solution and min_stops:
-        opt = optimize(nodes, arcs, **common, max_stops=max_stops, min_stops=None,
-                       time_limit_s=SOLVE_TIME_LIMIT_S,
-                       deterministic_limit=SOLVE_WORK_LIMIT)
+        opt = await asyncio.to_thread(
+            optimize, nodes, arcs, **common, max_stops=max_stops, min_stops=None,
+            time_limit_s=SOLVE_TIME_LIMIT_S, deterministic_limit=SOLVE_WORK_LIMIT)
         attempts.append(("cpsat_relaxed_count", opt))
         if opt.is_solution and len(opt.stops) < min_stops:
             out.notes.append(f"Only {len(opt.stops)} stops fit; you asked for {min_stops}")

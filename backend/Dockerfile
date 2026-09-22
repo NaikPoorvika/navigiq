@@ -22,5 +22,8 @@ USER navigiq
 
 EXPOSE 8000
 
-# Migrations run before the server starts; they are idempotent.
-CMD ["sh", "-c", "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8000 --proxy-headers --forwarded-allow-ips='*'"]
+# Migrations run before the server starts; they are idempotent. Several
+# workers: the recommendation scoring is CPU-bound Python (see
+# docs/reports/load_test.md: 4 workers ~2.4x the throughput of one).
+ENV UVICORN_WORKERS=4
+CMD ["sh", "-c", "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8000 --workers ${UVICORN_WORKERS} --proxy-headers --forwarded-allow-ips='*'"]

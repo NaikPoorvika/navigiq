@@ -58,6 +58,12 @@ services:
       REDIS_URL: redis://redis:6379/0
       NAVIGIQ_DATA_DIR: /data
       OLLAMA_HOST: ${OLLAMA_HOST:-http://host.docker.internal:11434}
+      # 4 worker processes (docs/reports/load_test.md); rate limits are shared
+      # through Redis. 2 model calls per worker measured better than 1: Ollama
+      # queues on the GPU itself, and each worker still has a breaker and a
+      # queue timeout.
+      UVICORN_WORKERS: "4"
+      LLM_MAX_CONCURRENCY: "2"
     extra_hosts:
       - "host.docker.internal:host-gateway"
     volumes:

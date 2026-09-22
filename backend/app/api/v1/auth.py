@@ -32,7 +32,7 @@ async def _tokens(db: AsyncSession, user: User) -> TokenPair:
 @router.post("/register", response_model=TokenPair, status_code=status.HTTP_201_CREATED)
 async def register(body: UserCreate, request: Request, db: AsyncSession = Depends(get_db),
                    sid: str | None = Depends(session_id)) -> TokenPair:
-    auth_limiter.check(client_key(request))
+    await auth_limiter.check(client_key(request))
     if await crud_user.get_user_by_email(db, body.email):
         raise api_error(status.HTTP_409_CONFLICT, "EMAIL_TAKEN",
                         "an account with this email already exists")
@@ -45,7 +45,7 @@ async def register(body: UserCreate, request: Request, db: AsyncSession = Depend
 @router.post("/login", response_model=TokenPair)
 async def login(body: LoginRequest, request: Request, db: AsyncSession = Depends(get_db),
                 sid: str | None = Depends(session_id)) -> TokenPair:
-    auth_limiter.check(client_key(request))
+    await auth_limiter.check(client_key(request))
     user = await crud_user.authenticate_user(db, body.email, body.password)
     if user is None or not user.is_active:
         raise api_error(status.HTTP_401_UNAUTHORIZED, "INVALID_CREDENTIALS",
@@ -60,7 +60,7 @@ async def login(body: LoginRequest, request: Request, db: AsyncSession = Depends
 async def login_form(request: Request, form: OAuth2PasswordRequestForm = Depends(),
                      db: AsyncSession = Depends(get_db)) -> dict:
     """OAuth2 password flow (kept for API tooling / the OpenAPI Authorize button)."""
-    auth_limiter.check(client_key(request))
+    await auth_limiter.check(client_key(request))
     user = await crud_user.authenticate_user(db, form.username, form.password)
     if user is None or not user.is_active:
         raise api_error(status.HTTP_401_UNAUTHORIZED, "INVALID_CREDENTIALS",
@@ -71,7 +71,7 @@ async def login_form(request: Request, form: OAuth2PasswordRequestForm = Depends
 @router.post("/refresh", response_model=TokenPair)
 async def refresh(body: RefreshRequest, request: Request,
                   db: AsyncSession = Depends(get_db)) -> TokenPair:
-    auth_limiter.check(client_key(request))
+    await auth_limiter.check(client_key(request))
     try:
         user, new_refresh = await crud_user.rotate_refresh_token(db, body.refresh_token)
     except crud_user.RefreshError as exc:

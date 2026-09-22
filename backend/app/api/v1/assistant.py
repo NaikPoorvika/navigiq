@@ -39,7 +39,7 @@ def _gateway():
 async def chat(body: ChatRequest, request: Request, response: Response,
                db: AsyncSession = Depends(get_db), user: User | None = Depends(optional_user),
                who: Owner = Depends(owner)) -> AssistantResponse:
-    assistant_limiter.check(client_key(request, user, who.session_id))
+    await assistant_limiter.check(client_key(request, user, who.session_id))
     if user is None and not who.session_id:
         raise api_error(status.HTTP_400_BAD_REQUEST, "SESSION_REQUIRED",
                         "send X-NavigIQ-Session or sign in")
