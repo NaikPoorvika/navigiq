@@ -66,7 +66,7 @@ listed that the new scope dropped are marked deferred with the ADR.
 - [ ] Transportation provider (OSRM road times with honest labelling) — reverses ADR-022
 - [ ] Live events (festivals, closures) — needs a lawful source
 - [ ] More place photos from Wikimedia Commons (only ~20 of 12k have one)
-- [ ] Update CLAUDE.md "Technology Direction" to match the decisions (OSRM and Celery are not used in this version) — requires the owner's approval
+- [x] CLAUDE.md "Technology Direction" updated with the owner's approval (2026-09-22): OSRM and Celery documented as deferred/not used
 
 ---
 

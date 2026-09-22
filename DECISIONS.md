@@ -19,10 +19,12 @@
 ## ADR-005: Deterministic planning core
 **Status:** Accepted
 **Decision:** All math, routing (OSRM), optimization (OR-Tools), and constraint validations are handled strictly by deterministic code, acting as the authoritative planner.
+**Amended 2026-09-14 by ADR-022:** routing is deferred. The V1 planner has no OSRM dependency and calculates no travel times; the rest of this decision stands.
 
 ## ADR-006: Prefer modular monolith
 **Status:** Accepted
 **Decision:** The system will be built as a modular monolith. Separate containers are acceptable only where operationally justified (e.g., PostgreSQL, Redis, OSRM, Ollama), avoiding unnecessary microservices.
+**Note (2026-09-22):** in V1 the containers are PostgreSQL, Redis, the API and the web server; Ollama runs on the host. OSRM is a deferred capability behind the compose `routing` profile (ADR-022). No task queue (Celery) is used: V1 has no background workload that needs one.
 
 ## ADR-007: Metro removed
 **Status:** Accepted

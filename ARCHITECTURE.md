@@ -83,6 +83,17 @@ pipeline once per day, passing other days' places as transient exclusions,
 splitting the budget, and adding a trip-level check (no repeats, total
 budget). A change to one day re-plans only that day.
 
+**Transportation (deferred, ADR-022)** — V1 calculates no travel: no routes,
+travel times, ETAs, traffic or fares, and never claims one. Consecutive stops
+are separated by a fixed transition buffer (15 min by default, shown on every
+itinerary with the note that travel time is not calculated), and the
+optimizer keeps each day geographically coherent by penalising hop distance
+— a preference, never a time. Planning asks a `TransportationProvider`
+(`services/transport`); V1 uses the Null provider. A future provider can
+supply real travel-time matrices through that interface (the optimizer
+already accepts per-arc durations). The old OSRM client
+(`services/routing`) is preserved but not imported by the active path.
+
 **Change a plan** — the assistant's rule parser (or the model, validated)
 produces closed operations (`remove_stop`, `set_budget`, `set_pace`,
 `add_meal`… with an optional `day`). Python applies them to the spec, locks or
@@ -137,7 +148,10 @@ moods are closed vocabularies. See `DATA.md` and `docs/data_quality_report.md`.
 ## Operations
 
 - `infrastructure/docker-compose.yml`: db, redis, backend (migrations on
-  start, 4 workers), web (nginx). OSRM behind the `routing` profile.
+  start, 4 workers), web (nginx). OSRM is not part of V1; its container sits
+  behind the `routing` profile for the deferred transportation work (ADR-022).
+- No task queue: V1 has no background workload (ingestion is a CLI, every
+  other operation is request-scoped), so Celery is not used.
 - Health: `/api/v1/health` (DB, Redis) and `/api/v1/health/deep`.
 - Observability: structured logs with request ids; agent runs, tool calls and
   LLM calls are recorded with timings (retention configurable).
