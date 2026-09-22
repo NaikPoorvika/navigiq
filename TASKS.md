@@ -102,7 +102,26 @@ Legend:
         malformed-time 0%, **hallucination 26.9%**, **unsupported date
         phrase 18.2%** - the last two are recorded, not smoothed over
   - [x] ADR-016 recorded
-- [ ] NQ-030 — Eval datasets + scorer + baseline report
+- [x] NQ-030 — Extraction prompt v2 (restraint) + held-out evaluation
+  - [x] `tripdraft_extraction_v2.md` is the default; v1 kept byte-identical
+        (sha256-pinned) and still selectable. The NQ-029 runner is pinned to v1
+  - [x] 40-case held-out set (`ai/evals/nq030/heldout.json`), written after
+        v2 was frozen, hash-pinned, leakage-guarded against the prompt
+  - [x] Scorer measures both directions (under-extraction and unrequested
+        fields) and classifies each invented value as benign / clarifying /
+        plan-altering using draft_builder's real defaults
+  - [x] Held-out, v1 -> v2: plan-altering hallucination 46.2% -> 27.5%,
+        explicit extraction 84.5% -> 92.8%, place/interest 80% -> 100%,
+        clean cases 47.5% -> 70.0%. 3 case-level regressions recorded
+  - [x] FINDING: JSON-schema constrained decoding coerces unsupported values
+        into allowed ones (bus -> auto) and forces a key order that drops
+        fields. Unsupported transport is still substituted in 2/2 held-out
+        cases - needs an architectural decision, not more prompt
+  - [x] FINDING: qwen3:14b on Ollama is not bit-reproducible across sessions
+        at temperature 0 / fixed seed (NQ-029 re-run: 2/26 responses changed)
+  - [ ] DECISION NEEDED: how to stop grammar coercion (see
+        `ai/evals/nq030/README.md` §7). Would need an ADR; ADR-017 is
+        reserved by the execution plan for the architecture-lint contract
 - [ ] NQ-031 — Clarification flow
 - [ ] NQ-032 — Grounded explanation + numeric entailment
 - [ ] NQ-033 — NL input UI with editable chips

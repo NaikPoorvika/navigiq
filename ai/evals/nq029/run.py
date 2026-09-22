@@ -37,7 +37,7 @@ sys.path.insert(0, str(HERE))
 
 from app.llm import LLMError, build_llm_gateway  # noqa: E402
 from app.llm.extraction import (  # noqa: E402
-    PROMPT_VERSION,
+    PROMPT_VERSIONS,
     TripDraftExtractionFailed,
     extract_trip_draft,
 )
@@ -84,12 +84,20 @@ class RecordingGateway:
         await self._inner.aclose()
 
 
-async def run_case(case, gateway: RecordingGateway) -> CaseResult:
+# NQ-029's measurement was made with v1. The production default has since
+# moved on (NQ-030), so the baseline is pinned here explicitly - otherwise
+# re-running this eval would silently measure a different prompt.
+BASELINE_PROMPT_VERSION = "v1"
+
+
+async def run_case(case, gateway: RecordingGateway,
+                   prompt_version: str = BASELINE_PROMPT_VERSION) -> CaseResult:
     started = time.perf_counter()
     draft = None
     failure_reason = None
     try:
-        extraction = await extract_trip_draft(case.text, gateway=gateway)
+        extraction = await extract_trip_draft(
+            case.text, gateway=gateway, prompt_version=prompt_version)
         draft = extraction.draft.model_dump(mode="json")
     except TripDraftExtractionFailed as exc:
         failure_reason = exc.reason
@@ -108,6 +116,9 @@ async def main() -> int:
                         help="run only these case ids (repeatable)")
     parser.add_argument("--out", default=str(HERE / "results"),
                         help="directory for results.json and report.md")
+    parser.add_argument("--prompt-version", default=BASELINE_PROMPT_VERSION,
+                        choices=PROMPT_VERSIONS,
+                        help="prompt to measure (default: the v1 baseline)")
     args = parser.parse_args()
 
     cases = CASES
@@ -126,7 +137,7 @@ async def main() -> int:
         for index, case in enumerate(cases, 1):
             print(f"[{index}/{len(cases)}] {case.id} ...",
                   end=" ", flush=True)
-            result = await run_case(case, gateway)
+            result = await run_case(case, gateway, args.prompt_version)
             results.append(result)
             verdict = ("ok" if result.ok else f"FAILED({result.failure_reason})")
             print(f"{verdict} {result.correct}/{result.total} "
@@ -140,7 +151,7 @@ async def main() -> int:
         "run_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "model": settings.OLLAMA_GEN_MODEL,
         "num_ctx": settings.OLLAMA_NUM_CTX,
-        "prompt_version": PROMPT_VERSION,
+        "prompt_version": args.prompt_version,
         "ollama_host": settings.OLLAMA_HOST,
     }
 

@@ -35,6 +35,7 @@ from app.llm import (  # noqa: E402
     LLMTruncated,
     LLMUnavailable,
 )
+from app.llm.extraction import PROMPT_VERSION  # noqa: E402
 from app.main import app  # noqa: E402
 
 pytestmark = pytest.mark.asyncio
@@ -75,7 +76,7 @@ async def test_a_request_becomes_a_draft(client):
     assert body["draft"]["date_phrase"] == "tomorrow"
     assert body["draft"]["interests"] == [
         {"category": "cafe", "count": 1, "priority": "should"}]
-    assert body["prompt_version"] == "v1"
+    assert body["prompt_version"] == PROMPT_VERSION
     assert body["model"] == "fake-generation"
 
 

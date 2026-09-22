@@ -21,6 +21,17 @@ python ai/evals/nq029/run.py
 python ai/evals/nq029/run.py --case 17-ambiguous --case 24-unsupported-transport
 ```
 
+The runner is pinned to the **v1** prompt that produced the committed
+baseline, even though production moved to v2 in NQ-030 — otherwise re-running
+it would silently measure a different prompt. `--prompt-version v2` runs the
+same cases against v2. NQ-030's own evaluation (held-out set, both prompts,
+repeats) lives in `ai/evals/nq030/`.
+
+Re-running the baseline does not reproduce it bit-for-bit: qwen3:14b on
+Ollama is not deterministic at temperature 0 with a fixed seed. A re-run on
+2026-09-22 changed 2 of 26 raw responses (hallucination 26.9% → 30.8%). See
+`ai/evals/nq030/README.md`.
+
 Writes `results/results.json` (including every raw model response) and
 `results/report.md`.
 

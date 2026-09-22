@@ -1,0 +1,4364 @@
+{
+  "meta": {
+    "task": "NQ-030",
+    "dataset": "heldout",
+    "dataset_sha256": "2d768e27b66e4d27ca88240d115b077b90b9565109475a7822bbd1352e78c3cb",
+    "prompt_version": "v1",
+    "prompt_sha256": "811cff33f26e8c22a403912ba154eadb1df2704c1b277049bbc499a116798503",
+    "model": "qwen3:14b",
+    "num_ctx": 8192,
+    "temperature": 0.0,
+    "seed": 0,
+    "max_tokens": 512,
+    "repeats": 3,
+    "run_at": "2026-09-22T09:02:43+00:00"
+  },
+  "aggregate": {
+    "schema_validity_rate": {
+      "mean": 0.975,
+      "min": 0.975,
+      "max": 0.975
+    },
+    "explicit_extraction_accuracy": {
+      "mean": 0.845360824742268,
+      "min": 0.845360824742268,
+      "max": 0.845360824742268
+    },
+    "under_extraction_rate": {
+      "mean": 0.14432989690721648,
+      "min": 0.14432989690721648,
+      "max": 0.14432989690721648
+    },
+    "wrong_value_rate": {
+      "mean": 0.010309278350515464,
+      "min": 0.010309278350515464,
+      "max": 0.010309278350515464
+    },
+    "unrequested_case_rate": {
+      "mean": 0.48717948717948717,
+      "min": 0.48717948717948717,
+      "max": 0.48717948717948717
+    },
+    "unrequested_field_rate": {
+      "mean": 0.05855855855855855,
+      "min": 0.05855855855855856,
+      "max": 0.05855855855855856
+    },
+    "plan_altering_rate": {
+      "mean": 0.4615384615384615,
+      "min": 0.46153846153846156,
+      "max": 0.46153846153846156
+    },
+    "coordinate_leakage_rate": {
+      "mean": 0.0,
+      "min": 0.0,
+      "max": 0.0
+    },
+    "malformed_time_rate": {
+      "mean": 0.0,
+      "min": 0.0,
+      "max": 0.0
+    },
+    "unsupported_date_rate": {
+      "mean": 0.16666666666666666,
+      "min": 0.16666666666666666,
+      "max": 0.16666666666666666
+    },
+    "place_interest_accuracy": {
+      "mean": 0.8000000000000002,
+      "min": 0.8,
+      "max": 0.8
+    },
+    "clean_rate": {
+      "mean": 0.4749999999999999,
+      "min": 0.475,
+      "max": 0.475
+    },
+    "latency_ms_mean": {
+      "mean": 681.9938633336278,
+      "min": 636.4583725000557,
+      "max": 769.9692250003864
+    }
+  },
+  "unstable_cases": [],
+  "repeats": [
+    {
+      "summary": {
+        "cases": 40,
+        "clean_cases": 19,
+        "clean_rate": 0.475,
+        "schema_valid": 39,
+        "schema_validity_rate": 0.975,
+        "stated_checks": 97,
+        "stated_correct": 82,
+        "explicit_extraction_accuracy": 0.845360824742268,
+        "stated_missing": 14,
+        "under_extraction_rate": 0.14432989690721648,
+        "stated_wrong": 1,
+        "wrong_value_rate": 0.010309278350515464,
+        "unrequested_cases": 19,
+        "unrequested_case_rate": 0.48717948717948717,
+        "unrequested_fields": 26,
+        "restraint_opportunities": 444,
+        "unrequested_field_rate": 0.05855855855855856,
+        "unrequested_by_severity": {
+          "benign": 6,
+          "clarifying": 2,
+          "plan_altering": 18
+        },
+        "plan_altering_cases": 18,
+        "plan_altering_rate": 0.46153846153846156,
+        "coordinate_leak_cases": 0,
+        "coordinate_leakage_rate": 0.0,
+        "responses_with_a_time": 5,
+        "malformed_time_rate": 0.0,
+        "responses_with_a_date_phrase": 18,
+        "unsupported_date_cases": 3,
+        "unsupported_date_rate": 0.16666666666666666,
+        "place_interest_cases": 5,
+        "place_interest_correct": 4,
+        "place_interest_accuracy": 0.8,
+        "latency_ms_mean": 769.9692250003864,
+        "latency_ms_p50": 558.6963999958243,
+        "latency_ms_max": 4269.064600011916,
+        "failures_by_reason": {
+          "schema_invalid": 1
+        },
+        "by_category": {
+          "explicit_extraction": {
+            "cases": 10,
+            "clean": 5
+          },
+          "missing_info_restraint": {
+            "cases": 8,
+            "clean": 5
+          },
+          "ambiguous_wording": {
+            "cases": 5,
+            "clean": 3
+          },
+          "unsupported_enum": {
+            "cases": 4,
+            "clean": 1
+          },
+          "date_time": {
+            "cases": 5,
+            "clean": 0
+          },
+          "place_interest": {
+            "cases": 5,
+            "clean": 4
+          },
+          "indian_english_noisy": {
+            "cases": 3,
+            "clean": 1
+          }
+        }
+      },
+      "cases": [
+        {
+          "case_id": "A01-explicit-full",
+          "category": "explicit_extraction",
+          "input": "Head out from Banashankari to Nandi Hills on Sunday, three of us, with a budget of Rs 3,000.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": false,
+          "stated": [
+            {
+              "field": "origin",
+              "status": "correct",
+              "got": "'Banashankari'"
+            },
+            {
+              "field": "destination",
+              "status": "correct",
+              "got": "'Nandi Hills'"
+            },
+            {
+              "field": "date_phrase",
+              "status": "correct",
+              "got": "'Sunday' -> 2026-09-27"
+            },
+            {
+              "field": "party_size",
+              "status": "correct",
+              "got": "3"
+            },
+            {
+              "field": "budget_inr",
+              "status": "missing",
+              "got": "None"
+            }
+          ],
+          "unrequested": [
+            {
+              "field": "transport",
+              "severity": "plan_altering",
+              "value": "[\"own_car\"]"
+            },
+            {
+              "field": "vegetarian",
+              "severity": "benign",
+              "value": "false"
+            },
+            {
+              "field": "mode",
+              "severity": "benign",
+              "value": "\"balanced\""
+            }
+          ],
+          "plan_altering": [
+            "transport"
+          ],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 3417.9,
+          "raw": "{\"origin\": {\"name\": \"Banashankari\"}, \"destination\": {\"name\": \"Nandi Hills\"}, \"date_phrase\": \"Sunday\", \"party_size\": 3, \"transport\": [\"own_car\"], \"vegetarian\": false, \"mode\": \"balanced\"}"
+        },
+        {
+          "case_id": "A02-explicit-time-interests",
+          "category": "explicit_extraction",
+          "input": "Starting in Malleshwaram at 8:30 am, I'd like to see a temple and a museum.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": true,
+          "stated": [
+            {
+              "field": "origin",
+              "status": "correct",
+              "got": "'Malleshwaram'"
+            },
+            {
+              "field": "start_time_local",
+              "status": "correct",
+              "got": "'08:30'"
+            },
+            {
+              "field": "interests",
+              "status": "correct",
+              "got": "['museum', 'temple']"
+            }
+          ],
+          "unrequested": [],
+          "plan_altering": [],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 4269.1,
+          "raw": "{\n  \"origin\": {\n    \"name\": \"Malleshwaram\"\n  },\n  \"start_time_local\": \"08:30\",\n  \"interests\": [\n    {\n      \"category\": \"temple\"\n    },\n    {\n      \"category\": \"museum\"\n    }\n  ]\n}"
+        },
+        {
+          "case_id": "A03-explicit-cab-group",
+          "category": "explicit_extraction",
+          "input": "We are 5 friends going from Electronic City, and we'd like a cab for the whole day.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": true,
+          "stated": [
+            {
+              "field": "origin",
+              "status": "correct",
+              "got": "'Electronic City'"
+            },
+            {
+              "field": "party_size",
+              "status": "correct",
+              "got": "5"
+            },
+            {
+              "field": "transport",
+              "status": "correct",
+              "got": "['cab']"
+            }
+          ],
+          "unrequested": [],
+          "plan_altering": [],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 454.3,
+          "raw": "{\"origin\": {\"name\": \"Electronic City\"}, \"party_size\": 5, \"transport\": [\"cab\"]}"
+        },
+        {
+          "case_id": "A04-explicit-vegetarian",
+          "category": "explicit_extraction",
+          "input": "Vegetarian lunch spot first, then a bookstore, starting from Basavanagudi.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": false,
+          "stated": [
+            {
+              "field": "origin",
+              "status": "correct",
+              "got": "'Basavanagudi'"
+            },
+            {
+              "field": "vegetarian",
+              "status": "missing",
+              "got": "None"
+            },
+            {
+              "field": "interests",
+              "status": "correct",
+              "got": "['bookstore', 'restaurant']"
+            }
+          ],
+          "unrequested": [],
+          "plan_altering": [],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 664.1,
+          "raw": "{\"origin\": {\"name\": \"Basavanagudi\"}, \"interests\": [{\"category\": \"restaurant\", \"priority\": \"must\"}, {\"category\": \"bookstore\"}]}"
+        },
+        {
+          "case_id": "A05-explicit-days-car",
+          "category": "explicit_extraction",
+          "input": "Two-day trip from Yelahanka, we'll drive ourselves.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": false,
+          "stated": [
+            {
+              "field": "origin",
+              "status": "correct",
+              "got": "'Yelahanka'"
+            },
+            {
+              "field": "days",
+              "status": "missing",
+              "got": "None"
+            },
+            {
+              "field": "transport",
+              "status": "correct",
+              "got": "['own_car']"
+            }
+          ],
+          "unrequested": [
+            {
+              "field": "mode",
+              "severity": "plan_altering",
+              "value": "\"relaxed\""
+            }
+          ],
+          "plan_altering": [
+            "mode"
+          ],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 515.2,
+          "raw": "{\"origin\": {\"name\": \"Yelahanka\"}, \"transport\": [\"own_car\"], \"mode\": \"relaxed\"}"
+        },
+        {
+          "case_id": "A06-explicit-walk-limit-end",
+          "category": "explicit_extraction",
+          "input": "From Frazer Town, cap the walking at 2 km and finish by 7 pm.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": false,
+          "stated": [
+            {
+              "field": "origin",
+              "status": "correct",
+              "got": "'Frazer Town'"
+            },
+            {
+              "field": "max_walking_km",
+              "status": "correct",
+              "got": "2.0"
+            },
+            {
+              "field": "end_time_local",
+              "status": "missing",
+              "got": "None"
+            }
+          ],
+          "unrequested": [
+            {
+              "field": "mode",
+              "severity": "plan_altering",
+              "value": "\"quick\""
+            }
+          ],
+          "plan_altering": [
+            "mode"
+          ],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 533.6,
+          "raw": "{\"origin\": {\"name\": \"Frazer Town\"}, \"max_walking_km\": 2, \"mode\": \"quick\"}"
+        },
+        {
+          "case_id": "A07-explicit-bicycle-lake",
+          "category": "explicit_extraction",
+          "input": "Bicycle ride from Ulsoor to a lake, next Tuesday.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": false,
+          "stated": [
+            {
+              "field": "origin",
+              "status": "correct",
+              "got": "'Ulsoor'"
+            },
+            {
+              "field": "transport",
+              "status": "correct",
+              "got": "['bike']"
+            },
+            {
+              "field": "interests",
+              "status": "missing",
+              "got": "[]"
+            },
+            {
+              "field": "date_phrase",
+              "status": "correct",
+              "got": "'next Tuesday' -> 2026-09-22"
+            }
+          ],
+          "unrequested": [
+            {
+              "field": "destination",
+              "severity": "plan_altering",
+              "value": "{\"name\": \"lake\"}"
+            }
+          ],
+          "plan_altering": [
+            "destination"
+          ],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 929.6,
+          "raw": "{\n  \"origin\": {\n    \"name\": \"Ulsoor\"\n  },\n  \"destination\": {\n    \"name\": \"lake\"\n  },\n  \"date_phrase\": \"next Tuesday\",\n  \"transport\": [\n    \"bike\"\n  ]\n}"
+        },
+        {
+          "case_id": "A08-explicit-iso-date",
+          "category": "explicit_extraction",
+          "input": "I want a viewpoint and some dessert, starting from RT Nagar on 2026-11-14.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": true,
+          "stated": [
+            {
+              "field": "origin",
+              "status": "correct",
+              "got": "'RT Nagar'"
+            },
+            {
+              "field": "interests",
+              "status": "correct",
+              "got": "['dessert', 'viewpoint']"
+            },
+            {
+              "field": "date_phrase",
+              "status": "correct",
+              "got": "'2026-11-14' -> 2026-11-14"
+            }
+          ],
+          "unrequested": [],
+          "plan_altering": [],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 1171.8,
+          "raw": "{\n  \"origin\": {\n    \"name\": \"RT Nagar\"\n  },\n  \"date_phrase\": \"2026-11-14\",\n  \"interests\": [\n    {\n      \"category\": \"viewpoint\"\n    },\n    {\n      \"category\": \"dessert\"\n    }\n  ]\n}"
+        },
+        {
+          "case_id": "A09-explicit-pace",
+          "category": "explicit_extraction",
+          "input": "Rush through as many sights as possible, starting from Majestic this Friday.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": true,
+          "stated": [
+            {
+              "field": "origin",
+              "status": "correct",
+              "got": "'Majestic'"
+            },
+            {
+              "field": "date_phrase",
+              "status": "correct",
+              "got": "'Friday' -> 2026-09-25"
+            },
+            {
+              "field": "mode",
+              "status": "correct",
+              "got": "'quick'"
+            }
+          ],
+          "unrequested": [],
+          "plan_altering": [],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 459.9,
+          "raw": "{\"origin\": {\"name\": \"Majestic\"}, \"date_phrase\": \"Friday\", \"mode\": \"quick\"}"
+        },
+        {
+          "case_id": "A10-explicit-solo",
+          "category": "explicit_extraction",
+          "input": "Take me to Lalbagh tomorrow at 7 in the morning, just me.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": true,
+          "stated": [
+            {
+              "field": "destination",
+              "status": "correct",
+              "got": "'Lalbagh'"
+            },
+            {
+              "field": "date_phrase",
+              "status": "correct",
+              "got": "'tomorrow' -> 2026-09-22"
+            },
+            {
+              "field": "start_time_local",
+              "status": "correct",
+              "got": "'07:00'"
+            },
+            {
+              "field": "party_size",
+              "status": "correct",
+              "got": "1"
+            }
+          ],
+          "unrequested": [],
+          "plan_altering": [],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 720.5,
+          "raw": "{\"destination\": {\"name\": \"Lalbagh\"}, \"date_phrase\": \"tomorrow\", \"start_time_local\": \"07:00\", \"party_size\": 1}"
+        },
+        {
+          "case_id": "B01-affordable",
+          "category": "missing_info_restraint",
+          "input": "Plan an affordable outing from HSR Layout.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": false,
+          "stated": [
+            {
+              "field": "origin",
+              "status": "correct",
+              "got": "'HSR Layout'"
+            }
+          ],
+          "unrequested": [
+            {
+              "field": "budget_inr",
+              "severity": "plan_altering",
+              "value": "0"
+            }
+          ],
+          "plan_altering": [
+            "budget_inr"
+          ],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 375.1,
+          "raw": "{\"origin\": {\"name\": \"HSR Layout\"}, \"budget_inr\": 0}"
+        },
+        {
+          "case_id": "B02-kids",
+          "category": "missing_info_restraint",
+          "input": "Something for me and the kids, starting at Jayanagar.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": false,
+          "stated": [
+            {
+              "field": "origin",
+              "status": "correct",
+              "got": "'Jayanagar'"
+            }
+          ],
+          "unrequested": [
+            {
+              "field": "party_size",
+              "severity": "plan_altering",
+              "value": "2"
+            }
+          ],
+          "plan_altering": [
+            "party_size"
+          ],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 362.2,
+          "raw": "{\"origin\": {\"name\": \"Jayanagar\"}, \"party_size\": 2}"
+        },
+        {
+          "case_id": "B03-eat-not-veg",
+          "category": "missing_info_restraint",
+          "input": "From Whitefield, I'd like somewhere to eat.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": true,
+          "stated": [
+            {
+              "field": "origin",
+              "status": "correct",
+              "got": "'Whitefield'"
+            },
+            {
+              "field": "interests",
+              "status": "correct",
+              "got": "['restaurant']"
+            }
+          ],
+          "unrequested": [],
+          "plan_altering": [],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 414.1,
+          "raw": "{\"origin\": {\"name\": \"Whitefield\"}, \"interests\": [{\"category\": \"restaurant\"}]}"
+        },
+        {
+          "case_id": "B04-relaxing-vibe",
+          "category": "missing_info_restraint",
+          "input": "A relaxing Saturday from Indiranagar.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": false,
+          "stated": [
+            {
+              "field": "origin",
+              "status": "correct",
+              "got": "'Indiranagar'"
+            },
+            {
+              "field": "date_phrase",
+              "status": "correct",
+              "got": "'Saturday' -> 2026-09-26"
+            }
+          ],
+          "unrequested": [
+            {
+              "field": "mode",
+              "severity": "plan_altering",
+              "value": "\"relaxed\""
+            }
+          ],
+          "plan_altering": [
+            "mode"
+          ],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 475.4,
+          "raw": "{\"origin\": {\"name\": \"Indiranagar\"}, \"date_phrase\": \"Saturday\", \"mode\": \"relaxed\"}"
+        },
+        {
+          "case_id": "B05-colleagues",
+          "category": "missing_info_restraint",
+          "input": "Organise something from Hebbal with my colleagues.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": true,
+          "stated": [
+            {
+              "field": "origin",
+              "status": "correct",
+              "got": "'Hebbal'"
+            }
+          ],
+          "unrequested": [],
+          "plan_altering": [],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 234.4,
+          "raw": "{\"origin\": {\"name\": \"Hebbal\"}}"
+        },
+        {
+          "case_id": "B06-low-budget",
+          "category": "missing_info_restraint",
+          "input": "Low-budget plan starting from Koramangala, some cafes please.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": true,
+          "stated": [
+            {
+              "field": "origin",
+              "status": "correct",
+              "got": "'Koramangala'"
+            },
+            {
+              "field": "interests",
+              "status": "correct",
+              "got": "['cafe']"
+            }
+          ],
+          "unrequested": [
+            {
+              "field": "mode",
+              "severity": "benign",
+              "value": "\"balanced\""
+            }
+          ],
+          "plan_altering": [],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 689.5,
+          "raw": "{\"origin\": {\"name\": \"Koramangala\"}, \"interests\": [{\"category\": \"cafe\", \"count\": 1}], \"mode\": \"balanced\"}"
+        },
+        {
+          "case_id": "B07-bare-destination",
+          "category": "missing_info_restraint",
+          "input": "Heading to Cubbon Park.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": true,
+          "stated": [
+            {
+              "field": "destination",
+              "status": "correct",
+              "got": "'Cubbon Park'"
+            }
+          ],
+          "unrequested": [],
+          "plan_altering": [],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 252.6,
+          "raw": "{\"destination\": {\"name\": \"Cubbon Park\"}}"
+        },
+        {
+          "case_id": "B08-bare-date",
+          "category": "missing_info_restraint",
+          "input": "Can you sort out a plan for Sunday?",
+          "ok": true,
+          "failure_reason": null,
+          "clean": true,
+          "stated": [
+            {
+              "field": "date_phrase",
+              "status": "correct",
+              "got": "'Sunday' -> 2026-09-27"
+            }
+          ],
+          "unrequested": [],
+          "plan_altering": [],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 171.3,
+          "raw": "{\"date_phrase\": \"Sunday\"}"
+        },
+        {
+          "case_id": "C01-late-tonight",
+          "category": "ambiguous_wording",
+          "input": "Somewhere near Church Street late tonight.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": true,
+          "stated": [
+            {
+              "field": "place_any",
+              "status": "correct",
+              "got": "[None, 'Church Street']"
+            },
+            {
+              "field": "date_phrase",
+              "status": "correct",
+              "got": "'tonight' -> 2026-09-21"
+            }
+          ],
+          "unrequested": [],
+          "plan_altering": [],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 349.0,
+          "raw": "{\"destination\": {\"name\": \"Church Street\"}, \"date_phrase\": \"tonight\"}"
+        },
+        {
+          "case_id": "C02-undecided-destination",
+          "category": "ambiguous_wording",
+          "input": "Maybe Mysore, maybe Coorg, not sure yet.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": true,
+          "stated": [],
+          "unrequested": [],
+          "plan_altering": [],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 70.4,
+          "raw": "{}"
+        },
+        {
+          "case_id": "C03-lunchtime",
+          "category": "ambiguous_wording",
+          "input": "Around lunchtime in Sadashivanagar, a quiet spot.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": false,
+          "stated": [
+            {
+              "field": "place_any",
+              "status": "correct",
+              "got": "['Sadashivanagar', None]"
+            }
+          ],
+          "unrequested": [
+            {
+              "field": "date_phrase",
+              "severity": "plan_altering",
+              "value": "\"today\""
+            },
+            {
+              "field": "start_time_local",
+              "severity": "plan_altering",
+              "value": "\"12:00\""
+            }
+          ],
+          "plan_altering": [
+            "date_phrase",
+            "start_time_local"
+          ],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 575.2,
+          "raw": "{\"origin\": {\"name\": \"Sadashivanagar\"}, \"date_phrase\": \"today\", \"start_time_local\": \"12:00\"}"
+        },
+        {
+          "case_id": "C04-afternoon",
+          "category": "ambiguous_wording",
+          "input": "A few hours out in the afternoon, Rajajinagar side.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": false,
+          "stated": [
+            {
+              "field": "place_any",
+              "status": "missing",
+              "got": "None"
+            }
+          ],
+          "unrequested": [
+            {
+              "field": "date_phrase",
+              "severity": "clarifying",
+              "value": "\"afternoon\""
+            },
+            {
+              "field": "interests",
+              "severity": "plan_altering",
+              "value": "[\"park\"]"
+            }
+          ],
+          "plan_altering": [
+            "interests"
+          ],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": "afternoon",
+          "latency_ms": 416.8,
+          "raw": "{\"date_phrase\": \"afternoon\", \"interests\": [{\"category\": \"park\"}]}"
+        },
+        {
+          "case_id": "C05-hedged-interest",
+          "category": "ambiguous_wording",
+          "input": "We might do a couple of cafes, or maybe not, from BTM Layout.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": true,
+          "stated": [
+            {
+              "field": "origin",
+              "status": "correct",
+              "got": "'BTM Layout'"
+            }
+          ],
+          "unrequested": [],
+          "plan_altering": [],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 542.7,
+          "raw": "{\"origin\": {\"name\": \"BTM Layout\"}, \"interests\": [{\"category\": \"cafe\", \"count\": 2}]}"
+        },
+        {
+          "case_id": "D01-metro",
+          "category": "unsupported_enum",
+          "input": "We'll ride the metro from MG Road to Yeshwanthpur.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": false,
+          "stated": [
+            {
+              "field": "origin",
+              "status": "correct",
+              "got": "'MG Road'"
+            },
+            {
+              "field": "destination",
+              "status": "correct",
+              "got": "'Yeshwanthpur'"
+            }
+          ],
+          "unrequested": [
+            {
+              "field": "transport",
+              "severity": "plan_altering",
+              "value": "[\"auto\"]"
+            }
+          ],
+          "plan_altering": [
+            "transport"
+          ],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 575.0,
+          "raw": "{\"origin\": {\"name\": \"MG Road\"}, \"destination\": {\"name\": \"Yeshwanthpur\"}, \"transport\": [\"auto\"]}"
+        },
+        {
+          "case_id": "D02-train",
+          "category": "unsupported_enum",
+          "input": "Taking a train out to Mysore on Saturday.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": true,
+          "stated": [
+            {
+              "field": "destination",
+              "status": "correct",
+              "got": "'Mysore'"
+            },
+            {
+              "field": "date_phrase",
+              "status": "correct",
+              "got": "'Saturday' -> 2026-09-26"
+            }
+          ],
+          "unrequested": [],
+          "plan_altering": [],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 358.6,
+          "raw": "{\"destination\": {\"name\": \"Mysore\"}, \"date_phrase\": \"Saturday\"}"
+        },
+        {
+          "case_id": "D03-unmappable-interests",
+          "category": "unsupported_enum",
+          "input": "From Koramangala, I'd love a spa afternoon and a pottery class.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": false,
+          "stated": [
+            {
+              "field": "origin",
+              "status": "correct",
+              "got": "'Koramangala'"
+            },
+            {
+              "field": "free_text_contains",
+              "status": "correct",
+              "got": "['spa afternoon', 'pottery class']"
+            }
+          ],
+          "unrequested": [
+            {
+              "field": "interests",
+              "severity": "plan_altering",
+              "value": "[\"market\", \"shopping\"]"
+            }
+          ],
+          "plan_altering": [
+            "interests"
+          ],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 801.6,
+          "raw": "{\"origin\": {\"name\": \"Koramangala\"}, \"interests\": [{\"category\": \"shopping\"}, {\"category\": \"market\"}], \"free_text_interests\": [\"spa afternoon\", \"pottery class\"]}"
+        },
+        {
+          "case_id": "D04-bmtc",
+          "category": "unsupported_enum",
+          "input": "Catching a BMTC from Shivajinagar to Hebbal.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": false,
+          "stated": [
+            {
+              "field": "origin",
+              "status": "correct",
+              "got": "'Shivajinagar'"
+            },
+            {
+              "field": "destination",
+              "status": "correct",
+              "got": "'Hebbal'"
+            }
+          ],
+          "unrequested": [
+            {
+              "field": "transport",
+              "severity": "plan_altering",
+              "value": "[\"auto\"]"
+            }
+          ],
+          "plan_altering": [
+            "transport"
+          ],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 558.7,
+          "raw": "{\"origin\": {\"name\": \"Shivajinagar\"}, \"destination\": {\"name\": \"Hebbal\"}, \"transport\": [\"auto\"]}"
+        },
+        {
+          "case_id": "E01-weekday-evening",
+          "category": "date_time",
+          "input": "Next Thursday evening from Jayanagar, dinner somewhere.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": false,
+          "stated": [
+            {
+              "field": "origin",
+              "status": "correct",
+              "got": "'Jayanagar'"
+            },
+            {
+              "field": "date_phrase",
+              "status": "correct",
+              "got": "'Thursday' -> 2026-09-24"
+            },
+            {
+              "field": "interests",
+              "status": "correct",
+              "got": "['restaurant']"
+            }
+          ],
+          "unrequested": [
+            {
+              "field": "transport",
+              "severity": "plan_altering",
+              "value": "[\"auto\"]"
+            }
+          ],
+          "plan_altering": [
+            "transport"
+          ],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 1023.6,
+          "raw": "{\n  \"origin\": {\n    \"name\": \"Jayanagar\"\n  },\n  \"date_phrase\": \"Thursday\",\n  \"interests\": [\n    {\n      \"category\": \"restaurant\"\n    }\n  ],\n  \"transport\": [\n    \"auto\"\n  ]\n}"
+        },
+        {
+          "case_id": "E02-night-clock",
+          "category": "date_time",
+          "input": "Friday night, starting 8 pm from Indiranagar, a bar.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": false,
+          "stated": [
+            {
+              "field": "origin",
+              "status": "missing",
+              "got": "None"
+            },
+            {
+              "field": "date_phrase",
+              "status": "correct",
+              "got": "'Friday' -> 2026-09-25"
+            },
+            {
+              "field": "start_time_local",
+              "status": "correct",
+              "got": "'20:00'"
+            },
+            {
+              "field": "interests",
+              "status": "correct",
+              "got": "['bar']"
+            }
+          ],
+          "unrequested": [
+            {
+              "field": "transport",
+              "severity": "plan_altering",
+              "value": "[\"walking\"]"
+            }
+          ],
+          "plan_altering": [
+            "transport"
+          ],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 1016.4,
+          "raw": "{\n  \"date_phrase\": \"Friday\",\n  \"start_time_local\": \"20:00\",\n  \"interests\": [\n    {\n      \"category\": \"bar\"\n    }\n  ],\n  \"transport\": [\n    \"walking\"\n  ]\n}"
+        },
+        {
+          "case_id": "E03-month",
+          "category": "date_time",
+          "input": "Can we go sometime in October from Hebbal?",
+          "ok": true,
+          "failure_reason": null,
+          "clean": false,
+          "stated": [
+            {
+              "field": "origin",
+              "status": "correct",
+              "got": "'Hebbal'"
+            }
+          ],
+          "unrequested": [
+            {
+              "field": "date_phrase",
+              "severity": "clarifying",
+              "value": "\"October\""
+            }
+          ],
+          "plan_altering": [],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": "October",
+          "latency_ms": 353.4,
+          "raw": "{\"origin\": {\"name\": \"Hebbal\"}, \"date_phrase\": \"October\"}"
+        },
+        {
+          "case_id": "E04-clock-range",
+          "category": "date_time",
+          "input": "Day after tomorrow, from 10:15 to 16:45, Koramangala.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": false,
+          "stated": [
+            {
+              "field": "place_any",
+              "status": "missing",
+              "got": "None"
+            },
+            {
+              "field": "date_phrase",
+              "status": "correct",
+              "got": "'day after tomorrow' -> 2026-09-23"
+            },
+            {
+              "field": "start_time_local",
+              "status": "correct",
+              "got": "'10:15'"
+            },
+            {
+              "field": "end_time_local",
+              "status": "correct",
+              "got": "'16:45'"
+            }
+          ],
+          "unrequested": [
+            {
+              "field": "transport",
+              "severity": "plan_altering",
+              "value": "[\"own_car\"]"
+            }
+          ],
+          "plan_altering": [
+            "transport"
+          ],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 876.0,
+          "raw": "{\n  \"date_phrase\": \"day after tomorrow\",\n  \"start_time_local\": \"10:15\",\n  \"end_time_local\": \"16:45\",\n  \"transport\": [\"own_car\"]\n}"
+        },
+        {
+          "case_id": "E05-early-morning",
+          "category": "date_time",
+          "input": "Early morning tomorrow from Basavanagudi for a temple visit.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": false,
+          "stated": [
+            {
+              "field": "origin",
+              "status": "correct",
+              "got": "'Basavanagudi'"
+            },
+            {
+              "field": "date_phrase",
+              "status": "correct",
+              "got": "'tomorrow' -> 2026-09-22"
+            },
+            {
+              "field": "interests",
+              "status": "correct",
+              "got": "['temple']"
+            }
+          ],
+          "unrequested": [
+            {
+              "field": "transport",
+              "severity": "plan_altering",
+              "value": "[\"walking\"]"
+            }
+          ],
+          "plan_altering": [
+            "transport"
+          ],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 721.0,
+          "raw": "{\"origin\": {\"name\": \"Basavanagudi\"}, \"date_phrase\": \"tomorrow\", \"interests\": [{\"category\": \"temple\"}], \"transport\": [\"walking\"]}"
+        },
+        {
+          "case_id": "F01-named-park",
+          "category": "place_interest",
+          "input": "Take me to Bannerghatta National Park.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": true,
+          "stated": [
+            {
+              "field": "destination",
+              "status": "correct",
+              "got": "'Bannerghatta National Park'"
+            }
+          ],
+          "unrequested": [],
+          "plan_altering": [],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 271.1,
+          "raw": "{\"destination\": {\"name\": \"Bannerghatta National Park\"}}"
+        },
+        {
+          "case_id": "F02-generic-lake",
+          "category": "place_interest",
+          "input": "From Malleshwaram, I'd like to find a lake to sit by.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": true,
+          "stated": [
+            {
+              "field": "origin",
+              "status": "correct",
+              "got": "'Malleshwaram'"
+            },
+            {
+              "field": "interests",
+              "status": "correct",
+              "got": "['lake']"
+            }
+          ],
+          "unrequested": [],
+          "plan_altering": [],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 452.6,
+          "raw": "{\"origin\": {\"name\": \"Malleshwaram\"}, \"interests\": [{\"category\": \"lake\"}]}"
+        },
+        {
+          "case_id": "F03-generic-pair",
+          "category": "place_interest",
+          "input": "Find me a museum and a market, I'm at Shivajinagar.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": true,
+          "stated": [
+            {
+              "field": "origin",
+              "status": "correct",
+              "got": "'Shivajinagar'"
+            },
+            {
+              "field": "interests",
+              "status": "correct",
+              "got": "['market', 'museum']"
+            }
+          ],
+          "unrequested": [],
+          "plan_altering": [],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 577.0,
+          "raw": "{\"origin\": {\"name\": \"Shivajinagar\"}, \"interests\": [{\"category\": \"museum\"}, {\"category\": \"market\"}]}"
+        },
+        {
+          "case_id": "F04-named-plus-generic",
+          "category": "place_interest",
+          "input": "Go to Bangalore Palace, then an art gallery, from Sadashivanagar.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": false,
+          "stated": [
+            {
+              "field": "origin",
+              "status": "correct",
+              "got": "'Sadashivanagar'"
+            },
+            {
+              "field": "destination",
+              "status": "correct",
+              "got": "'Bangalore Palace'"
+            },
+            {
+              "field": "interests",
+              "status": "wrong",
+              "got": "['art_gallery', 'landmark']"
+            }
+          ],
+          "unrequested": [],
+          "plan_altering": [
+            "interests (wrong)"
+          ],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 769.2,
+          "raw": "{\"origin\": {\"name\": \"Sadashivanagar\"}, \"destination\": {\"name\": \"Bangalore Palace\"}, \"interests\": [{\"category\": \"landmark\"}, {\"category\": \"art_gallery\"}]}"
+        },
+        {
+          "case_id": "F05-generic-view",
+          "category": "place_interest",
+          "input": "Somewhere with a nice view in the city, starting from Hebbal.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": true,
+          "stated": [
+            {
+              "field": "origin",
+              "status": "correct",
+              "got": "'Hebbal'"
+            },
+            {
+              "field": "interests",
+              "status": "correct",
+              "got": "['viewpoint']"
+            }
+          ],
+          "unrequested": [],
+          "plan_altering": [],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 442.4,
+          "raw": "{\"origin\": {\"name\": \"Hebbal\"}, \"interests\": [{\"category\": \"viewpoint\"}]}"
+        },
+        {
+          "case_id": "G01-indian-english",
+          "category": "indian_english_noisy",
+          "input": "Myself and my brother only, from Vijayanagar, total budget two thousand rupees, one small temple visit also.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": false,
+          "stated": [
+            {
+              "field": "origin",
+              "status": "correct",
+              "got": "'Vijayanagar'"
+            },
+            {
+              "field": "party_size",
+              "status": "correct",
+              "got": "2"
+            },
+            {
+              "field": "budget_inr",
+              "status": "missing",
+              "got": "None"
+            },
+            {
+              "field": "interests",
+              "status": "correct",
+              "got": "['temple']"
+            }
+          ],
+          "unrequested": [
+            {
+              "field": "free_text_interests",
+              "severity": "benign",
+              "value": "[\"one small temple visit also\"]"
+            },
+            {
+              "field": "transport",
+              "severity": "plan_altering",
+              "value": "[\"own_car\"]"
+            },
+            {
+              "field": "vegetarian",
+              "severity": "benign",
+              "value": "false"
+            },
+            {
+              "field": "mode",
+              "severity": "benign",
+              "value": "\"balanced\""
+            }
+          ],
+          "plan_altering": [
+            "transport"
+          ],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 1735.8,
+          "raw": "{\n  \"origin\": {\n    \"name\": \"Vijayanagar\"\n  },\n  \"party_size\": 2,\n  \"interests\": [\n    {\n      \"category\": \"temple\"\n    }\n  ],\n  \"free_text_interests\": [\n    \"one small temple visit also\"\n  ],\n  \"transport\": [\n    \"own_car\"\n  ],\n  \"vegetarian\": false,\n  \"mode\": \"balanced\"\n}"
+        },
+        {
+          "case_id": "G02-sms-style",
+          "category": "indian_english_noisy",
+          "input": "pls plan smthng frm kormangala 2mrw, 4 ppl, cafe+park, max 1500/-",
+          "ok": false,
+          "failure_reason": "schema_invalid",
+          "clean": false,
+          "stated": [
+            {
+              "field": "origin",
+              "status": "missing",
+              "got": "no draft"
+            },
+            {
+              "field": "date_phrase",
+              "status": "missing",
+              "got": "no draft"
+            },
+            {
+              "field": "party_size",
+              "status": "missing",
+              "got": "no draft"
+            },
+            {
+              "field": "interests",
+              "status": "missing",
+              "got": "no draft"
+            },
+            {
+              "field": "budget_inr",
+              "status": "missing",
+              "got": "no draft"
+            }
+          ],
+          "unrequested": [],
+          "plan_altering": [],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": "2mrw",
+          "latency_ms": 1472.2,
+          "raw": "{\n  \"origin\": {\n    \"name\": \"kormangala\"\n  },\n  \"date_phrase\": \"2mrw\",\n  \"party_size\": 4,\n  \"interests\": [\n    {\n      \"category\": \"cafe\"\n    },\n    {\n      \"category\": \"park\"\n    }\n  ],\n  \"max_walking_km\": 1500\n}"
+        },
+        {
+          "case_id": "G03-formal-request",
+          "category": "indian_english_noisy",
+          "input": "Sir, kindly arrange a pure-veg outing from Rajajinagar this Sunday, 6 members, auto only.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": true,
+          "stated": [
+            {
+              "field": "origin",
+              "status": "correct",
+              "got": "'Rajajinagar'"
+            },
+            {
+              "field": "vegetarian",
+              "status": "correct",
+              "got": "True"
+            },
+            {
+              "field": "date_phrase",
+              "status": "correct",
+              "got": "'Sunday' -> 2026-09-27"
+            },
+            {
+              "field": "party_size",
+              "status": "correct",
+              "got": "6"
+            },
+            {
+              "field": "transport",
+              "status": "correct",
+              "got": "['auto']"
+            }
+          ],
+          "unrequested": [],
+          "plan_altering": [],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 729.4,
+          "raw": "{\"origin\": {\"name\": \"Rajajinagar\"}, \"date_phrase\": \"Sunday\", \"party_size\": 6, \"transport\": [\"auto\"], \"vegetarian\": true}"
+        }
+      ]
+    },
+    {
+      "summary": {
+        "cases": 40,
+        "clean_cases": 19,
+        "clean_rate": 0.475,
+        "schema_valid": 39,
+        "schema_validity_rate": 0.975,
+        "stated_checks": 97,
+        "stated_correct": 82,
+        "explicit_extraction_accuracy": 0.845360824742268,
+        "stated_missing": 14,
+        "under_extraction_rate": 0.14432989690721648,
+        "stated_wrong": 1,
+        "wrong_value_rate": 0.010309278350515464,
+        "unrequested_cases": 19,
+        "unrequested_case_rate": 0.48717948717948717,
+        "unrequested_fields": 26,
+        "restraint_opportunities": 444,
+        "unrequested_field_rate": 0.05855855855855856,
+        "unrequested_by_severity": {
+          "benign": 6,
+          "clarifying": 2,
+          "plan_altering": 18
+        },
+        "plan_altering_cases": 18,
+        "plan_altering_rate": 0.46153846153846156,
+        "coordinate_leak_cases": 0,
+        "coordinate_leakage_rate": 0.0,
+        "responses_with_a_time": 5,
+        "malformed_time_rate": 0.0,
+        "responses_with_a_date_phrase": 18,
+        "unsupported_date_cases": 3,
+        "unsupported_date_rate": 0.16666666666666666,
+        "place_interest_cases": 5,
+        "place_interest_correct": 4,
+        "place_interest_accuracy": 0.8,
+        "latency_ms_mean": 636.4583725000557,
+        "latency_ms_p50": 570.0816000025952,
+        "latency_ms_max": 1764.442900006543,
+        "failures_by_reason": {
+          "schema_invalid": 1
+        },
+        "by_category": {
+          "explicit_extraction": {
+            "cases": 10,
+            "clean": 5
+          },
+          "missing_info_restraint": {
+            "cases": 8,
+            "clean": 5
+          },
+          "ambiguous_wording": {
+            "cases": 5,
+            "clean": 3
+          },
+          "unsupported_enum": {
+            "cases": 4,
+            "clean": 1
+          },
+          "date_time": {
+            "cases": 5,
+            "clean": 0
+          },
+          "place_interest": {
+            "cases": 5,
+            "clean": 4
+          },
+          "indian_english_noisy": {
+            "cases": 3,
+            "clean": 1
+          }
+        }
+      },
+      "cases": [
+        {
+          "case_id": "A01-explicit-full",
+          "category": "explicit_extraction",
+          "input": "Head out from Banashankari to Nandi Hills on Sunday, three of us, with a budget of Rs 3,000.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": false,
+          "stated": [
+            {
+              "field": "origin",
+              "status": "correct",
+              "got": "'Banashankari'"
+            },
+            {
+              "field": "destination",
+              "status": "correct",
+              "got": "'Nandi Hills'"
+            },
+            {
+              "field": "date_phrase",
+              "status": "correct",
+              "got": "'Sunday' -> 2026-09-27"
+            },
+            {
+              "field": "party_size",
+              "status": "correct",
+              "got": "3"
+            },
+            {
+              "field": "budget_inr",
+              "status": "missing",
+              "got": "None"
+            }
+          ],
+          "unrequested": [
+            {
+              "field": "transport",
+              "severity": "plan_altering",
+              "value": "[\"own_car\"]"
+            },
+            {
+              "field": "vegetarian",
+              "severity": "benign",
+              "value": "false"
+            },
+            {
+              "field": "mode",
+              "severity": "benign",
+              "value": "\"balanced\""
+            }
+          ],
+          "plan_altering": [
+            "transport"
+          ],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 1103.2,
+          "raw": "{\"origin\": {\"name\": \"Banashankari\"}, \"destination\": {\"name\": \"Nandi Hills\"}, \"date_phrase\": \"Sunday\", \"party_size\": 3, \"transport\": [\"own_car\"], \"vegetarian\": false, \"mode\": \"balanced\"}"
+        },
+        {
+          "case_id": "A02-explicit-time-interests",
+          "category": "explicit_extraction",
+          "input": "Starting in Malleshwaram at 8:30 am, I'd like to see a temple and a museum.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": true,
+          "stated": [
+            {
+              "field": "origin",
+              "status": "correct",
+              "got": "'Malleshwaram'"
+            },
+            {
+              "field": "start_time_local",
+              "status": "correct",
+              "got": "'08:30'"
+            },
+            {
+              "field": "interests",
+              "status": "correct",
+              "got": "['museum', 'temple']"
+            }
+          ],
+          "unrequested": [],
+          "plan_altering": [],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 1140.6,
+          "raw": "{\n  \"origin\": {\n    \"name\": \"Malleshwaram\"\n  },\n  \"start_time_local\": \"08:30\",\n  \"interests\": [\n    {\n      \"category\": \"temple\"\n    },\n    {\n      \"category\": \"museum\"\n    }\n  ]\n}"
+        },
+        {
+          "case_id": "A03-explicit-cab-group",
+          "category": "explicit_extraction",
+          "input": "We are 5 friends going from Electronic City, and we'd like a cab for the whole day.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": true,
+          "stated": [
+            {
+              "field": "origin",
+              "status": "correct",
+              "got": "'Electronic City'"
+            },
+            {
+              "field": "party_size",
+              "status": "correct",
+              "got": "5"
+            },
+            {
+              "field": "transport",
+              "status": "correct",
+              "got": "['cab']"
+            }
+          ],
+          "unrequested": [],
+          "plan_altering": [],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 445.7,
+          "raw": "{\"origin\": {\"name\": \"Electronic City\"}, \"party_size\": 5, \"transport\": [\"cab\"]}"
+        },
+        {
+          "case_id": "A04-explicit-vegetarian",
+          "category": "explicit_extraction",
+          "input": "Vegetarian lunch spot first, then a bookstore, starting from Basavanagudi.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": false,
+          "stated": [
+            {
+              "field": "origin",
+              "status": "correct",
+              "got": "'Basavanagudi'"
+            },
+            {
+              "field": "vegetarian",
+              "status": "missing",
+              "got": "None"
+            },
+            {
+              "field": "interests",
+              "status": "correct",
+              "got": "['bookstore', 'restaurant']"
+            }
+          ],
+          "unrequested": [],
+          "plan_altering": [],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 664.5,
+          "raw": "{\"origin\": {\"name\": \"Basavanagudi\"}, \"interests\": [{\"category\": \"restaurant\", \"priority\": \"must\"}, {\"category\": \"bookstore\"}]}"
+        },
+        {
+          "case_id": "A05-explicit-days-car",
+          "category": "explicit_extraction",
+          "input": "Two-day trip from Yelahanka, we'll drive ourselves.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": false,
+          "stated": [
+            {
+              "field": "origin",
+              "status": "correct",
+              "got": "'Yelahanka'"
+            },
+            {
+              "field": "days",
+              "status": "missing",
+              "got": "None"
+            },
+            {
+              "field": "transport",
+              "status": "correct",
+              "got": "['own_car']"
+            }
+          ],
+          "unrequested": [
+            {
+              "field": "mode",
+              "severity": "plan_altering",
+              "value": "\"relaxed\""
+            }
+          ],
+          "plan_altering": [
+            "mode"
+          ],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 522.3,
+          "raw": "{\"origin\": {\"name\": \"Yelahanka\"}, \"transport\": [\"own_car\"], \"mode\": \"relaxed\"}"
+        },
+        {
+          "case_id": "A06-explicit-walk-limit-end",
+          "category": "explicit_extraction",
+          "input": "From Frazer Town, cap the walking at 2 km and finish by 7 pm.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": false,
+          "stated": [
+            {
+              "field": "origin",
+              "status": "correct",
+              "got": "'Frazer Town'"
+            },
+            {
+              "field": "max_walking_km",
+              "status": "correct",
+              "got": "2.0"
+            },
+            {
+              "field": "end_time_local",
+              "status": "missing",
+              "got": "None"
+            }
+          ],
+          "unrequested": [
+            {
+              "field": "mode",
+              "severity": "plan_altering",
+              "value": "\"quick\""
+            }
+          ],
+          "plan_altering": [
+            "mode"
+          ],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 538.4,
+          "raw": "{\"origin\": {\"name\": \"Frazer Town\"}, \"max_walking_km\": 2, \"mode\": \"quick\"}"
+        },
+        {
+          "case_id": "A07-explicit-bicycle-lake",
+          "category": "explicit_extraction",
+          "input": "Bicycle ride from Ulsoor to a lake, next Tuesday.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": false,
+          "stated": [
+            {
+              "field": "origin",
+              "status": "correct",
+              "got": "'Ulsoor'"
+            },
+            {
+              "field": "transport",
+              "status": "correct",
+              "got": "['bike']"
+            },
+            {
+              "field": "interests",
+              "status": "missing",
+              "got": "[]"
+            },
+            {
+              "field": "date_phrase",
+              "status": "correct",
+              "got": "'next Tuesday' -> 2026-09-22"
+            }
+          ],
+          "unrequested": [
+            {
+              "field": "destination",
+              "severity": "plan_altering",
+              "value": "{\"name\": \"lake\"}"
+            }
+          ],
+          "plan_altering": [
+            "destination"
+          ],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 947.5,
+          "raw": "{\n  \"origin\": {\n    \"name\": \"Ulsoor\"\n  },\n  \"destination\": {\n    \"name\": \"lake\"\n  },\n  \"date_phrase\": \"next Tuesday\",\n  \"transport\": [\n    \"bike\"\n  ]\n}"
+        },
+        {
+          "case_id": "A08-explicit-iso-date",
+          "category": "explicit_extraction",
+          "input": "I want a viewpoint and some dessert, starting from RT Nagar on 2026-11-14.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": true,
+          "stated": [
+            {
+              "field": "origin",
+              "status": "correct",
+              "got": "'RT Nagar'"
+            },
+            {
+              "field": "interests",
+              "status": "correct",
+              "got": "['dessert', 'viewpoint']"
+            },
+            {
+              "field": "date_phrase",
+              "status": "correct",
+              "got": "'2026-11-14' -> 2026-11-14"
+            }
+          ],
+          "unrequested": [],
+          "plan_altering": [],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 1181.5,
+          "raw": "{\n  \"origin\": {\n    \"name\": \"RT Nagar\"\n  },\n  \"date_phrase\": \"2026-11-14\",\n  \"interests\": [\n    {\n      \"category\": \"viewpoint\"\n    },\n    {\n      \"category\": \"dessert\"\n    }\n  ]\n}"
+        },
+        {
+          "case_id": "A09-explicit-pace",
+          "category": "explicit_extraction",
+          "input": "Rush through as many sights as possible, starting from Majestic this Friday.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": true,
+          "stated": [
+            {
+              "field": "origin",
+              "status": "correct",
+              "got": "'Majestic'"
+            },
+            {
+              "field": "date_phrase",
+              "status": "correct",
+              "got": "'Friday' -> 2026-09-25"
+            },
+            {
+              "field": "mode",
+              "status": "correct",
+              "got": "'quick'"
+            }
+          ],
+          "unrequested": [],
+          "plan_altering": [],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 464.6,
+          "raw": "{\"origin\": {\"name\": \"Majestic\"}, \"date_phrase\": \"Friday\", \"mode\": \"quick\"}"
+        },
+        {
+          "case_id": "A10-explicit-solo",
+          "category": "explicit_extraction",
+          "input": "Take me to Lalbagh tomorrow at 7 in the morning, just me.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": true,
+          "stated": [
+            {
+              "field": "destination",
+              "status": "correct",
+              "got": "'Lalbagh'"
+            },
+            {
+              "field": "date_phrase",
+              "status": "correct",
+              "got": "'tomorrow' -> 2026-09-22"
+            },
+            {
+              "field": "start_time_local",
+              "status": "correct",
+              "got": "'07:00'"
+            },
+            {
+              "field": "party_size",
+              "status": "correct",
+              "got": "1"
+            }
+          ],
+          "unrequested": [],
+          "plan_altering": [],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 711.9,
+          "raw": "{\"destination\": {\"name\": \"Lalbagh\"}, \"date_phrase\": \"tomorrow\", \"start_time_local\": \"07:00\", \"party_size\": 1}"
+        },
+        {
+          "case_id": "B01-affordable",
+          "category": "missing_info_restraint",
+          "input": "Plan an affordable outing from HSR Layout.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": false,
+          "stated": [
+            {
+              "field": "origin",
+              "status": "correct",
+              "got": "'HSR Layout'"
+            }
+          ],
+          "unrequested": [
+            {
+              "field": "budget_inr",
+              "severity": "plan_altering",
+              "value": "0"
+            }
+          ],
+          "plan_altering": [
+            "budget_inr"
+          ],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 371.6,
+          "raw": "{\"origin\": {\"name\": \"HSR Layout\"}, \"budget_inr\": 0}"
+        },
+        {
+          "case_id": "B02-kids",
+          "category": "missing_info_restraint",
+          "input": "Something for me and the kids, starting at Jayanagar.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": false,
+          "stated": [
+            {
+              "field": "origin",
+              "status": "correct",
+              "got": "'Jayanagar'"
+            }
+          ],
+          "unrequested": [
+            {
+              "field": "party_size",
+              "severity": "plan_altering",
+              "value": "2"
+            }
+          ],
+          "plan_altering": [
+            "party_size"
+          ],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 358.9,
+          "raw": "{\"origin\": {\"name\": \"Jayanagar\"}, \"party_size\": 2}"
+        },
+        {
+          "case_id": "B03-eat-not-veg",
+          "category": "missing_info_restraint",
+          "input": "From Whitefield, I'd like somewhere to eat.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": true,
+          "stated": [
+            {
+              "field": "origin",
+              "status": "correct",
+              "got": "'Whitefield'"
+            },
+            {
+              "field": "interests",
+              "status": "correct",
+              "got": "['restaurant']"
+            }
+          ],
+          "unrequested": [],
+          "plan_altering": [],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 410.4,
+          "raw": "{\"origin\": {\"name\": \"Whitefield\"}, \"interests\": [{\"category\": \"restaurant\"}]}"
+        },
+        {
+          "case_id": "B04-relaxing-vibe",
+          "category": "missing_info_restraint",
+          "input": "A relaxing Saturday from Indiranagar.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": false,
+          "stated": [
+            {
+              "field": "origin",
+              "status": "correct",
+              "got": "'Indiranagar'"
+            },
+            {
+              "field": "date_phrase",
+              "status": "correct",
+              "got": "'Saturday' -> 2026-09-26"
+            }
+          ],
+          "unrequested": [
+            {
+              "field": "mode",
+              "severity": "plan_altering",
+              "value": "\"relaxed\""
+            }
+          ],
+          "plan_altering": [
+            "mode"
+          ],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 475.4,
+          "raw": "{\"origin\": {\"name\": \"Indiranagar\"}, \"date_phrase\": \"Saturday\", \"mode\": \"relaxed\"}"
+        },
+        {
+          "case_id": "B05-colleagues",
+          "category": "missing_info_restraint",
+          "input": "Organise something from Hebbal with my colleagues.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": true,
+          "stated": [
+            {
+              "field": "origin",
+              "status": "correct",
+              "got": "'Hebbal'"
+            }
+          ],
+          "unrequested": [],
+          "plan_altering": [],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 237.9,
+          "raw": "{\"origin\": {\"name\": \"Hebbal\"}}"
+        },
+        {
+          "case_id": "B06-low-budget",
+          "category": "missing_info_restraint",
+          "input": "Low-budget plan starting from Koramangala, some cafes please.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": true,
+          "stated": [
+            {
+              "field": "origin",
+              "status": "correct",
+              "got": "'Koramangala'"
+            },
+            {
+              "field": "interests",
+              "status": "correct",
+              "got": "['cafe']"
+            }
+          ],
+          "unrequested": [
+            {
+              "field": "mode",
+              "severity": "benign",
+              "value": "\"balanced\""
+            }
+          ],
+          "plan_altering": [],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 709.7,
+          "raw": "{\"origin\": {\"name\": \"Koramangala\"}, \"interests\": [{\"category\": \"cafe\", \"count\": 1}], \"mode\": \"balanced\"}"
+        },
+        {
+          "case_id": "B07-bare-destination",
+          "category": "missing_info_restraint",
+          "input": "Heading to Cubbon Park.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": true,
+          "stated": [
+            {
+              "field": "destination",
+              "status": "correct",
+              "got": "'Cubbon Park'"
+            }
+          ],
+          "unrequested": [],
+          "plan_altering": [],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 254.7,
+          "raw": "{\"destination\": {\"name\": \"Cubbon Park\"}}"
+        },
+        {
+          "case_id": "B08-bare-date",
+          "category": "missing_info_restraint",
+          "input": "Can you sort out a plan for Sunday?",
+          "ok": true,
+          "failure_reason": null,
+          "clean": true,
+          "stated": [
+            {
+              "field": "date_phrase",
+              "status": "correct",
+              "got": "'Sunday' -> 2026-09-27"
+            }
+          ],
+          "unrequested": [],
+          "plan_altering": [],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 170.2,
+          "raw": "{\"date_phrase\": \"Sunday\"}"
+        },
+        {
+          "case_id": "C01-late-tonight",
+          "category": "ambiguous_wording",
+          "input": "Somewhere near Church Street late tonight.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": true,
+          "stated": [
+            {
+              "field": "place_any",
+              "status": "correct",
+              "got": "[None, 'Church Street']"
+            },
+            {
+              "field": "date_phrase",
+              "status": "correct",
+              "got": "'tonight' -> 2026-09-21"
+            }
+          ],
+          "unrequested": [],
+          "plan_altering": [],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 356.8,
+          "raw": "{\"destination\": {\"name\": \"Church Street\"}, \"date_phrase\": \"tonight\"}"
+        },
+        {
+          "case_id": "C02-undecided-destination",
+          "category": "ambiguous_wording",
+          "input": "Maybe Mysore, maybe Coorg, not sure yet.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": true,
+          "stated": [],
+          "unrequested": [],
+          "plan_altering": [],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 69.1,
+          "raw": "{}"
+        },
+        {
+          "case_id": "C03-lunchtime",
+          "category": "ambiguous_wording",
+          "input": "Around lunchtime in Sadashivanagar, a quiet spot.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": false,
+          "stated": [
+            {
+              "field": "place_any",
+              "status": "correct",
+              "got": "['Sadashivanagar', None]"
+            }
+          ],
+          "unrequested": [
+            {
+              "field": "date_phrase",
+              "severity": "plan_altering",
+              "value": "\"today\""
+            },
+            {
+              "field": "start_time_local",
+              "severity": "plan_altering",
+              "value": "\"12:00\""
+            }
+          ],
+          "plan_altering": [
+            "date_phrase",
+            "start_time_local"
+          ],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 577.2,
+          "raw": "{\"origin\": {\"name\": \"Sadashivanagar\"}, \"date_phrase\": \"today\", \"start_time_local\": \"12:00\"}"
+        },
+        {
+          "case_id": "C04-afternoon",
+          "category": "ambiguous_wording",
+          "input": "A few hours out in the afternoon, Rajajinagar side.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": false,
+          "stated": [
+            {
+              "field": "place_any",
+              "status": "missing",
+              "got": "None"
+            }
+          ],
+          "unrequested": [
+            {
+              "field": "date_phrase",
+              "severity": "clarifying",
+              "value": "\"afternoon\""
+            },
+            {
+              "field": "interests",
+              "severity": "plan_altering",
+              "value": "[\"park\"]"
+            }
+          ],
+          "plan_altering": [
+            "interests"
+          ],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": "afternoon",
+          "latency_ms": 419.1,
+          "raw": "{\"date_phrase\": \"afternoon\", \"interests\": [{\"category\": \"park\"}]}"
+        },
+        {
+          "case_id": "C05-hedged-interest",
+          "category": "ambiguous_wording",
+          "input": "We might do a couple of cafes, or maybe not, from BTM Layout.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": true,
+          "stated": [
+            {
+              "field": "origin",
+              "status": "correct",
+              "got": "'BTM Layout'"
+            }
+          ],
+          "unrequested": [],
+          "plan_altering": [],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 542.8,
+          "raw": "{\"origin\": {\"name\": \"BTM Layout\"}, \"interests\": [{\"category\": \"cafe\", \"count\": 2}]}"
+        },
+        {
+          "case_id": "D01-metro",
+          "category": "unsupported_enum",
+          "input": "We'll ride the metro from MG Road to Yeshwanthpur.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": false,
+          "stated": [
+            {
+              "field": "origin",
+              "status": "correct",
+              "got": "'MG Road'"
+            },
+            {
+              "field": "destination",
+              "status": "correct",
+              "got": "'Yeshwanthpur'"
+            }
+          ],
+          "unrequested": [
+            {
+              "field": "transport",
+              "severity": "plan_altering",
+              "value": "[\"auto\"]"
+            }
+          ],
+          "plan_altering": [
+            "transport"
+          ],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 582.4,
+          "raw": "{\"origin\": {\"name\": \"MG Road\"}, \"destination\": {\"name\": \"Yeshwanthpur\"}, \"transport\": [\"auto\"]}"
+        },
+        {
+          "case_id": "D02-train",
+          "category": "unsupported_enum",
+          "input": "Taking a train out to Mysore on Saturday.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": true,
+          "stated": [
+            {
+              "field": "destination",
+              "status": "correct",
+              "got": "'Mysore'"
+            },
+            {
+              "field": "date_phrase",
+              "status": "correct",
+              "got": "'Saturday' -> 2026-09-26"
+            }
+          ],
+          "unrequested": [],
+          "plan_altering": [],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 350.6,
+          "raw": "{\"destination\": {\"name\": \"Mysore\"}, \"date_phrase\": \"Saturday\"}"
+        },
+        {
+          "case_id": "D03-unmappable-interests",
+          "category": "unsupported_enum",
+          "input": "From Koramangala, I'd love a spa afternoon and a pottery class.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": false,
+          "stated": [
+            {
+              "field": "origin",
+              "status": "correct",
+              "got": "'Koramangala'"
+            },
+            {
+              "field": "free_text_contains",
+              "status": "correct",
+              "got": "['spa afternoon', 'pottery class']"
+            }
+          ],
+          "unrequested": [
+            {
+              "field": "interests",
+              "severity": "plan_altering",
+              "value": "[\"market\", \"shopping\"]"
+            }
+          ],
+          "plan_altering": [
+            "interests"
+          ],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 798.3,
+          "raw": "{\"origin\": {\"name\": \"Koramangala\"}, \"interests\": [{\"category\": \"shopping\"}, {\"category\": \"market\"}], \"free_text_interests\": [\"spa afternoon\", \"pottery class\"]}"
+        },
+        {
+          "case_id": "D04-bmtc",
+          "category": "unsupported_enum",
+          "input": "Catching a BMTC from Shivajinagar to Hebbal.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": false,
+          "stated": [
+            {
+              "field": "origin",
+              "status": "correct",
+              "got": "'Shivajinagar'"
+            },
+            {
+              "field": "destination",
+              "status": "correct",
+              "got": "'Hebbal'"
+            }
+          ],
+          "unrequested": [
+            {
+              "field": "transport",
+              "severity": "plan_altering",
+              "value": "[\"auto\"]"
+            }
+          ],
+          "plan_altering": [
+            "transport"
+          ],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 570.1,
+          "raw": "{\"origin\": {\"name\": \"Shivajinagar\"}, \"destination\": {\"name\": \"Hebbal\"}, \"transport\": [\"auto\"]}"
+        },
+        {
+          "case_id": "E01-weekday-evening",
+          "category": "date_time",
+          "input": "Next Thursday evening from Jayanagar, dinner somewhere.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": false,
+          "stated": [
+            {
+              "field": "origin",
+              "status": "correct",
+              "got": "'Jayanagar'"
+            },
+            {
+              "field": "date_phrase",
+              "status": "correct",
+              "got": "'Thursday' -> 2026-09-24"
+            },
+            {
+              "field": "interests",
+              "status": "correct",
+              "got": "['restaurant']"
+            }
+          ],
+          "unrequested": [
+            {
+              "field": "transport",
+              "severity": "plan_altering",
+              "value": "[\"auto\"]"
+            }
+          ],
+          "plan_altering": [
+            "transport"
+          ],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 1038.4,
+          "raw": "{\n  \"origin\": {\n    \"name\": \"Jayanagar\"\n  },\n  \"date_phrase\": \"Thursday\",\n  \"interests\": [\n    {\n      \"category\": \"restaurant\"\n    }\n  ],\n  \"transport\": [\n    \"auto\"\n  ]\n}"
+        },
+        {
+          "case_id": "E02-night-clock",
+          "category": "date_time",
+          "input": "Friday night, starting 8 pm from Indiranagar, a bar.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": false,
+          "stated": [
+            {
+              "field": "origin",
+              "status": "missing",
+              "got": "None"
+            },
+            {
+              "field": "date_phrase",
+              "status": "correct",
+              "got": "'Friday' -> 2026-09-25"
+            },
+            {
+              "field": "start_time_local",
+              "status": "correct",
+              "got": "'20:00'"
+            },
+            {
+              "field": "interests",
+              "status": "correct",
+              "got": "['bar']"
+            }
+          ],
+          "unrequested": [
+            {
+              "field": "transport",
+              "severity": "plan_altering",
+              "value": "[\"walking\"]"
+            }
+          ],
+          "plan_altering": [
+            "transport"
+          ],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 1015.3,
+          "raw": "{\n  \"date_phrase\": \"Friday\",\n  \"start_time_local\": \"20:00\",\n  \"interests\": [\n    {\n      \"category\": \"bar\"\n    }\n  ],\n  \"transport\": [\n    \"walking\"\n  ]\n}"
+        },
+        {
+          "case_id": "E03-month",
+          "category": "date_time",
+          "input": "Can we go sometime in October from Hebbal?",
+          "ok": true,
+          "failure_reason": null,
+          "clean": false,
+          "stated": [
+            {
+              "field": "origin",
+              "status": "correct",
+              "got": "'Hebbal'"
+            }
+          ],
+          "unrequested": [
+            {
+              "field": "date_phrase",
+              "severity": "clarifying",
+              "value": "\"October\""
+            }
+          ],
+          "plan_altering": [],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": "October",
+          "latency_ms": 353.6,
+          "raw": "{\"origin\": {\"name\": \"Hebbal\"}, \"date_phrase\": \"October\"}"
+        },
+        {
+          "case_id": "E04-clock-range",
+          "category": "date_time",
+          "input": "Day after tomorrow, from 10:15 to 16:45, Koramangala.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": false,
+          "stated": [
+            {
+              "field": "place_any",
+              "status": "missing",
+              "got": "None"
+            },
+            {
+              "field": "date_phrase",
+              "status": "correct",
+              "got": "'day after tomorrow' -> 2026-09-23"
+            },
+            {
+              "field": "start_time_local",
+              "status": "correct",
+              "got": "'10:15'"
+            },
+            {
+              "field": "end_time_local",
+              "status": "correct",
+              "got": "'16:45'"
+            }
+          ],
+          "unrequested": [
+            {
+              "field": "transport",
+              "severity": "plan_altering",
+              "value": "[\"own_car\"]"
+            }
+          ],
+          "plan_altering": [
+            "transport"
+          ],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 872.9,
+          "raw": "{\n  \"date_phrase\": \"day after tomorrow\",\n  \"start_time_local\": \"10:15\",\n  \"end_time_local\": \"16:45\",\n  \"transport\": [\"own_car\"]\n}"
+        },
+        {
+          "case_id": "E05-early-morning",
+          "category": "date_time",
+          "input": "Early morning tomorrow from Basavanagudi for a temple visit.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": false,
+          "stated": [
+            {
+              "field": "origin",
+              "status": "correct",
+              "got": "'Basavanagudi'"
+            },
+            {
+              "field": "date_phrase",
+              "status": "correct",
+              "got": "'tomorrow' -> 2026-09-22"
+            },
+            {
+              "field": "interests",
+              "status": "correct",
+              "got": "['temple']"
+            }
+          ],
+          "unrequested": [
+            {
+              "field": "transport",
+              "severity": "plan_altering",
+              "value": "[\"walking\"]"
+            }
+          ],
+          "plan_altering": [
+            "transport"
+          ],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 726.8,
+          "raw": "{\"origin\": {\"name\": \"Basavanagudi\"}, \"date_phrase\": \"tomorrow\", \"interests\": [{\"category\": \"temple\"}], \"transport\": [\"walking\"]}"
+        },
+        {
+          "case_id": "F01-named-park",
+          "category": "place_interest",
+          "input": "Take me to Bannerghatta National Park.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": true,
+          "stated": [
+            {
+              "field": "destination",
+              "status": "correct",
+              "got": "'Bannerghatta National Park'"
+            }
+          ],
+          "unrequested": [],
+          "plan_altering": [],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 270.5,
+          "raw": "{\"destination\": {\"name\": \"Bannerghatta National Park\"}}"
+        },
+        {
+          "case_id": "F02-generic-lake",
+          "category": "place_interest",
+          "input": "From Malleshwaram, I'd like to find a lake to sit by.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": true,
+          "stated": [
+            {
+              "field": "origin",
+              "status": "correct",
+              "got": "'Malleshwaram'"
+            },
+            {
+              "field": "interests",
+              "status": "correct",
+              "got": "['lake']"
+            }
+          ],
+          "unrequested": [],
+          "plan_altering": [],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 442.6,
+          "raw": "{\"origin\": {\"name\": \"Malleshwaram\"}, \"interests\": [{\"category\": \"lake\"}]}"
+        },
+        {
+          "case_id": "F03-generic-pair",
+          "category": "place_interest",
+          "input": "Find me a museum and a market, I'm at Shivajinagar.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": true,
+          "stated": [
+            {
+              "field": "origin",
+              "status": "correct",
+              "got": "'Shivajinagar'"
+            },
+            {
+              "field": "interests",
+              "status": "correct",
+              "got": "['market', 'museum']"
+            }
+          ],
+          "unrequested": [],
+          "plan_altering": [],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 590.8,
+          "raw": "{\"origin\": {\"name\": \"Shivajinagar\"}, \"interests\": [{\"category\": \"museum\"}, {\"category\": \"market\"}]}"
+        },
+        {
+          "case_id": "F04-named-plus-generic",
+          "category": "place_interest",
+          "input": "Go to Bangalore Palace, then an art gallery, from Sadashivanagar.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": false,
+          "stated": [
+            {
+              "field": "origin",
+              "status": "correct",
+              "got": "'Sadashivanagar'"
+            },
+            {
+              "field": "destination",
+              "status": "correct",
+              "got": "'Bangalore Palace'"
+            },
+            {
+              "field": "interests",
+              "status": "wrong",
+              "got": "['art_gallery', 'landmark']"
+            }
+          ],
+          "unrequested": [],
+          "plan_altering": [
+            "interests (wrong)"
+          ],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 769.3,
+          "raw": "{\"origin\": {\"name\": \"Sadashivanagar\"}, \"destination\": {\"name\": \"Bangalore Palace\"}, \"interests\": [{\"category\": \"landmark\"}, {\"category\": \"art_gallery\"}]}"
+        },
+        {
+          "case_id": "F05-generic-view",
+          "category": "place_interest",
+          "input": "Somewhere with a nice view in the city, starting from Hebbal.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": true,
+          "stated": [
+            {
+              "field": "origin",
+              "status": "correct",
+              "got": "'Hebbal'"
+            },
+            {
+              "field": "interests",
+              "status": "correct",
+              "got": "['viewpoint']"
+            }
+          ],
+          "unrequested": [],
+          "plan_altering": [],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 448.9,
+          "raw": "{\"origin\": {\"name\": \"Hebbal\"}, \"interests\": [{\"category\": \"viewpoint\"}]}"
+        },
+        {
+          "case_id": "G01-indian-english",
+          "category": "indian_english_noisy",
+          "input": "Myself and my brother only, from Vijayanagar, total budget two thousand rupees, one small temple visit also.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": false,
+          "stated": [
+            {
+              "field": "origin",
+              "status": "correct",
+              "got": "'Vijayanagar'"
+            },
+            {
+              "field": "party_size",
+              "status": "correct",
+              "got": "2"
+            },
+            {
+              "field": "budget_inr",
+              "status": "missing",
+              "got": "None"
+            },
+            {
+              "field": "interests",
+              "status": "correct",
+              "got": "['temple']"
+            }
+          ],
+          "unrequested": [
+            {
+              "field": "free_text_interests",
+              "severity": "benign",
+              "value": "[\"one small temple visit also\"]"
+            },
+            {
+              "field": "transport",
+              "severity": "plan_altering",
+              "value": "[\"own_car\"]"
+            },
+            {
+              "field": "vegetarian",
+              "severity": "benign",
+              "value": "false"
+            },
+            {
+              "field": "mode",
+              "severity": "benign",
+              "value": "\"balanced\""
+            }
+          ],
+          "plan_altering": [
+            "transport"
+          ],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 1764.4,
+          "raw": "{\n  \"origin\": {\n    \"name\": \"Vijayanagar\"\n  },\n  \"party_size\": 2,\n  \"interests\": [\n    {\n      \"category\": \"temple\"\n    }\n  ],\n  \"free_text_interests\": [\n    \"one small temple visit also\"\n  ],\n  \"transport\": [\n    \"own_car\"\n  ],\n  \"vegetarian\": false,\n  \"mode\": \"balanced\"\n}"
+        },
+        {
+          "case_id": "G02-sms-style",
+          "category": "indian_english_noisy",
+          "input": "pls plan smthng frm kormangala 2mrw, 4 ppl, cafe+park, max 1500/-",
+          "ok": false,
+          "failure_reason": "schema_invalid",
+          "clean": false,
+          "stated": [
+            {
+              "field": "origin",
+              "status": "missing",
+              "got": "no draft"
+            },
+            {
+              "field": "date_phrase",
+              "status": "missing",
+              "got": "no draft"
+            },
+            {
+              "field": "party_size",
+              "status": "missing",
+              "got": "no draft"
+            },
+            {
+              "field": "interests",
+              "status": "missing",
+              "got": "no draft"
+            },
+            {
+              "field": "budget_inr",
+              "status": "missing",
+              "got": "no draft"
+            }
+          ],
+          "unrequested": [],
+          "plan_altering": [],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": "2mrw",
+          "latency_ms": 1464.9,
+          "raw": "{\n  \"origin\": {\n    \"name\": \"kormangala\"\n  },\n  \"date_phrase\": \"2mrw\",\n  \"party_size\": 4,\n  \"interests\": [\n    {\n      \"category\": \"cafe\"\n    },\n    {\n      \"category\": \"park\"\n    }\n  ],\n  \"max_walking_km\": 1500\n}"
+        },
+        {
+          "case_id": "G03-formal-request",
+          "category": "indian_english_noisy",
+          "input": "Sir, kindly arrange a pure-veg outing from Rajajinagar this Sunday, 6 members, auto only.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": true,
+          "stated": [
+            {
+              "field": "origin",
+              "status": "correct",
+              "got": "'Rajajinagar'"
+            },
+            {
+              "field": "vegetarian",
+              "status": "correct",
+              "got": "True"
+            },
+            {
+              "field": "date_phrase",
+              "status": "correct",
+              "got": "'Sunday' -> 2026-09-27"
+            },
+            {
+              "field": "party_size",
+              "status": "correct",
+              "got": "6"
+            },
+            {
+              "field": "transport",
+              "status": "correct",
+              "got": "['auto']"
+            }
+          ],
+          "unrequested": [],
+          "plan_altering": [],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 724.4,
+          "raw": "{\"origin\": {\"name\": \"Rajajinagar\"}, \"date_phrase\": \"Sunday\", \"party_size\": 6, \"transport\": [\"auto\"], \"vegetarian\": true}"
+        }
+      ]
+    },
+    {
+      "summary": {
+        "cases": 40,
+        "clean_cases": 19,
+        "clean_rate": 0.475,
+        "schema_valid": 39,
+        "schema_validity_rate": 0.975,
+        "stated_checks": 97,
+        "stated_correct": 82,
+        "explicit_extraction_accuracy": 0.845360824742268,
+        "stated_missing": 14,
+        "under_extraction_rate": 0.14432989690721648,
+        "stated_wrong": 1,
+        "wrong_value_rate": 0.010309278350515464,
+        "unrequested_cases": 19,
+        "unrequested_case_rate": 0.48717948717948717,
+        "unrequested_fields": 26,
+        "restraint_opportunities": 444,
+        "unrequested_field_rate": 0.05855855855855856,
+        "unrequested_by_severity": {
+          "benign": 6,
+          "clarifying": 2,
+          "plan_altering": 18
+        },
+        "plan_altering_cases": 18,
+        "plan_altering_rate": 0.46153846153846156,
+        "coordinate_leak_cases": 0,
+        "coordinate_leakage_rate": 0.0,
+        "responses_with_a_time": 5,
+        "malformed_time_rate": 0.0,
+        "responses_with_a_date_phrase": 18,
+        "unsupported_date_cases": 3,
+        "unsupported_date_rate": 0.16666666666666666,
+        "place_interest_cases": 5,
+        "place_interest_correct": 4,
+        "place_interest_accuracy": 0.8,
+        "latency_ms_mean": 639.5539925004414,
+        "latency_ms_p50": 568.9316999923903,
+        "latency_ms_max": 1764.3963000009535,
+        "failures_by_reason": {
+          "schema_invalid": 1
+        },
+        "by_category": {
+          "explicit_extraction": {
+            "cases": 10,
+            "clean": 5
+          },
+          "missing_info_restraint": {
+            "cases": 8,
+            "clean": 5
+          },
+          "ambiguous_wording": {
+            "cases": 5,
+            "clean": 3
+          },
+          "unsupported_enum": {
+            "cases": 4,
+            "clean": 1
+          },
+          "date_time": {
+            "cases": 5,
+            "clean": 0
+          },
+          "place_interest": {
+            "cases": 5,
+            "clean": 4
+          },
+          "indian_english_noisy": {
+            "cases": 3,
+            "clean": 1
+          }
+        }
+      },
+      "cases": [
+        {
+          "case_id": "A01-explicit-full",
+          "category": "explicit_extraction",
+          "input": "Head out from Banashankari to Nandi Hills on Sunday, three of us, with a budget of Rs 3,000.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": false,
+          "stated": [
+            {
+              "field": "origin",
+              "status": "correct",
+              "got": "'Banashankari'"
+            },
+            {
+              "field": "destination",
+              "status": "correct",
+              "got": "'Nandi Hills'"
+            },
+            {
+              "field": "date_phrase",
+              "status": "correct",
+              "got": "'Sunday' -> 2026-09-27"
+            },
+            {
+              "field": "party_size",
+              "status": "correct",
+              "got": "3"
+            },
+            {
+              "field": "budget_inr",
+              "status": "missing",
+              "got": "None"
+            }
+          ],
+          "unrequested": [
+            {
+              "field": "transport",
+              "severity": "plan_altering",
+              "value": "[\"own_car\"]"
+            },
+            {
+              "field": "vegetarian",
+              "severity": "benign",
+              "value": "false"
+            },
+            {
+              "field": "mode",
+              "severity": "benign",
+              "value": "\"balanced\""
+            }
+          ],
+          "plan_altering": [
+            "transport"
+          ],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 1137.6,
+          "raw": "{\"origin\": {\"name\": \"Banashankari\"}, \"destination\": {\"name\": \"Nandi Hills\"}, \"date_phrase\": \"Sunday\", \"party_size\": 3, \"transport\": [\"own_car\"], \"vegetarian\": false, \"mode\": \"balanced\"}"
+        },
+        {
+          "case_id": "A02-explicit-time-interests",
+          "category": "explicit_extraction",
+          "input": "Starting in Malleshwaram at 8:30 am, I'd like to see a temple and a museum.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": true,
+          "stated": [
+            {
+              "field": "origin",
+              "status": "correct",
+              "got": "'Malleshwaram'"
+            },
+            {
+              "field": "start_time_local",
+              "status": "correct",
+              "got": "'08:30'"
+            },
+            {
+              "field": "interests",
+              "status": "correct",
+              "got": "['museum', 'temple']"
+            }
+          ],
+          "unrequested": [],
+          "plan_altering": [],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 1144.6,
+          "raw": "{\n  \"origin\": {\n    \"name\": \"Malleshwaram\"\n  },\n  \"start_time_local\": \"08:30\",\n  \"interests\": [\n    {\n      \"category\": \"temple\"\n    },\n    {\n      \"category\": \"museum\"\n    }\n  ]\n}"
+        },
+        {
+          "case_id": "A03-explicit-cab-group",
+          "category": "explicit_extraction",
+          "input": "We are 5 friends going from Electronic City, and we'd like a cab for the whole day.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": true,
+          "stated": [
+            {
+              "field": "origin",
+              "status": "correct",
+              "got": "'Electronic City'"
+            },
+            {
+              "field": "party_size",
+              "status": "correct",
+              "got": "5"
+            },
+            {
+              "field": "transport",
+              "status": "correct",
+              "got": "['cab']"
+            }
+          ],
+          "unrequested": [],
+          "plan_altering": [],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 455.4,
+          "raw": "{\"origin\": {\"name\": \"Electronic City\"}, \"party_size\": 5, \"transport\": [\"cab\"]}"
+        },
+        {
+          "case_id": "A04-explicit-vegetarian",
+          "category": "explicit_extraction",
+          "input": "Vegetarian lunch spot first, then a bookstore, starting from Basavanagudi.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": false,
+          "stated": [
+            {
+              "field": "origin",
+              "status": "correct",
+              "got": "'Basavanagudi'"
+            },
+            {
+              "field": "vegetarian",
+              "status": "missing",
+              "got": "None"
+            },
+            {
+              "field": "interests",
+              "status": "correct",
+              "got": "['bookstore', 'restaurant']"
+            }
+          ],
+          "unrequested": [],
+          "plan_altering": [],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 669.6,
+          "raw": "{\"origin\": {\"name\": \"Basavanagudi\"}, \"interests\": [{\"category\": \"restaurant\", \"priority\": \"must\"}, {\"category\": \"bookstore\"}]}"
+        },
+        {
+          "case_id": "A05-explicit-days-car",
+          "category": "explicit_extraction",
+          "input": "Two-day trip from Yelahanka, we'll drive ourselves.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": false,
+          "stated": [
+            {
+              "field": "origin",
+              "status": "correct",
+              "got": "'Yelahanka'"
+            },
+            {
+              "field": "days",
+              "status": "missing",
+              "got": "None"
+            },
+            {
+              "field": "transport",
+              "status": "correct",
+              "got": "['own_car']"
+            }
+          ],
+          "unrequested": [
+            {
+              "field": "mode",
+              "severity": "plan_altering",
+              "value": "\"relaxed\""
+            }
+          ],
+          "plan_altering": [
+            "mode"
+          ],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 530.7,
+          "raw": "{\"origin\": {\"name\": \"Yelahanka\"}, \"transport\": [\"own_car\"], \"mode\": \"relaxed\"}"
+        },
+        {
+          "case_id": "A06-explicit-walk-limit-end",
+          "category": "explicit_extraction",
+          "input": "From Frazer Town, cap the walking at 2 km and finish by 7 pm.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": false,
+          "stated": [
+            {
+              "field": "origin",
+              "status": "correct",
+              "got": "'Frazer Town'"
+            },
+            {
+              "field": "max_walking_km",
+              "status": "correct",
+              "got": "2.0"
+            },
+            {
+              "field": "end_time_local",
+              "status": "missing",
+              "got": "None"
+            }
+          ],
+          "unrequested": [
+            {
+              "field": "mode",
+              "severity": "plan_altering",
+              "value": "\"quick\""
+            }
+          ],
+          "plan_altering": [
+            "mode"
+          ],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 541.3,
+          "raw": "{\"origin\": {\"name\": \"Frazer Town\"}, \"max_walking_km\": 2, \"mode\": \"quick\"}"
+        },
+        {
+          "case_id": "A07-explicit-bicycle-lake",
+          "category": "explicit_extraction",
+          "input": "Bicycle ride from Ulsoor to a lake, next Tuesday.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": false,
+          "stated": [
+            {
+              "field": "origin",
+              "status": "correct",
+              "got": "'Ulsoor'"
+            },
+            {
+              "field": "transport",
+              "status": "correct",
+              "got": "['bike']"
+            },
+            {
+              "field": "interests",
+              "status": "missing",
+              "got": "[]"
+            },
+            {
+              "field": "date_phrase",
+              "status": "correct",
+              "got": "'next Tuesday' -> 2026-09-22"
+            }
+          ],
+          "unrequested": [
+            {
+              "field": "destination",
+              "severity": "plan_altering",
+              "value": "{\"name\": \"lake\"}"
+            }
+          ],
+          "plan_altering": [
+            "destination"
+          ],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 944.6,
+          "raw": "{\n  \"origin\": {\n    \"name\": \"Ulsoor\"\n  },\n  \"destination\": {\n    \"name\": \"lake\"\n  },\n  \"date_phrase\": \"next Tuesday\",\n  \"transport\": [\n    \"bike\"\n  ]\n}"
+        },
+        {
+          "case_id": "A08-explicit-iso-date",
+          "category": "explicit_extraction",
+          "input": "I want a viewpoint and some dessert, starting from RT Nagar on 2026-11-14.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": true,
+          "stated": [
+            {
+              "field": "origin",
+              "status": "correct",
+              "got": "'RT Nagar'"
+            },
+            {
+              "field": "interests",
+              "status": "correct",
+              "got": "['dessert', 'viewpoint']"
+            },
+            {
+              "field": "date_phrase",
+              "status": "correct",
+              "got": "'2026-11-14' -> 2026-11-14"
+            }
+          ],
+          "unrequested": [],
+          "plan_altering": [],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 1192.5,
+          "raw": "{\n  \"origin\": {\n    \"name\": \"RT Nagar\"\n  },\n  \"date_phrase\": \"2026-11-14\",\n  \"interests\": [\n    {\n      \"category\": \"viewpoint\"\n    },\n    {\n      \"category\": \"dessert\"\n    }\n  ]\n}"
+        },
+        {
+          "case_id": "A09-explicit-pace",
+          "category": "explicit_extraction",
+          "input": "Rush through as many sights as possible, starting from Majestic this Friday.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": true,
+          "stated": [
+            {
+              "field": "origin",
+              "status": "correct",
+              "got": "'Majestic'"
+            },
+            {
+              "field": "date_phrase",
+              "status": "correct",
+              "got": "'Friday' -> 2026-09-25"
+            },
+            {
+              "field": "mode",
+              "status": "correct",
+              "got": "'quick'"
+            }
+          ],
+          "unrequested": [],
+          "plan_altering": [],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 463.9,
+          "raw": "{\"origin\": {\"name\": \"Majestic\"}, \"date_phrase\": \"Friday\", \"mode\": \"quick\"}"
+        },
+        {
+          "case_id": "A10-explicit-solo",
+          "category": "explicit_extraction",
+          "input": "Take me to Lalbagh tomorrow at 7 in the morning, just me.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": true,
+          "stated": [
+            {
+              "field": "destination",
+              "status": "correct",
+              "got": "'Lalbagh'"
+            },
+            {
+              "field": "date_phrase",
+              "status": "correct",
+              "got": "'tomorrow' -> 2026-09-22"
+            },
+            {
+              "field": "start_time_local",
+              "status": "correct",
+              "got": "'07:00'"
+            },
+            {
+              "field": "party_size",
+              "status": "correct",
+              "got": "1"
+            }
+          ],
+          "unrequested": [],
+          "plan_altering": [],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 721.8,
+          "raw": "{\"destination\": {\"name\": \"Lalbagh\"}, \"date_phrase\": \"tomorrow\", \"start_time_local\": \"07:00\", \"party_size\": 1}"
+        },
+        {
+          "case_id": "B01-affordable",
+          "category": "missing_info_restraint",
+          "input": "Plan an affordable outing from HSR Layout.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": false,
+          "stated": [
+            {
+              "field": "origin",
+              "status": "correct",
+              "got": "'HSR Layout'"
+            }
+          ],
+          "unrequested": [
+            {
+              "field": "budget_inr",
+              "severity": "plan_altering",
+              "value": "0"
+            }
+          ],
+          "plan_altering": [
+            "budget_inr"
+          ],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 371.2,
+          "raw": "{\"origin\": {\"name\": \"HSR Layout\"}, \"budget_inr\": 0}"
+        },
+        {
+          "case_id": "B02-kids",
+          "category": "missing_info_restraint",
+          "input": "Something for me and the kids, starting at Jayanagar.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": false,
+          "stated": [
+            {
+              "field": "origin",
+              "status": "correct",
+              "got": "'Jayanagar'"
+            }
+          ],
+          "unrequested": [
+            {
+              "field": "party_size",
+              "severity": "plan_altering",
+              "value": "2"
+            }
+          ],
+          "plan_altering": [
+            "party_size"
+          ],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 362.7,
+          "raw": "{\"origin\": {\"name\": \"Jayanagar\"}, \"party_size\": 2}"
+        },
+        {
+          "case_id": "B03-eat-not-veg",
+          "category": "missing_info_restraint",
+          "input": "From Whitefield, I'd like somewhere to eat.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": true,
+          "stated": [
+            {
+              "field": "origin",
+              "status": "correct",
+              "got": "'Whitefield'"
+            },
+            {
+              "field": "interests",
+              "status": "correct",
+              "got": "['restaurant']"
+            }
+          ],
+          "unrequested": [],
+          "plan_altering": [],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 408.0,
+          "raw": "{\"origin\": {\"name\": \"Whitefield\"}, \"interests\": [{\"category\": \"restaurant\"}]}"
+        },
+        {
+          "case_id": "B04-relaxing-vibe",
+          "category": "missing_info_restraint",
+          "input": "A relaxing Saturday from Indiranagar.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": false,
+          "stated": [
+            {
+              "field": "origin",
+              "status": "correct",
+              "got": "'Indiranagar'"
+            },
+            {
+              "field": "date_phrase",
+              "status": "correct",
+              "got": "'Saturday' -> 2026-09-26"
+            }
+          ],
+          "unrequested": [
+            {
+              "field": "mode",
+              "severity": "plan_altering",
+              "value": "\"relaxed\""
+            }
+          ],
+          "plan_altering": [
+            "mode"
+          ],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 476.5,
+          "raw": "{\"origin\": {\"name\": \"Indiranagar\"}, \"date_phrase\": \"Saturday\", \"mode\": \"relaxed\"}"
+        },
+        {
+          "case_id": "B05-colleagues",
+          "category": "missing_info_restraint",
+          "input": "Organise something from Hebbal with my colleagues.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": true,
+          "stated": [
+            {
+              "field": "origin",
+              "status": "correct",
+              "got": "'Hebbal'"
+            }
+          ],
+          "unrequested": [],
+          "plan_altering": [],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 239.7,
+          "raw": "{\"origin\": {\"name\": \"Hebbal\"}}"
+        },
+        {
+          "case_id": "B06-low-budget",
+          "category": "missing_info_restraint",
+          "input": "Low-budget plan starting from Koramangala, some cafes please.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": true,
+          "stated": [
+            {
+              "field": "origin",
+              "status": "correct",
+              "got": "'Koramangala'"
+            },
+            {
+              "field": "interests",
+              "status": "correct",
+              "got": "['cafe']"
+            }
+          ],
+          "unrequested": [
+            {
+              "field": "mode",
+              "severity": "benign",
+              "value": "\"balanced\""
+            }
+          ],
+          "plan_altering": [],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 704.8,
+          "raw": "{\"origin\": {\"name\": \"Koramangala\"}, \"interests\": [{\"category\": \"cafe\", \"count\": 1}], \"mode\": \"balanced\"}"
+        },
+        {
+          "case_id": "B07-bare-destination",
+          "category": "missing_info_restraint",
+          "input": "Heading to Cubbon Park.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": true,
+          "stated": [
+            {
+              "field": "destination",
+              "status": "correct",
+              "got": "'Cubbon Park'"
+            }
+          ],
+          "unrequested": [],
+          "plan_altering": [],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 255.9,
+          "raw": "{\"destination\": {\"name\": \"Cubbon Park\"}}"
+        },
+        {
+          "case_id": "B08-bare-date",
+          "category": "missing_info_restraint",
+          "input": "Can you sort out a plan for Sunday?",
+          "ok": true,
+          "failure_reason": null,
+          "clean": true,
+          "stated": [
+            {
+              "field": "date_phrase",
+              "status": "correct",
+              "got": "'Sunday' -> 2026-09-27"
+            }
+          ],
+          "unrequested": [],
+          "plan_altering": [],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 171.7,
+          "raw": "{\"date_phrase\": \"Sunday\"}"
+        },
+        {
+          "case_id": "C01-late-tonight",
+          "category": "ambiguous_wording",
+          "input": "Somewhere near Church Street late tonight.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": true,
+          "stated": [
+            {
+              "field": "place_any",
+              "status": "correct",
+              "got": "[None, 'Church Street']"
+            },
+            {
+              "field": "date_phrase",
+              "status": "correct",
+              "got": "'tonight' -> 2026-09-21"
+            }
+          ],
+          "unrequested": [],
+          "plan_altering": [],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 358.9,
+          "raw": "{\"destination\": {\"name\": \"Church Street\"}, \"date_phrase\": \"tonight\"}"
+        },
+        {
+          "case_id": "C02-undecided-destination",
+          "category": "ambiguous_wording",
+          "input": "Maybe Mysore, maybe Coorg, not sure yet.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": true,
+          "stated": [],
+          "unrequested": [],
+          "plan_altering": [],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 68.4,
+          "raw": "{}"
+        },
+        {
+          "case_id": "C03-lunchtime",
+          "category": "ambiguous_wording",
+          "input": "Around lunchtime in Sadashivanagar, a quiet spot.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": false,
+          "stated": [
+            {
+              "field": "place_any",
+              "status": "correct",
+              "got": "['Sadashivanagar', None]"
+            }
+          ],
+          "unrequested": [
+            {
+              "field": "date_phrase",
+              "severity": "plan_altering",
+              "value": "\"today\""
+            },
+            {
+              "field": "start_time_local",
+              "severity": "plan_altering",
+              "value": "\"12:00\""
+            }
+          ],
+          "plan_altering": [
+            "date_phrase",
+            "start_time_local"
+          ],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 578.2,
+          "raw": "{\"origin\": {\"name\": \"Sadashivanagar\"}, \"date_phrase\": \"today\", \"start_time_local\": \"12:00\"}"
+        },
+        {
+          "case_id": "C04-afternoon",
+          "category": "ambiguous_wording",
+          "input": "A few hours out in the afternoon, Rajajinagar side.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": false,
+          "stated": [
+            {
+              "field": "place_any",
+              "status": "missing",
+              "got": "None"
+            }
+          ],
+          "unrequested": [
+            {
+              "field": "date_phrase",
+              "severity": "clarifying",
+              "value": "\"afternoon\""
+            },
+            {
+              "field": "interests",
+              "severity": "plan_altering",
+              "value": "[\"park\"]"
+            }
+          ],
+          "plan_altering": [
+            "interests"
+          ],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": "afternoon",
+          "latency_ms": 420.2,
+          "raw": "{\"date_phrase\": \"afternoon\", \"interests\": [{\"category\": \"park\"}]}"
+        },
+        {
+          "case_id": "C05-hedged-interest",
+          "category": "ambiguous_wording",
+          "input": "We might do a couple of cafes, or maybe not, from BTM Layout.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": true,
+          "stated": [
+            {
+              "field": "origin",
+              "status": "correct",
+              "got": "'BTM Layout'"
+            }
+          ],
+          "unrequested": [],
+          "plan_altering": [],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 545.1,
+          "raw": "{\"origin\": {\"name\": \"BTM Layout\"}, \"interests\": [{\"category\": \"cafe\", \"count\": 2}]}"
+        },
+        {
+          "case_id": "D01-metro",
+          "category": "unsupported_enum",
+          "input": "We'll ride the metro from MG Road to Yeshwanthpur.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": false,
+          "stated": [
+            {
+              "field": "origin",
+              "status": "correct",
+              "got": "'MG Road'"
+            },
+            {
+              "field": "destination",
+              "status": "correct",
+              "got": "'Yeshwanthpur'"
+            }
+          ],
+          "unrequested": [
+            {
+              "field": "transport",
+              "severity": "plan_altering",
+              "value": "[\"auto\"]"
+            }
+          ],
+          "plan_altering": [
+            "transport"
+          ],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 580.4,
+          "raw": "{\"origin\": {\"name\": \"MG Road\"}, \"destination\": {\"name\": \"Yeshwanthpur\"}, \"transport\": [\"auto\"]}"
+        },
+        {
+          "case_id": "D02-train",
+          "category": "unsupported_enum",
+          "input": "Taking a train out to Mysore on Saturday.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": true,
+          "stated": [
+            {
+              "field": "destination",
+              "status": "correct",
+              "got": "'Mysore'"
+            },
+            {
+              "field": "date_phrase",
+              "status": "correct",
+              "got": "'Saturday' -> 2026-09-26"
+            }
+          ],
+          "unrequested": [],
+          "plan_altering": [],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 355.9,
+          "raw": "{\"destination\": {\"name\": \"Mysore\"}, \"date_phrase\": \"Saturday\"}"
+        },
+        {
+          "case_id": "D03-unmappable-interests",
+          "category": "unsupported_enum",
+          "input": "From Koramangala, I'd love a spa afternoon and a pottery class.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": false,
+          "stated": [
+            {
+              "field": "origin",
+              "status": "correct",
+              "got": "'Koramangala'"
+            },
+            {
+              "field": "free_text_contains",
+              "status": "correct",
+              "got": "['spa afternoon', 'pottery class']"
+            }
+          ],
+          "unrequested": [
+            {
+              "field": "interests",
+              "severity": "plan_altering",
+              "value": "[\"market\", \"shopping\"]"
+            }
+          ],
+          "plan_altering": [
+            "interests"
+          ],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 805.4,
+          "raw": "{\"origin\": {\"name\": \"Koramangala\"}, \"interests\": [{\"category\": \"shopping\"}, {\"category\": \"market\"}], \"free_text_interests\": [\"spa afternoon\", \"pottery class\"]}"
+        },
+        {
+          "case_id": "D04-bmtc",
+          "category": "unsupported_enum",
+          "input": "Catching a BMTC from Shivajinagar to Hebbal.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": false,
+          "stated": [
+            {
+              "field": "origin",
+              "status": "correct",
+              "got": "'Shivajinagar'"
+            },
+            {
+              "field": "destination",
+              "status": "correct",
+              "got": "'Hebbal'"
+            }
+          ],
+          "unrequested": [
+            {
+              "field": "transport",
+              "severity": "plan_altering",
+              "value": "[\"auto\"]"
+            }
+          ],
+          "plan_altering": [
+            "transport"
+          ],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 568.9,
+          "raw": "{\"origin\": {\"name\": \"Shivajinagar\"}, \"destination\": {\"name\": \"Hebbal\"}, \"transport\": [\"auto\"]}"
+        },
+        {
+          "case_id": "E01-weekday-evening",
+          "category": "date_time",
+          "input": "Next Thursday evening from Jayanagar, dinner somewhere.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": false,
+          "stated": [
+            {
+              "field": "origin",
+              "status": "correct",
+              "got": "'Jayanagar'"
+            },
+            {
+              "field": "date_phrase",
+              "status": "correct",
+              "got": "'Thursday' -> 2026-09-24"
+            },
+            {
+              "field": "interests",
+              "status": "correct",
+              "got": "['restaurant']"
+            }
+          ],
+          "unrequested": [
+            {
+              "field": "transport",
+              "severity": "plan_altering",
+              "value": "[\"auto\"]"
+            }
+          ],
+          "plan_altering": [
+            "transport"
+          ],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 1038.6,
+          "raw": "{\n  \"origin\": {\n    \"name\": \"Jayanagar\"\n  },\n  \"date_phrase\": \"Thursday\",\n  \"interests\": [\n    {\n      \"category\": \"restaurant\"\n    }\n  ],\n  \"transport\": [\n    \"auto\"\n  ]\n}"
+        },
+        {
+          "case_id": "E02-night-clock",
+          "category": "date_time",
+          "input": "Friday night, starting 8 pm from Indiranagar, a bar.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": false,
+          "stated": [
+            {
+              "field": "origin",
+              "status": "missing",
+              "got": "None"
+            },
+            {
+              "field": "date_phrase",
+              "status": "correct",
+              "got": "'Friday' -> 2026-09-25"
+            },
+            {
+              "field": "start_time_local",
+              "status": "correct",
+              "got": "'20:00'"
+            },
+            {
+              "field": "interests",
+              "status": "correct",
+              "got": "['bar']"
+            }
+          ],
+          "unrequested": [
+            {
+              "field": "transport",
+              "severity": "plan_altering",
+              "value": "[\"walking\"]"
+            }
+          ],
+          "plan_altering": [
+            "transport"
+          ],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 1042.7,
+          "raw": "{\n  \"date_phrase\": \"Friday\",\n  \"start_time_local\": \"20:00\",\n  \"interests\": [\n    {\n      \"category\": \"bar\"\n    }\n  ],\n  \"transport\": [\n    \"walking\"\n  ]\n}"
+        },
+        {
+          "case_id": "E03-month",
+          "category": "date_time",
+          "input": "Can we go sometime in October from Hebbal?",
+          "ok": true,
+          "failure_reason": null,
+          "clean": false,
+          "stated": [
+            {
+              "field": "origin",
+              "status": "correct",
+              "got": "'Hebbal'"
+            }
+          ],
+          "unrequested": [
+            {
+              "field": "date_phrase",
+              "severity": "clarifying",
+              "value": "\"October\""
+            }
+          ],
+          "plan_altering": [],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": "October",
+          "latency_ms": 355.7,
+          "raw": "{\"origin\": {\"name\": \"Hebbal\"}, \"date_phrase\": \"October\"}"
+        },
+        {
+          "case_id": "E04-clock-range",
+          "category": "date_time",
+          "input": "Day after tomorrow, from 10:15 to 16:45, Koramangala.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": false,
+          "stated": [
+            {
+              "field": "place_any",
+              "status": "missing",
+              "got": "None"
+            },
+            {
+              "field": "date_phrase",
+              "status": "correct",
+              "got": "'day after tomorrow' -> 2026-09-23"
+            },
+            {
+              "field": "start_time_local",
+              "status": "correct",
+              "got": "'10:15'"
+            },
+            {
+              "field": "end_time_local",
+              "status": "correct",
+              "got": "'16:45'"
+            }
+          ],
+          "unrequested": [
+            {
+              "field": "transport",
+              "severity": "plan_altering",
+              "value": "[\"own_car\"]"
+            }
+          ],
+          "plan_altering": [
+            "transport"
+          ],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 879.2,
+          "raw": "{\n  \"date_phrase\": \"day after tomorrow\",\n  \"start_time_local\": \"10:15\",\n  \"end_time_local\": \"16:45\",\n  \"transport\": [\"own_car\"]\n}"
+        },
+        {
+          "case_id": "E05-early-morning",
+          "category": "date_time",
+          "input": "Early morning tomorrow from Basavanagudi for a temple visit.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": false,
+          "stated": [
+            {
+              "field": "origin",
+              "status": "correct",
+              "got": "'Basavanagudi'"
+            },
+            {
+              "field": "date_phrase",
+              "status": "correct",
+              "got": "'tomorrow' -> 2026-09-22"
+            },
+            {
+              "field": "interests",
+              "status": "correct",
+              "got": "['temple']"
+            }
+          ],
+          "unrequested": [
+            {
+              "field": "transport",
+              "severity": "plan_altering",
+              "value": "[\"walking\"]"
+            }
+          ],
+          "plan_altering": [
+            "transport"
+          ],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 722.8,
+          "raw": "{\"origin\": {\"name\": \"Basavanagudi\"}, \"date_phrase\": \"tomorrow\", \"interests\": [{\"category\": \"temple\"}], \"transport\": [\"walking\"]}"
+        },
+        {
+          "case_id": "F01-named-park",
+          "category": "place_interest",
+          "input": "Take me to Bannerghatta National Park.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": true,
+          "stated": [
+            {
+              "field": "destination",
+              "status": "correct",
+              "got": "'Bannerghatta National Park'"
+            }
+          ],
+          "unrequested": [],
+          "plan_altering": [],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 272.4,
+          "raw": "{\"destination\": {\"name\": \"Bannerghatta National Park\"}}"
+        },
+        {
+          "case_id": "F02-generic-lake",
+          "category": "place_interest",
+          "input": "From Malleshwaram, I'd like to find a lake to sit by.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": true,
+          "stated": [
+            {
+              "field": "origin",
+              "status": "correct",
+              "got": "'Malleshwaram'"
+            },
+            {
+              "field": "interests",
+              "status": "correct",
+              "got": "['lake']"
+            }
+          ],
+          "unrequested": [],
+          "plan_altering": [],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 451.1,
+          "raw": "{\"origin\": {\"name\": \"Malleshwaram\"}, \"interests\": [{\"category\": \"lake\"}]}"
+        },
+        {
+          "case_id": "F03-generic-pair",
+          "category": "place_interest",
+          "input": "Find me a museum and a market, I'm at Shivajinagar.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": true,
+          "stated": [
+            {
+              "field": "origin",
+              "status": "correct",
+              "got": "'Shivajinagar'"
+            },
+            {
+              "field": "interests",
+              "status": "correct",
+              "got": "['market', 'museum']"
+            }
+          ],
+          "unrequested": [],
+          "plan_altering": [],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 583.7,
+          "raw": "{\"origin\": {\"name\": \"Shivajinagar\"}, \"interests\": [{\"category\": \"museum\"}, {\"category\": \"market\"}]}"
+        },
+        {
+          "case_id": "F04-named-plus-generic",
+          "category": "place_interest",
+          "input": "Go to Bangalore Palace, then an art gallery, from Sadashivanagar.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": false,
+          "stated": [
+            {
+              "field": "origin",
+              "status": "correct",
+              "got": "'Sadashivanagar'"
+            },
+            {
+              "field": "destination",
+              "status": "correct",
+              "got": "'Bangalore Palace'"
+            },
+            {
+              "field": "interests",
+              "status": "wrong",
+              "got": "['art_gallery', 'landmark']"
+            }
+          ],
+          "unrequested": [],
+          "plan_altering": [
+            "interests (wrong)"
+          ],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 765.1,
+          "raw": "{\"origin\": {\"name\": \"Sadashivanagar\"}, \"destination\": {\"name\": \"Bangalore Palace\"}, \"interests\": [{\"category\": \"landmark\"}, {\"category\": \"art_gallery\"}]}"
+        },
+        {
+          "case_id": "F05-generic-view",
+          "category": "place_interest",
+          "input": "Somewhere with a nice view in the city, starting from Hebbal.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": true,
+          "stated": [
+            {
+              "field": "origin",
+              "status": "correct",
+              "got": "'Hebbal'"
+            },
+            {
+              "field": "interests",
+              "status": "correct",
+              "got": "['viewpoint']"
+            }
+          ],
+          "unrequested": [],
+          "plan_altering": [],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 448.9,
+          "raw": "{\"origin\": {\"name\": \"Hebbal\"}, \"interests\": [{\"category\": \"viewpoint\"}]}"
+        },
+        {
+          "case_id": "G01-indian-english",
+          "category": "indian_english_noisy",
+          "input": "Myself and my brother only, from Vijayanagar, total budget two thousand rupees, one small temple visit also.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": false,
+          "stated": [
+            {
+              "field": "origin",
+              "status": "correct",
+              "got": "'Vijayanagar'"
+            },
+            {
+              "field": "party_size",
+              "status": "correct",
+              "got": "2"
+            },
+            {
+              "field": "budget_inr",
+              "status": "missing",
+              "got": "None"
+            },
+            {
+              "field": "interests",
+              "status": "correct",
+              "got": "['temple']"
+            }
+          ],
+          "unrequested": [
+            {
+              "field": "free_text_interests",
+              "severity": "benign",
+              "value": "[\"one small temple visit also\"]"
+            },
+            {
+              "field": "transport",
+              "severity": "plan_altering",
+              "value": "[\"own_car\"]"
+            },
+            {
+              "field": "vegetarian",
+              "severity": "benign",
+              "value": "false"
+            },
+            {
+              "field": "mode",
+              "severity": "benign",
+              "value": "\"balanced\""
+            }
+          ],
+          "plan_altering": [
+            "transport"
+          ],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 1764.4,
+          "raw": "{\n  \"origin\": {\n    \"name\": \"Vijayanagar\"\n  },\n  \"party_size\": 2,\n  \"interests\": [\n    {\n      \"category\": \"temple\"\n    }\n  ],\n  \"free_text_interests\": [\n    \"one small temple visit also\"\n  ],\n  \"transport\": [\n    \"own_car\"\n  ],\n  \"vegetarian\": false,\n  \"mode\": \"balanced\"\n}"
+        },
+        {
+          "case_id": "G02-sms-style",
+          "category": "indian_english_noisy",
+          "input": "pls plan smthng frm kormangala 2mrw, 4 ppl, cafe+park, max 1500/-",
+          "ok": false,
+          "failure_reason": "schema_invalid",
+          "clean": false,
+          "stated": [
+            {
+              "field": "origin",
+              "status": "missing",
+              "got": "no draft"
+            },
+            {
+              "field": "date_phrase",
+              "status": "missing",
+              "got": "no draft"
+            },
+            {
+              "field": "party_size",
+              "status": "missing",
+              "got": "no draft"
+            },
+            {
+              "field": "interests",
+              "status": "missing",
+              "got": "no draft"
+            },
+            {
+              "field": "budget_inr",
+              "status": "missing",
+              "got": "no draft"
+            }
+          ],
+          "unrequested": [],
+          "plan_altering": [],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": "2mrw",
+          "latency_ms": 1459.7,
+          "raw": "{\n  \"origin\": {\n    \"name\": \"kormangala\"\n  },\n  \"date_phrase\": \"2mrw\",\n  \"party_size\": 4,\n  \"interests\": [\n    {\n      \"category\": \"cafe\"\n    },\n    {\n      \"category\": \"park\"\n    }\n  ],\n  \"max_walking_km\": 1500\n}"
+        },
+        {
+          "case_id": "G03-formal-request",
+          "category": "indian_english_noisy",
+          "input": "Sir, kindly arrange a pure-veg outing from Rajajinagar this Sunday, 6 members, auto only.",
+          "ok": true,
+          "failure_reason": null,
+          "clean": true,
+          "stated": [
+            {
+              "field": "origin",
+              "status": "correct",
+              "got": "'Rajajinagar'"
+            },
+            {
+              "field": "vegetarian",
+              "status": "correct",
+              "got": "True"
+            },
+            {
+              "field": "date_phrase",
+              "status": "correct",
+              "got": "'Sunday' -> 2026-09-27"
+            },
+            {
+              "field": "party_size",
+              "status": "correct",
+              "got": "6"
+            },
+            {
+              "field": "transport",
+              "status": "correct",
+              "got": "['auto']"
+            }
+          ],
+          "unrequested": [],
+          "plan_altering": [],
+          "coordinate_leak": false,
+          "malformed_times": [],
+          "unsupported_date_phrase": null,
+          "latency_ms": 724.0,
+          "raw": "{\"origin\": {\"name\": \"Rajajinagar\"}, \"date_phrase\": \"Sunday\", \"party_size\": 6, \"transport\": [\"auto\"], \"vegetarian\": true}"
+        }
+      ]
+    }
+  ]
+}

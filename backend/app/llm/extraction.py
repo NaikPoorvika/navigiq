@@ -56,7 +56,14 @@ logger = structlog.get_logger("app.llm.extraction")
 # Prompts are versioned in the repo and live under backend/ rather than the
 # repo-level ai/ directory because the backend image's Docker build context
 # is backend/ only - a prompt outside it would not ship with the service.
-PROMPT_VERSION = "v1"
+#
+# Versions are kept side by side, never overwritten, so any past evaluation
+# can be re-run against the same prompt (the model itself is not
+# bit-reproducible across sessions - see ai/evals/nq030/README.md):
+#   v1  NQ-029 baseline (ai/evals/nq029/)
+#   v2  NQ-030 restraint-focused prompt (ai/evals/nq030/) - the default
+PROMPT_VERSION = "v2"
+PROMPT_VERSIONS = ("v1", "v2")
 PROMPT_DIR = Path(__file__).parent / "prompts"
 
 # A TripDraft is a handful of short fields; schema-constrained decoding
@@ -135,6 +142,10 @@ def render_prompt(version: str = PROMPT_VERSION) -> str:
         categories=", ".join(c.value for c in Category),
         transport_modes=", ".join(t.value for t in TransportMode),
         planning_modes=", ".join(m.value for m in PlanningMode),
+        # The order constrained decoding forces keys into (NQ-030). Taken
+        # from the schema actually sent, so it cannot drift from it. v1
+        # has no placeholder for it; str.format ignores unused names.
+        field_order=", ".join(draft_json_schema()["properties"]),
     )
 
 

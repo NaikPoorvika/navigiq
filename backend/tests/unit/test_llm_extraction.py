@@ -41,6 +41,9 @@ from app.llm import (  # noqa: E402
 from app.llm.extraction import (  # noqa: E402
     EXTRACTION_MAX_TOKENS,
     MAX_USER_REQUEST_CHARS,
+    PROMPT_DIR,
+    PROMPT_VERSION,
+    PROMPT_VERSIONS,
     REASON_INVALID_JSON,
     REASON_NOT_AN_OBJECT,
     REASON_SCHEMA_INVALID,
@@ -183,7 +186,7 @@ async def test_an_empty_object_is_a_valid_extraction_not_an_error():
 async def test_provenance_is_reported():
     result = await _extract({"destination": {"name": "Mysore"}})
     assert result.model == "fake-generation"
-    assert result.prompt_version == "v1"
+    assert result.prompt_version == PROMPT_VERSION
     assert result.attempts == 1
     assert result.completion_tokens > 0
 
@@ -355,42 +358,48 @@ async def test_non_string_requests_are_a_type_error():
         await extract_trip_draft({"text": "hi"}, gateway=_llm({}))
 
 
-# --- 6. the prompt and the code cannot drift apart ---------------------------
+# --- 6. the prompts and the code cannot drift apart --------------------------
+# Every check runs against every shipped version: v1 must stay renderable so
+# the NQ-029 baseline can be reproduced, and v2 is what production uses.
 
-def test_every_category_value_is_offered_to_the_model():
+@pytest.mark.parametrize("version", PROMPT_VERSIONS)
+def test_every_category_value_is_offered_to_the_model(version):
     """A category added to the enum without the prompt being updated is a
     value the model is never told about. Injection makes that impossible;
     this proves the injection happened."""
-    prompt = render_prompt()
+    prompt = render_prompt(version)
     for category in Category:
         assert category.value in prompt, category.value
 
 
-def test_every_transport_and_planning_value_is_offered_to_the_model():
-    prompt = render_prompt()
+@pytest.mark.parametrize("version", PROMPT_VERSIONS)
+def test_every_transport_and_planning_value_is_offered_to_the_model(version):
+    prompt = render_prompt(version)
     for mode in TransportMode:
         assert mode.value in prompt, mode.value
     for mode in PlanningMode:
         assert mode.value in prompt, mode.value
 
 
-def test_the_prompt_has_no_unrendered_placeholders():
-    prompt = render_prompt()
-    assert "{categories}" not in prompt
-    assert "{transport_modes}" not in prompt
-    assert "{planning_modes}" not in prompt
+@pytest.mark.parametrize("version", PROMPT_VERSIONS)
+def test_the_prompt_has_no_unrendered_placeholders(version):
+    prompt = render_prompt(version)
+    for name in ("categories", "transport_modes", "planning_modes",
+                 "field_order"):
+        assert "{" + name + "}" not in prompt
 
 
-def test_the_prompt_never_shows_the_model_a_coordinate():
+@pytest.mark.parametrize("version", PROMPT_VERSIONS)
+def test_the_prompt_never_shows_the_model_a_coordinate(version):
     """A latitude anywhere in the prompt - even in a counter-example - is a
     coordinate the model has seen in context and may echo."""
-    prompt = render_prompt()
+    prompt = render_prompt(version)
     assert not re.search(r"\b1[23]\.\d{3,}\b", prompt), \
         "the prompt contains something shaped like a Bengaluru latitude"
 
 
-# Every date phrase the prompt tells the model is understood. If
-# resolve_date_phrase() ever stops accepting one of these, the prompt is
+# Every date phrase the prompts tell the model is understood. If
+# resolve_date_phrase() ever stops accepting one of these, a prompt is
 # advertising a phrase that will become a clarifying question instead of a
 # date - silent drift between the prompt and the resolver, which is exactly
 # what ADR-015 pinned for the schema docstring.
@@ -412,13 +421,158 @@ def test_prompt_date_vocabulary_matches_the_resolver(phrase):
         f"but resolve_date_phrase() returns None for it")
 
 
+@pytest.mark.parametrize("version", PROMPT_VERSIONS)
 @pytest.mark.parametrize("phrase", PROMPT_ADVERTISED_PHRASES)
-def test_the_prompt_actually_names_each_phrase_it_is_credited_with(phrase):
+def test_the_prompt_actually_names_each_phrase_it_is_credited_with(
+        phrase, version):
     """Guards the other direction: this list must describe the real prompt,
     not a prompt someone remembers writing. An ISO date is advertised as a
     form rather than as a literal example, so it matches on the form."""
-    prompt = render_prompt().lower()
+    prompt = render_prompt(version).lower()
     if re.fullmatch(r"\d{4}-\d{2}-\d{2}", phrase):
         assert "yyyy-mm-dd" in prompt
     else:
         assert phrase.lower() in prompt, phrase
+
+
+# --- 7. v2 (NQ-030): what makes it v2 -----------------------------------------
+
+def test_v2_is_the_production_default():
+    assert PROMPT_VERSION == "v2"
+
+
+async def test_extraction_sends_the_v2_prompt_by_default():
+    gateway = _llm({})
+    await extract_trip_draft(REQUEST, gateway=gateway)
+    assert gateway.generate_calls[0].messages[0].content == render_prompt("v2")
+
+
+async def test_the_v1_baseline_is_still_selectable():
+    gateway = _llm({})
+    result = await extract_trip_draft(REQUEST, gateway=gateway,
+                                      prompt_version="v1")
+    assert result.prompt_version == "v1"
+    assert gateway.generate_calls[0].messages[0].content == render_prompt("v1")
+
+
+def test_both_versions_exist_on_disk():
+    for version in PROMPT_VERSIONS:
+        assert (PROMPT_DIR / f"tripdraft_extraction_{version}.md").is_file()
+
+
+def test_v2_leads_with_the_global_restraint_rule():
+    """The restraint rule must come BEFORE any field-specific instruction,
+    not be repeated under each field."""
+    prompt = render_prompt("v2")
+    rule = prompt.index("Extraction is not interpretation")
+    assert rule < prompt.index("# Fields")
+    assert "When uncertain, OMIT rather than GUESS." in prompt[:prompt.index("# Fields")]
+
+
+@pytest.mark.parametrize("negative", [
+    "we'll take the bus",       # unsupported transport
+    "a cheap day out",          # vague budget
+    "next week",                # unsupported date
+    "with my family",           # uncountable group
+    "find a park",              # generic attraction
+    "evening",                  # time of day
+])
+def test_v2_carries_each_required_negative_example(negative):
+    assert negative in render_prompt("v2").lower()
+
+
+def test_v2_tells_the_model_the_schema_key_order():
+    """Constrained decoding writes keys in schema order and cannot go back
+    (NQ-030 finding). The order in the prompt is injected from the schema
+    that is actually sent, so the two cannot disagree."""
+    order = ", ".join(draft_json_schema()["properties"])
+    assert order in render_prompt("v2")
+
+
+def test_every_v2_example_writes_keys_in_schema_order():
+    """An example written out of order teaches the model an order the
+    grammar will not let it finish - v1's own example did exactly that
+    (party_size before budget_inr) and lost budgets in practice."""
+    import json as _json
+
+    order = list(draft_json_schema()["properties"])
+    examples = [line for line in _example_blocks(render_prompt("v2"))]
+    assert len(examples) >= 5
+    for example in examples:
+        keys = list(_json.loads(example))
+        assert keys == sorted(keys, key=order.index), keys
+
+
+def _example_blocks(prompt: str) -> list[str]:
+    """The JSON objects in the Examples section, joined across lines."""
+    section = prompt[prompt.index("# Examples"):prompt.index("# Output\n")]
+    blocks, current = [], []
+    for line in section.splitlines():
+        if line.startswith("{") or current:
+            current.append(line)
+            if line.rstrip().endswith("}") and _balanced(" ".join(current)):
+                blocks.append(" ".join(current))
+                current = []
+    return blocks
+
+
+def _balanced(text: str) -> bool:
+    return text.count("{") == text.count("}")
+
+
+# --- 8. the extraction LAYER adds nothing and drops nothing -------------------
+# FakeLLM cannot tell us how qwen3:14b behaves - ai/evals/nq030 measures that.
+# What it CAN pin is that nothing between the model and the caller fills a
+# default, drops a value, or "fixes" an answer: the draft that comes out is
+# exactly the one the model gave, for every restraint scenario NQ-030 targets.
+
+EMPTY_OPTIONALS = {
+    "origin": None, "destination": None, "date_phrase": None,
+    "start_time_local": None, "end_time_local": None, "days": None,
+    "budget_inr": None, "party_size": None, "interests": [],
+    "free_text_interests": [], "transport": [], "max_walking_km": None,
+    "vegetarian": None, "mode": None,
+}
+
+
+@pytest.mark.parametrize("scenario,model_answer,expected", [
+    ("explicit budget", {"budget_inr": 2500}, {"budget_inr": 2500}),
+    ("vague budget", {}, {}),
+    ("explicit party size", {"party_size": 4}, {"party_size": 4}),
+    ("uncountable group", {}, {}),
+    ("supported transport", {"transport": ["cab"]}, {"transport": ["cab"]}),
+    ("unsupported transport", {"destination": {"name": "Lalbagh"}},
+     {"destination": {"name": "Lalbagh"}}),
+    ("generic park", {"interests": [{"category": "park"}]},
+     {"interests": [{"category": "park", "count": 1, "priority": "should"}]}),
+    ("named park", {"destination": {"name": "Cubbon Park"}},
+     {"destination": {"name": "Cubbon Park"}}),
+    ("time of day only", {"origin": {"name": "Jayanagar"}},
+     {"origin": {"name": "Jayanagar"}}),
+    ("actual date", {"date_phrase": "next Tuesday"},
+     {"date_phrase": "next Tuesday"}),
+    ("unsupported date omitted", {}, {}),
+    ("explicit interests",
+     {"interests": [{"category": "cafe"}, {"category": "museum"}]},
+     {"interests": [{"category": "cafe", "count": 1, "priority": "should"},
+                    {"category": "museum", "count": 1, "priority": "should"}]}),
+    ("missing everything", {}, {}),
+])
+async def test_the_layer_returns_exactly_what_the_model_said(
+        scenario, model_answer, expected):
+    result = await _extract(model_answer)
+    assert result.draft.model_dump(mode="json") == {**EMPTY_OPTIONALS,
+                                                    **expected}, scenario
+
+
+async def test_no_accidental_defaults_are_filled_by_the_layer():
+    """The downstream defaults (party 1, walking+auto, balanced, 3 km,
+    vegetarian false) belong to draft_builder. None may appear here."""
+    draft = (await _extract({})).draft
+    assert draft.party_size is None
+    assert draft.transport == []
+    assert draft.mode is None
+    assert draft.max_walking_km is None
+    assert draft.vegetarian is None
+    assert draft.budget_inr is None
+    assert draft.date_phrase is None

@@ -122,9 +122,10 @@ not satisfy the schema returns 422 `EXTRACTION_FAILED` with a reason, never a
 salvaged half-draft (ADR-016). `/plan` and `/plan/draft` need no model at
 all, so planning keeps working when Ollama is down.
 
-The prompt is versioned at `backend/app/llm/prompts/`. Measured extraction
-quality — including where it falls short — is in `ai/evals/nq029/`, which
-also documents how to re-run it.
+The prompt is versioned at `backend/app/llm/prompts/` (v1 = NQ-029 baseline,
+v2 = NQ-030 default). Measured extraction quality — including where it falls
+short — is in `ai/evals/nq029/` (baseline) and `ai/evals/nq030/` (v1 vs v2 on
+a frozen held-out set), each documenting how to re-run it.
 
 ## Repository Structure
 - `/backend` — FastAPI app, SQLAlchemy models, Alembic migrations, tests
