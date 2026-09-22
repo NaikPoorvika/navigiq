@@ -126,6 +126,7 @@ export type ErrorCode =
   | "ROUTING_UNAVAILABLE"
   | "VALIDATION_FAILED"
   | "NETWORK"
+  | "AUTH"
   | "UNKNOWN";
 
 export interface ApiErrorDetails {
@@ -204,6 +205,26 @@ export interface ResolveResult {
   alternatives: PlaceMatch[];
   confidence: "high" | "medium" | "low" | "none";
   needs_clarification: boolean;
+}
+
+/** GET /auth/users/me - the signed-in user and their planning profile. */
+export interface UserMe {
+  id: string;
+  email: string;
+  display_name: string | null;
+  home_name: string | null;
+  home_lat: number | null;
+  home_lon: number | null;
+  interests: string[];
+  vegetarian: boolean;
+}
+
+/** PATCH /auth/users/me - only the fields sent are changed. */
+export interface ProfilePatch {
+  display_name?: string | null;
+  home?: { name: string; lat: number; lon: number } | null;
+  interests?: string[];
+  vegetarian?: boolean;
 }
 
 /** 902 -> "15:02" */
