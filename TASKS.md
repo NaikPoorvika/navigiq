@@ -40,6 +40,26 @@ Legend:
 ## Phase 2 — LLM + RAG
 (Tasks TBD upon entering phase)
 
+- [~] NQ-029 prep — TripDraft contract hardened ahead of extraction
+  - [x] `start_time_local`/`end_time_local` require exact `HH:MM`
+        (`Field(pattern=...)`, visible in `model_json_schema()`)
+  - [x] `free_text_interests` bounded to 10 entries / 80 chars, matching
+        TripSpec's existing bound
+  - [x] `date_phrase` vocabulary documented against the real
+        `resolve_date_phrase()` behaviour, with a test pinning docs to code
+  - [x] `POST /plan/draft` returns `needs_clarification` explicitly on both
+        paths (was previously absent on the successful path) - no existing
+        consumer found anywhere in the repo, confirmed additive
+  - [x] Clarification cap (`MAX_CLARIFICATIONS=2`) and coordinate safety
+        (`extra="ignore"`) now covered by regression tests
+  - [x] ADR-015 recorded
+  - [ ] NQ-029 itself (LLM extraction against this contract) - not started,
+        out of scope for this task
+  - NOTE: destination-resolution tests were added but currently fail/skip -
+    the local `places` table is missing the `kind` column `resolve_place()`
+    queries (pre-existing DB/migration sync issue, not introduced or fixed
+    here). See DECISIONS.md ADR-015 and this task's final report.
+
 ## Phase 3 — AGENTIC AI
 (Tasks TBD upon entering phase)
 

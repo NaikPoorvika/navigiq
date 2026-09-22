@@ -158,6 +158,12 @@ async def plan_from_draft(
 
     needs_clarification=true is a normal outcome, not an error: ask the user
     the question(s) and resubmit the draft with the answer filled in.
+
+    needs_clarification is always present and explicit (true or false) so a
+    caller can branch on it directly rather than on the presence of
+    unrelated fields such as `days` or `tripspec`. No existing consumer of
+    this endpoint was found in the repository when this discriminator was
+    added, so this is additive rather than a breaking change.
     """
     built = await build_tripspec(db, draft)
     if built.needs_clarification:
@@ -165,6 +171,7 @@ async def plan_from_draft(
 
     result = await plan_trip(db, built.tripspec, persist=True)
     return {
+        "needs_clarification": False,
         **result,
         "assumptions": built.assumptions,
         "tripspec": built.tripspec.model_dump(mode="json"),

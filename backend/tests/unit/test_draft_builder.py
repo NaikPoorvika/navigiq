@@ -59,6 +59,37 @@ def test_unparseable_phrase_returns_none_not_a_guess():
     assert resolve_date_phrase("sometime soon", MONDAY) is None
 
 
+@pytest.mark.parametrize("phrase", [
+    "sometime soon", "next week", "in two days", "eventually", "soon",
+    "the 5th", "next month",
+])
+def test_representative_unsupported_phrases_all_return_none(phrase):
+    """A phrase outside the resolver's vocabulary must become a clarifying
+    question (via None), never a guess."""
+    assert resolve_date_phrase(phrase, MONDAY) is None
+
+
+# Every phrase form documented on TripDraft.date_phrase (trip_draft.py) as
+# supported, one representative example each. If resolve_date_phrase()'s
+# actual vocabulary ever changes, this is the test that must be updated
+# alongside that docstring - it exists so the two cannot silently drift
+# apart (Change #2: schema/prompt documentation must match resolver reality,
+# never invent or duplicate resolution logic).
+DOCUMENTED_SUPPORTED_PHRASES = [
+    "today", "tonight", "tomorrow", "day after tomorrow", "day after",
+    "weekend", "this weekend",
+    "monday", "Monday", "mon", "this monday", "next monday", "coming monday",
+    "2026-10-01",
+]
+
+
+@pytest.mark.parametrize("phrase", DOCUMENTED_SUPPORTED_PHRASES)
+def test_documented_vocabulary_is_actually_supported(phrase):
+    assert resolve_date_phrase(phrase, MONDAY) is not None, (
+        f"{phrase!r} is documented on TripDraft.date_phrase as supported "
+        f"but resolve_date_phrase() returned None for it")
+
+
 # --- the draft contract -----------------------------------------------------
 
 def test_draft_ignores_hallucinated_coordinates():
@@ -109,6 +140,48 @@ def test_day_dates_are_consecutive():
 def test_days_are_bounded(days):
     with pytest.raises(Exception):
         _spec(days=days)
+
+
+# --- Change #5: clarification cap -------------------------------------------
+# _resolve() short-circuits before touching the database when a place ref is
+# None (see draft_builder.py), so a maximal-clarification scenario can be
+# built entirely from missing-field cases below, with no places-table
+# dependency. Destination-specific resolution cases are in the integration
+# section further down.
+
+@pytest.mark.asyncio
+async def test_clarification_cap_is_never_exceeded(db):
+    """Missing origin + missing interests + an unparseable date phrase can
+    all fire in the same draft - four sources of clarification are latent
+    in build_tripspec (origin, destination, interests, date), but the
+    response must never carry more than MAX_CLARIFICATIONS."""
+    from app.services.planning.draft_builder import MAX_CLARIFICATIONS
+
+    r = await build_tripspec(db, TripDraft(date_phrase="not a real phrase"))
+    # No origin, no interests, no destination, an unparseable date: every
+    # non-time clarification source is triggered at once.
+    assert r.needs_clarification
+    assert r.tripspec is None
+    assert len(r.to_dict()["clarifications"]) <= MAX_CLARIFICATIONS
+
+
+@pytest.mark.asyncio
+async def test_clarification_cap_ordering_is_deterministic(db):
+    """Origin is resolved first in build_tripspec, so when both origin and
+    interests are missing, origin's question must be the one that survives
+    the cap - not an arbitrary one."""
+    r = await build_tripspec(db, TripDraft())  # origin, interests both absent
+    assert r.needs_clarification
+    fields = [c["field"] for c in r.to_dict()["clarifications"]]
+    assert fields[0] == "origin"
+
+
+@pytest.mark.asyncio
+async def test_tripspec_is_none_whenever_clarification_is_needed(db):
+    r = await build_tripspec(db, TripDraft(date_phrase="gibberish"))
+    assert r.needs_clarification
+    assert r.tripspec is None
+    assert r.to_dict()["tripspec"] is None
 
 
 # --- integration: needs the places table ---------------------------------
@@ -171,3 +244,52 @@ async def test_defaults_are_recorded_as_assumptions(db):
     r = await build_tripspec(db, TripDraft(
         origin={"name": "Koramangala"}, interests=[{"category": "cafe"}]))
     assert r.assumptions, "defaults must be visible, not silent"
+
+
+# --- destination resolution -------------------------------------------------
+# Section 8: same resolver, same _resolve() codepath as origin, but with
+# required=False. Uses the existing gazetteer/resolution behaviour only -
+# no new destination semantics.
+
+@pytest.mark.asyncio
+async def test_destination_missing_is_not_a_clarification(db):
+    """destination is optional (required=False in _resolve) - unlike
+    origin, omitting it must never itself trigger a question."""
+    r = await build_tripspec(db, TripDraft(
+        origin={"name": "Koramangala"}, interests=[{"category": "cafe"}]))
+    assert not any(c.field == "destination" for c in r.clarifications)
+
+
+@pytest.mark.asyncio
+async def test_destination_supplied_and_resolvable(db):
+    r = await build_tripspec(db, TripDraft(
+        origin={"name": "Koramangala"}, destination={"name": "Jayanagar"},
+        date_phrase="saturday", interests=[{"category": "cafe"}]))
+    assert r.tripspec is not None, r.clarifications
+    assert r.tripspec.destination is not None
+    assert r.tripspec.destination.lat is not None
+    assert r.tripspec.destination.lon is not None
+
+
+@pytest.mark.asyncio
+async def test_destination_supplied_but_unknown_asks_rather_than_guessing(db):
+    r = await build_tripspec(db, TripDraft(
+        origin={"name": "Koramangala"}, destination={"name": "asdfghjkl"},
+        interests=[{"category": "cafe"}]))
+    assert r.needs_clarification
+    assert r.tripspec is None
+    assert any(c.field == "destination" for c in r.clarifications)
+
+
+@pytest.mark.asyncio
+async def test_destination_supplied_but_ambiguous_asks(db):
+    """'Indiranagar' is the same genuinely-ambiguous case documented in
+    ADR-011 for origin; the resolver applies identically to destination."""
+    r = await build_tripspec(db, TripDraft(
+        origin={"name": "Koramangala"}, destination={"name": "Indiranagar"},
+        interests=[{"category": "cafe"}]))
+    assert r.needs_clarification
+    assert r.tripspec is None
+    dest_clar = [c for c in r.clarifications if c.field == "destination"]
+    assert dest_clar, r.clarifications
+    assert len(dest_clar[0].options) >= 2

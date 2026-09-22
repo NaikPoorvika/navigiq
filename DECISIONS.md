@@ -177,3 +177,57 @@ budget.
 
 **Consequences:** The UI shows "≈ Rs 600 typical" rather than "Rs 600". Real
 prices, when curated, use `cost_basis: poi_specific` and take precedence.
+
+## ADR-015: TripDraft hardened ahead of NQ-029
+**Status:** Accepted
+**Date:** 2026-09-22
+
+**Context:** ADR-013 established TripDraft as what the LLM fills in, but
+three parts of the contract were looser than the model being asked to
+produce it. `start_time_local`/`end_time_local` accepted anything
+`TripSpec._hhmm` would (including "9:00", no leading zero); `free_text_interests`
+had no bound at all even though the same field on TripSpec is capped at 10
+entries/80 chars; and `POST /plan/draft`'s two response shapes could not be
+told apart without inspecting unrelated fields - the successful path carried
+no `needs_clarification` key at all, only the clarification path did.
+
+**Decision:**
+- `start_time_local`/`end_time_local` on TripDraft require exactly `HH:MM`,
+  24-hour, zero-padded, via `Field(pattern=...)` rather than a hand-written
+  validator, so the constraint is also visible in `TripDraft.model_json_schema()`
+  and can inform schema-constrained decoding, not just reject after the
+  fact. `None` (time not supplied) is unaffected - draft_builder still owns
+  picking a default.
+- `free_text_interests` on TripDraft is capped at 10 entries / 80 characters
+  each, matching TripSpec's existing bound exactly, declared the same
+  schema-visible way.
+- `date_phrase` is documented, not constrained: the vocabulary
+  `resolve_date_phrase()` (draft_builder.py) actually accepts is written out
+  on the field so a prompt can target it, but the schema does not duplicate
+  that resolution logic or reject phrases outside it.
+- `POST /plan/draft` now returns `"needs_clarification": false` explicitly
+  on the successful path (previously absent entirely), so a caller
+  distinguishes the two outcomes by one boolean rather than by field
+  presence. No consumer of this endpoint existed anywhere in the repository
+  at the time of this change (searched: frontend, backend, tests, docs), so
+  this is additive, not breaking.
+- Clarification cap (`MAX_CLARIFICATIONS = 2`, unchanged) and coordinate
+  safety (`extra="ignore"`, unchanged) are now pinned by regression tests
+  rather than only by the original implementation.
+
+**Rejected — constraining `date_phrase` to a fixed pattern/enum.** Would
+duplicate `resolve_date_phrase()`'s logic in a second place, guaranteed to
+drift from it. Left to prompt design and documentation instead.
+
+**Consequences:** A malformed time or an over-long free-text list from the
+model now fails at the TripDraft boundary with a field-specific error,
+rather than passing TripDraft and failing later inside `draft_builder`'s
+`TripSpec` construction as a generic one. NQ-029's extraction prompt can be
+written directly against `TripDraft.model_json_schema()` and the documented
+`date_phrase` vocabulary. No change to `draft_builder.py`'s resolution
+logic, `resolve_place`, multi-day planning, or any deterministic service.
+
+**Known gap, out of scope for this ADR:** the local database's `places`
+table does not currently have the `kind` column `resolve_place()` (ADR-011)
+queries - a pre-existing environment/migration sync issue, unrelated to and
+not fixed by this decision. See TASKS.md and this task's final report.
