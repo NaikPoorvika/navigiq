@@ -27,17 +27,17 @@ __pycache__/
 *$py.class
 *.so
 .Python
-build/
+/build/
 develop-eggs/
 dist/
 downloads/
 eggs/
 .eggs/
-lib/
-lib64/
-parts/
+/lib/
+/lib64/
+/parts/
 sdist/
-var/
+/var/
 wheels/
 share/python-wheels/
 *.egg-info/
@@ -89,3 +89,9 @@ infrastructure/osrm-foot/
 coverage.xml
 htmlcov/
 .hypothesis/
+
+# Frontend test/build artefacts
+frontend/coverage/
+frontend/playwright-report/
+frontend/test-results/
+frontend/blob-report/

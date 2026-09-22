@@ -1,0 +1,241 @@
+@import "tailwindcss";
+
+/*
+ * NavigIQ design system — the single source of visual truth.
+ *
+ * Identity (from the original NavigIQ concept): warm sand base, one deep
+ * olive accent, Sora for display and DM Sans for text, soft rounded surfaces.
+ * Additions for the product: a warm clay accent used sparingly for
+ * serendipity ("Surprise me", "I'm bored"), a muted sky tone for weather and
+ * information, and one earthy tone per category group so a place without a
+ * photograph still has a recognisable, honest visual identity.
+ *
+ * Components use the semantic tokens (bg-background, text-muted-foreground,
+ * bg-primary ...), never raw hex values.
+ */
+
+@theme {
+  /* raw palette ------------------------------------------------------------ */
+  --color-sand-50: #fbf8f2;
+  --color-sand-100: #f5eee2;
+  --color-sand-200: #efe5d3;
+  --color-sand-300: #e6dac4;
+  --color-sand-400: #dccdb4;
+  --color-sand-500: #c7b596;
+  --color-olive-950: #1b1e18;
+  --color-olive-900: #20231d;
+  --color-olive-800: #2c3225;
+  --color-olive-700: #39412f;
+  --color-olive-600: #4a543b;
+  --color-olive-500: #5d6849;
+  --color-olive-400: #7c8663;
+  --color-olive-200: #d3d8c2;
+  --color-olive-100: #e8ebdc;
+  --color-clay-700: #8c4526;
+  --color-clay-600: #a6532d;
+  --color-clay-500: #bf6a3f;
+  --color-clay-100: #f5e1d3;
+  --color-sky-700: #2f5c66;
+  --color-sky-100: #dbe8e8;
+
+  /* semantic tokens ------------------------------------------------------------- */
+  --color-background: var(--color-sand-100);
+  --color-foreground: var(--color-olive-900);
+  --color-card: var(--color-sand-50);
+  --color-card-foreground: var(--color-olive-900);
+  --color-surface: var(--color-sand-200);
+  --color-surface-strong: var(--color-sand-300);
+  --color-muted: var(--color-sand-300);
+  --color-muted-foreground: #66635a;
+  --color-border: #ddd1bb;
+  --color-border-strong: #c9ba9f;
+  --color-input: #d2c5ad;
+  --color-primary: var(--color-olive-700);
+  --color-primary-hover: var(--color-olive-800);
+  --color-primary-foreground: var(--color-sand-50);
+  --color-primary-soft: var(--color-olive-100);
+  --color-ring: var(--color-olive-500);
+  --color-accent: var(--color-clay-600);
+  --color-accent-foreground: #fff8f1;
+  --color-accent-soft: var(--color-clay-100);
+  --color-info: var(--color-sky-700);
+  --color-info-soft: var(--color-sky-100);
+  --color-success: #3c6a37;
+  --color-success-soft: #e0ecd9;
+  --color-warning: #8a5d0b;
+  --color-warning-soft: #f6e7c5;
+  --color-danger: #a23a2c;
+  --color-danger-soft: #f6dcd6;
+
+  /* category groups: [soft background, ink] ------------------------------------ */
+  --color-cat-nature: #dde5cb;
+  --color-cat-nature-ink: #394a26;
+  --color-cat-culture: #ecdcbc;
+  --color-cat-culture-ink: #6a4c17;
+  --color-cat-spiritual: #f2d9bd;
+  --color-cat-spiritual-ink: #87450f;
+  --color-cat-food: #f1d5c6;
+  --color-cat-food-ink: #883b1f;
+  --color-cat-shopping: #e8d6df;
+  --color-cat-shopping-ink: #683754;
+  --color-cat-fun: #dadcea;
+  --color-cat-fun-ink: #3a3f6c;
+  --color-cat-experience: #d2e4df;
+  --color-cat-experience-ink: #2c5850;
+  --color-cat-explore: #e4ddd2;
+  --color-cat-explore-ink: #574c3f;
+
+  /* type ---------------------------------------------------------------------------- */
+  --font-display: "Sora", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "DM Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --text-display: 3.25rem;
+  --text-display--line-height: 1.05;
+  --text-display--letter-spacing: -0.035em;
+  --text-headline: 2rem;
+  --text-headline--line-height: 1.12;
+  --text-headline--letter-spacing: -0.025em;
+  --text-title: 1.25rem;
+  --text-title--line-height: 1.3;
+  --text-title--letter-spacing: -0.015em;
+
+  /* shape ---------------------------------------------------------------------------- */
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.25rem;
+  --radius-2xl: 1.5rem;
+  --radius-3xl: 2rem;
+
+  /* depth ---------------------------------------------------------------------------- */
+  --shadow-soft: 0 1px 2px rgb(32 35 29 / 0.05), 0 6px 20px rgb(32 35 29 / 0.06);
+  --shadow-lift: 0 2px 6px rgb(32 35 29 / 0.07), 0 16px 36px rgb(32 35 29 / 0.12);
+  --shadow-float: 0 6px 16px rgb(32 35 29 / 0.1), 0 24px 56px rgb(32 35 29 / 0.18);
+  --shadow-inset: inset 0 0 0 1px rgb(32 35 29 / 0.06);
+
+  /* motion --------------------------------------------------------------------------- */
+  --ease-soft: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-snappy: cubic-bezier(0.3, 0.9, 0.3, 1.05);
+  --animate-rise: rise 420ms var(--ease-soft) both;
+  --animate-fade: fade 260ms ease-out both;
+  --animate-pop: pop 360ms var(--ease-snappy) both;
+  --animate-shimmer: shimmer 1.6s linear infinite;
+  --animate-breathe: breathe 2.4s ease-in-out infinite;
+
+  /* layout --------------------------------------------------------------------------- */
+  --breakpoint-xs: 24rem;
+  --container-page: 76rem;
+}
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes pop {
+  0% { opacity: 0; transform: scale(0.94); }
+  100% { opacity: 1; transform: scale(1); }
+}
+@keyframes shimmer {
+  from { background-position: -200% 0; }
+  to { background-position: 200% 0; }
+}
+@keyframes breathe {
+  0%, 100% { opacity: 0.55; transform: scale(0.96); }
+  50% { opacity: 1; transform: scale(1); }
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+  }
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    font-feature-settings: "ss01", "cv11";
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+  h1, h2, h3, h4 {
+    font-family: var(--font-display);
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+  p { text-wrap: pretty; }
+  * { border-color: var(--color-border); }
+  ::selection { background: var(--color-olive-200); color: var(--color-olive-900); }
+  :focus-visible {
+    outline: 2px solid var(--color-ring);
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
+  button, [role="button"] { cursor: pointer; }
+  button:disabled { cursor: not-allowed; }
+  img { max-width: 100%; }
+}
+
+@utility scrollbar-none {
+  scrollbar-width: none;
+  &::-webkit-scrollbar { display: none; }
+}
+
+@utility skeleton {
+  background: linear-gradient(90deg, var(--color-sand-300) 0%, var(--color-sand-200) 40%,
+    var(--color-sand-300) 80%);
+  background-size: 200% 100%;
+  animation: var(--animate-shimmer);
+}
+
+@utility pb-safe {
+  padding-bottom: max(env(safe-area-inset-bottom), 0.75rem);
+}
+
+@utility text-balance { text-wrap: balance; }
+
+/* Menu rows (Radix dropdown items). */
+@utility menu-item {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  border-radius: 0.75rem;
+  padding: 0.625rem 0.75rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  cursor: pointer;
+  outline: none;
+  user-select: none;
+  &[data-highlighted] { background: var(--color-surface); }
+  &[data-disabled] { opacity: 0.45; cursor: not-allowed; }
+  & svg { width: 1rem; height: 1rem; flex-shrink: 0; color: var(--color-muted-foreground); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Leaflet: keep its controls inside the design language. */
+.leaflet-container {
+  font-family: var(--font-sans);
+  background: var(--color-sand-200);
+}
+.leaflet-control-attribution {
+  font-size: 10px;
+  background: rgb(251 248 242 / 0.85) !important;
+}
+.leaflet-bar a {
+  color: var(--color-olive-800) !important;
+}
+.navigiq-pin {
+  background: transparent;
+  border: 0;
+}
