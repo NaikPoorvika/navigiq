@@ -24,7 +24,10 @@ async function scan(page: Page, name: string) {
 test("home is accessible", async ({ page }) => {
   await page.goto("/");
   await expect(page.getByRole("heading", { name: "What's your mood today?" })).toBeVisible();
-  await page.waitForTimeout(2500);
+  // Scan the loaded page, not skeletons: wait for real cards (a cold API can
+  // take a few seconds on its first forecast fetch).
+  await expect(page.locator("main article").first()).toBeVisible({ timeout: 30_000 });
+  await page.waitForLoadState("networkidle");
   await scan(page, "home");
 });
 

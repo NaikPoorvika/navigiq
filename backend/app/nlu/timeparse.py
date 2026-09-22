@@ -22,8 +22,13 @@ Numeric d/m dates are read day-first (Indian convention).
 Time windows: explicit ranges ("10 AM-7 PM", "from around 11 to 8", "4 to 9")
 use am/pm when given; otherwise an hour 1-6 is afternoon, 7-11 morning, and an
 end hour not after the start is moved 12 hours later ("11 to 8" -> 11:00-20:00).
+A day part overrides the bare-hour convention: "morning 6 to 9" is 06:00-09:00,
+"7 to 11 at night" 19:00-23:00. A clock time next to a day part is the start:
+"subah 6 baje" -> 06:00-12:00, "evening 5" -> 17:00-21:00.
 Day parts: morning 08:00-12:00, afternoon 12:00-17:00, evening 16:30-21:00,
 tonight/night 18:30-23:00, full day 09:00-19:00.
+Multi-day spans ("3 days", "friday to sunday", "10 to 12 october", "the whole
+weekend") are resolved by resolve_date_range().
 """
 from __future__ import annotations
 
@@ -40,7 +45,14 @@ WEEKDAYS = {"monday": 0, "mon": 0, "tuesday": 1, "tue": 1, "tues": 1, "wednesday
             "wed": 2, "thursday": 3, "thu": 3, "thur": 3, "thurs": 3, "friday": 4, "fri": 4,
             "saturday": 5, "sat": 5, "sunday": 6, "sun": 6,
             "somvar": 0, "mangalvar": 1, "budhvar": 2, "guruvar": 3, "shukravar": 4,
-            "shanivar": 5, "ravivar": 6, "itvar": 6}
+            "shanivar": 5, "ravivar": 6, "itvar": 6,
+            "somvaar": 0, "mangalvaar": 1, "budhvaar": 2, "guruvaar": 3, "shukravaar": 4,
+            "shanivaar": 5, "ravivaar": 6, "itvaar": 6,
+            "somwar": 0, "mangalwar": 1, "budhwar": 2, "guruwar": 3, "shukrawar": 4,
+            "shaniwar": 5, "raviwar": 6, "itwar": 6,
+            # Kannada (romanized)
+            "somavara": 0, "mangalavara": 1, "budhavara": 2, "guruvara": 3, "shukravara": 4,
+            "shanivara": 5, "bhanuvara": 6, "ravivara": 6}
 MONTHS = {"jan": 1, "january": 1, "feb": 2, "february": 2, "mar": 3, "march": 3, "apr": 4,
           "april": 4, "may": 5, "jun": 6, "june": 6, "jul": 7, "july": 7, "aug": 8,
           "august": 8, "sep": 9, "sept": 9, "september": 9, "oct": 10, "october": 10,
@@ -50,7 +62,8 @@ TODAY_WORDS = r"today|tonight|this (?:morning|afternoon|evening)|aaj|aj|ivattu|i
 TOMORROW_WORDS = r"tomorrow|tmrw|tmr|tomm?orow|kal|naale|nale|ನಾಳೆ|कल"
 DAY_AFTER_WORDS = r"day after tomorrow|day after tmrw|parso|parson|naadiddu|nadiddu|ನಾಡಿದ್ದು|परसों"
 
-EVENING_WORDS = r"evening|night|tonight|shaam|sham|sanje|raat|rathri|ಸಂಜೆ"
+EVENING_WORDS = r"evening|night|tonight|shaam|sham|sanje|raat|rathri|raatri|ratri|ಸಂಜೆ"
+MORNING_WORDS = r"morning|early morning|subah|beligge|sunrise|dawn|ಬೆಳಿಗ್ಗೆ"
 
 DAY_PARTS = {
     "early morning": (6 * 60, 9 * 60), "morning": (8 * 60, 12 * 60),
@@ -62,6 +75,7 @@ DAY_PARTS = {
     "ಸಂಜೆ": (16 * 60 + 30, 21 * 60),
     "tonight": (18 * 60 + 30, 23 * 60), "night": (18 * 60 + 30, 23 * 60),
     "raat": (18 * 60 + 30, 23 * 60), "rathri": (18 * 60 + 30, 23 * 60),
+    "raatri": (18 * 60 + 30, 23 * 60), "ratri": (18 * 60 + 30, 23 * 60),
     "full day": (9 * 60, 19 * 60), "whole day": (9 * 60, 19 * 60),
     "all day": (9 * 60, 19 * 60), "entire day": (9 * 60, 19 * 60),
 }
@@ -128,7 +142,8 @@ def resolve_date(utterance: str, today: date) -> DateResolution | None:
     if m:
         n = WORD_NUMBERS.get(m[1]) or int(m[1]) if not m[1].isdigit() else int(m[1])
         return DateResolution(today + timedelta(days=int(n)), m[0], "in_n_days")
-    m = re.search(_wb(r"next weekend"), t)
+    m = re.search(_wb(r"next weekend|(?:the )?weekend after (?:this one|this|next)|"
+                      r"(?:the )?following weekend"), t)
     if m:
         return DateResolution(next_weekday(today, 5), m[0], "next_weekend")
     m = re.search(_wb(r"(?:this |coming )?weekend"), t)
@@ -212,7 +227,7 @@ def resolve_date_range(utterance: str, today: date) -> DateRange | None:
       "next weekend" alone stays one day (Saturday), as does "weekend".
     "in 3 days" is a single date, never a span.
     """
-    t = normalize_utterance(utterance)
+    t = re.sub(r"\s*&\s*", " and ", normalize_utterance(utterance))   # "sat & sun"
     month_names = "|".join(sorted(MONTHS, key=len, reverse=True))
     wd_names = "|".join(sorted(WEEKDAYS, key=len, reverse=True))
     ordinal = r"(?:st|nd|rd|th)?"
@@ -222,39 +237,53 @@ def resolve_date_range(utterance: str, today: date) -> DateRange | None:
     if m:
         mo = MONTHS[m[3]]
         start, end = _roll_forward(today, mo, int(m[1])), _roll_forward(today, mo, int(m[2]))
-        if start and end and end >= start:
+        if _plausible_span(start, end):
             return DateRange(start, end, (end - start).days + 1, m[0], "day_range_month")
+    # "oct 10 - oct 12", "oct 30 to nov 2" - but not "1st oct 9 to 6", where
+    # "9 to 6" is the time window (a same-month range must go forwards, and no
+    # clock marker may follow).
     m = (re.search(_wb(rf"({month_names}) (\d{{1,2}}){ordinal}{_RANGE_SEP}"
-                       rf"(?:({month_names}) )?(\d{{1,2}}){ordinal}"), t)
+                       rf"(?:({month_names}) )?(\d{{1,2}}){ordinal}(?!\s*(?:am|pm|:|baje))"), t)
          or None)
-    if m:
+    if m and (m[3] or int(m[4]) > int(m[2])):
         mo1 = MONTHS[m[1]]
         mo2 = MONTHS[m[3]] if m[3] else mo1
         start = _roll_forward(today, mo1, int(m[2]))
         end = _roll_forward(start or today, mo2, int(m[4])) if start else None
-        if start and end and end >= start:
+        if _plausible_span(start, end):
             return DateRange(start, end, (end - start).days + 1, m[0], "month_day_range")
     m = re.search(_wb(rf"(\d{{1,2}}){ordinal} (?:of )?({month_names}){_RANGE_SEP}"
                       rf"(\d{{1,2}}){ordinal} (?:of )?({month_names})"), t)
     if m:
         start = _roll_forward(today, MONTHS[m[2]], int(m[1]))
         end = _roll_forward(start or today, MONTHS[m[4]], int(m[3])) if start else None
-        if start and end and end >= start:
+        if _plausible_span(start, end):
             return DateRange(start, end, (end - start).days + 1, m[0], "day_month_range")
     m = re.search(_wb(rf"(?:from |this |coming )?({wd_names}){_RANGE_SEP}"
                       rf"(?:this |the )?({wd_names})"), t)
     if m and not _joins_non_adjacent(m):
-        start = this_weekday(today, WEEKDAYS[m[1]])
+        # "monday to wednesday next week" / "next week monday to wednesday"
+        nxt = re.search(r"\bnext week\b", t[max(0, m.start() - 12):m.end() + 12]) or \
+            re.search(r"\bnext\s+$", t[max(0, m.start() - 6):m.start()])
+        start = (next_weekday(today, WEEKDAYS[m[1]]) if nxt
+                 else this_weekday(today, WEEKDAYS[m[1]]))
         end = start + timedelta(days=(WEEKDAYS[m[2]] - WEEKDAYS[m[1]]) % 7)
         if end > start:
             return DateRange(start, end, (end - start).days + 1, m[0], "weekday_range")
-    m = re.search(_wb(r"(?:(?:the )?(?:whole|entire|full) weekend|all weekend|"
-                      r"both days (?:of )?(?:this |the )?weekend|(?:this |the )?weekend,? both days|"
+    later = re.search(_wb(r"(?:the )?(?:next weekend|weekend after (?:this one|this|next)|"
+                          r"following weekend)"), t)
+    m = re.search(_wb(r"(?:(?:the )?(?:whole|entire|full) (?:next )?weekend|all weekend|"
+                      r"both days(?: (?:of )?(?:this |the |next )?weekend)?|"
+                      r"(?:this |the |next )?weekend,? both days|"
                       r"saturday and sunday|sat and sun|sat-sun|sat sun)"), t)
-    if m:
-        start = today if today.weekday() == 5 else this_weekday(today, 5)
-        if today.weekday() == 6:
-            return None
+    if m and (later or "weekend" in m[0] or re.search(r"\bweekend\b", t)):
+        if later:
+            # "next weekend" / "the weekend after this one" is next week's Saturday
+            start = next_weekday(today, 5)
+        else:
+            if today.weekday() == 6:
+                return None
+            start = today if today.weekday() == 5 else this_weekday(today, 5)
         return DateRange(start, start + timedelta(days=1), 2, m[0], "whole_weekend")
     m = re.search(_wb(rf"(?<!in )(?<!in a )(?:for |a |an |over )?(?:the )?(?:next )?"
                       rf"(?:{_N_DAYS})(?: (?:trip|itinerary|plan|getaway|"
@@ -268,6 +297,12 @@ def resolve_date_range(utterance: str, today: date) -> DateRange | None:
             return DateRange(start, start + timedelta(days=n - 1) if start else None, n, m[0],
                              "n_days")
     return None
+
+
+def _plausible_span(start: date | None, end: date | None) -> bool:
+    """A trip runs forwards and for weeks at most; anything else is a mis-read
+    (a time range next to a date, a year roll-over)."""
+    return bool(start and end and start <= end and (end - start).days <= 31)
 
 
 def _roll_forward(today: date, month: int, day: int) -> date | None:
@@ -336,6 +371,14 @@ def resolve_time_window(utterance: str) -> TimeWindow | None:
             # "10 to 7 pm": start inherits the end's meridiem when that keeps order.
             alt = _to_min(m[1], m[2], e_ampm)
             start = alt if alt is not None and alt < end else start
+        if (not s_ampm and not e_ampm and 5 * 60 <= start < 12 * 60
+                and re.search(_wb(MORNING_WORDS), t) and not re.search(_wb(EVENING_WORDS), t)):
+            # "morning 6 to 9": the day part settles the meridiem, not the
+            # afternoon convention for bare hours 1-6.
+            if end <= start:
+                end += 12 * 60
+            if 0 <= start < end <= 24 * 60:
+                return TimeWindow(start, end, end - start, m[0].strip(), "explicit_range")
         start = _infer_meridiem(start, bool(s_ampm))
         if not e_ampm and end <= start:
             end += 12 * 60
@@ -380,7 +423,34 @@ def resolve_time_window(utterance: str) -> TimeWindow | None:
         end = min(start + duration, 23 * 60 + 30) if duration else None
         return TimeWindow(start, end, duration, ms[0], "start_only")
     if end is not None:
+        # "tomorrow morning ... back by 11": the day part supplies the start.
+        for phrase in sorted(DAY_PARTS, key=len, reverse=True):
+            if re.search(_wb(re.escape(phrase)), t):
+                ps, _ = DAY_PARTS[phrase]
+                if ps + 60 <= end:
+                    return TimeWindow(ps, end, end - ps, f"{phrase} .. {me[0]}", "day_part_end")
+                break
         return TimeWindow(None, end, duration, me[0], "end_only")
+    # A clock time attached to a day part: "subah 6 baje", "morning at 7",
+    # "7 in the morning", "evening 5". The time is the start; the day part
+    # gives the end and the meridiem.
+    part_names = "|".join(sorted((re.escape(p) for p in DAY_PARTS), key=len, reverse=True))
+    mp = (re.search(rf"\b({part_names})\s+(?:at\s+|around\s+)?(\d{{1,2}})(?::(\d{{2}}))?"
+                    rf"\s*(am|pm)?(?![\d:])", t)
+          or re.search(rf"(?<![\d:])(\d{{1,2}})(?::(\d{{2}}))?\s*(am|pm)?\s+(?:in the\s+)?"
+                       rf"({part_names})\b", t))
+    if mp:
+        if mp[1][0].isdigit():
+            hour, minute, ampm, part = mp[1], mp[2], mp[3], mp[4]
+        else:
+            part, hour, minute, ampm = mp[1], mp[2], mp[3], mp[4]
+        s = _to_min(hour, minute, ampm)
+        p_start, p_end = DAY_PARTS[part]
+        if s is not None and not ampm and p_start >= 12 * 60 and s < 12 * 60:
+            s += 12 * 60                  # "evening 5" -> 17:00
+        if s is not None:
+            e = p_end if p_end > s + 60 else None
+            return TimeWindow(s, e, (e - s) if e else duration, mp[0], "day_part_clock")
     for phrase in sorted(DAY_PARTS, key=len, reverse=True):
         if re.search(_wb(re.escape(phrase)), t):
             s, e = DAY_PARTS[phrase]

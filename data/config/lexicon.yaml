@@ -120,8 +120,14 @@ entries:
     categories: [gallery]
   - phrases: [sports, sport, cricket, football]
     tags: [sports]
-  - phrases: [history, historical, historic, heritage, "old bangalore", "old bengaluru", colonial,
+  - phrases: [history, historical, historic, "old bangalore", "old bengaluru", colonial,
               ancient, "itihas", "itihaas"]
+    tags: [historic]
+    moods: [cultural]
+  # "heritage" names a kind of place people plan around, so it is the heritage
+  # category as well (the planner then makes sure one is included).
+  - phrases: [heritage, "heritage site", "heritage sites", "heritage places", "heritage buildings"]
+    categories: [heritage]
     tags: [historic]
     moods: [cultural]
   - phrases: [shopping, shop, "shop around", "window shopping", boutiques, "khareedari"]
@@ -202,7 +208,8 @@ entries:
               "go-karting", trampoline, "rock climbing", climbing, skating]
     categories: [activity]
     tags: [active]
-  - phrases: [paragliding, rappelling, ziplining, zipline, "zip line", camping, "adventure sports"]
+  - phrases: [paragliding, rappelling, ziplining, zipline, "zip line", camping, "adventure sports",
+              "adventure activities", "adventure activity", "adventure park"]
     categories: [adventure]
     moods: [adventurous]
   - phrases: [farm, farms, "farm stay", vineyard, vineyards, winery, wineries, "wine tasting"]

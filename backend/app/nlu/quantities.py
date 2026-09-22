@@ -1,8 +1,11 @@
 """Deterministic budget, party and radius extraction.
 
-Money is recognised only with a currency marker (₹, rs, inr, rupees, bucks)
-or an explicit budget/limit word ("budget 1500", "under 500", "1500 tak"),
-never from a bare number - "10 to 6" is a time and "four friends" a party.
+Money is recognised with a currency marker (₹, rs, inr, rupees, bucks), an
+explicit budget/limit word ("budget 1500", "under 500", "1500 tak"), a
+thousands multiplier ("25k"), a sum for the party ("4000 for both of us",
+"20000 for a family of 4"), or a clause that is nothing but an amount of at
+least 200 that isn't a year ("2 people, 4000"). Never from a number inside a
+phrase - "10 to 6" is a time and "four friends" a party.
 """
 from __future__ import annotations
 
@@ -57,22 +60,30 @@ def parse_budget(utterance: str) -> Budget | None:
         rf"\s*(?:rs\.?|inr)?\s*{_NUM}(?!\s*(?:km|kms|kilomet|hours|hrs|mins|minutes|people|"
         rf"persons|stops|places|am|pm|:))",
         rf"{_NUM}\s*(?:ka budget|ke andar|tak|mein|budget)",
+        rf"{_NUM}\s*(?:max|maximum|tops|at most|or less|or under)\b",
         rf"{_NUM}(?=\s*(?:per person|per head|each|pp|a head|per pax|per banda|per bande|"
         rf"har ek|a person))",
         rf"{_NUM}(?=\s*(?:total|in total|overall|altogether|all in|all-in|for all of us|"
         rf"for everyone|for the group)\b)",
-        # "4000 for both of us", "2500 for two": a sum for the party
+        # "4000 for both of us", "2500 for two", "20000 for a family of 4": a sum for the party
         rf"(?<![\d:]){_NUM}(?=\s*for (?:both of us|the two of us|two of us|us two|both|the two|"
-        rf"two|three|four|five|us|all|\d+(?: people| of us)?)\b)(?!\s*for \d+\s*(?:hours|hrs|"
-        rf"days|mins|minutes))",
+        rf"two|three|four|five|us|all|\d+(?: people| of us)?|(?:a|the|my|our) (?:family|group|"
+        rf"gang|team|couple))\b)(?!\s*for \d+\s*(?:hours|hrs|days|mins|minutes))",
+        # "25k", "20 thousand": the multiplier only ever means money here.
+        r"(?<![\d:.])(\d+(?:\.\d+)?)\s*(k|thousand|hazaar|hazar|lakh)(?![a-z])",
+        # A clause that is only an amount: "2 people, 4000", "... - 3500".
+        r"(?:^|,|;|-)\s*(?:around|about|approx\.?|~)?\s*(\d{3,6})()\s*(?=$|,|;|\.)",
     ]
-    for pat in patterns:
+    bare = len(patterns) - 1
+    for i, pat in enumerate(patterns):
         for m in re.finditer(pat, t):
             amount = _amount(m.group(1), m.group(2))
             if amount is None:
                 continue
             if amount < 20 and not m.group(2):
                 continue            # "under 5" is not a rupee budget
+            if i == bare and (amount < 200 or 1900 <= amount <= 2100):
+                continue            # a lone small number or a year is not a budget
             per_person = bool(PER_PERSON.match(t[m.end():m.end() + 24]))
             return Budget(amount, per_person, m.group(0).strip())
     return None
@@ -96,6 +107,10 @@ def _party_size(t: str) -> tuple[int | None, str]:
     if m and _n(m[1]):
         kids = _n(m[2]) if m[2] else 1
         return _n(m[1]) + (kids or 0), m[0]
+    # kids first: "4 kids and 2 adults"
+    m = re.search(rf"{_COUNT}\s+{_KIDS}(?:,|\s+and|\s*&|\s+plus)?\s+{_COUNT} adults?\b", t)
+    if m and _n(m[1]) and _n(m[2]):
+        return _n(m[1]) + _n(m[2]), m[0]
     m = re.search(rf"family of {_COUNT}\b", t)
     if m and _n(m[1]):
         return _n(m[1]), m[0]
@@ -104,6 +119,11 @@ def _party_size(t: str) -> tuple[int | None, str]:
         return 2 * _n(m[1]), m[0]
     m = re.search(rf"{_COUNT} (?:\w+ )?(?:friends|buddies|colleagues|mates|cousins|others) "
                   rf"(?:and|&|plus) (?:me|myself|i)\b", t)
+    if m and _n(m[1]):
+        return _n(m[1]) + 1, m[0]
+    # Hindi / Kannada: "do dost aur main", "mooru friends mattu naanu"
+    m = re.search(rf"{_COUNT} (?:dost|dosto|doston|yaar|friends|snehitaru|geleyaru) "
+                  rf"(?:aur|and|mattu|&) (?:main|mai|mein|naanu|nanu|me)\b", t)
     if m and _n(m[1]):
         return _n(m[1]) + 1, m[0]
     m = re.search(rf"(?:\b(?:me|myself|i)\s+)?(?:and|&|with|plus) (?:my )?{_COUNT} (?:\w+ )?"
@@ -121,7 +141,8 @@ def _party_size(t: str) -> tuple[int | None, str]:
     if m and _n(m[1]):
         return _n(m[1]), m[0]
     m = re.search(rf"\bfor {_COUNT}(?:\s+(?:people|persons|adults|of us))?(?=\s*(?:[,.;!?]|$|"
-                  rf"on\b|this\b|tomorrow|today|tonight|next\b|at\b|from\b|with\b|and\b))", t)
+                  rf"on\b|this\b|tomorrow|today|tonight|next\b|at\b|from\b|with\b|and\b|"
+                  rf"in\b|near\b|around\b))", t)
     if m and _n(m[1]) and 1 <= _n(m[1]) <= 20:
         return _n(m[1]), m[0]
     m = re.search(r"\b(?:both of us|the two of us|two of us|us two)\b", t)

@@ -4,7 +4,7 @@ Each example lists only the fields the text states (`expect`) and, where
 useful, fields that must stay empty (`absent`) so invented values count as
 errors. Scoring per field:
 
-  exact        date, start_time, end_time, budget_*, party_*, pace, stop counts,
+  exact        date, end_date (multi-day trips), start_time, end_time, budget_*, party_*, pace, stop counts,
                indoor_preference
   subset       interests, avoid_interests, dietary/meal/accessibility lists,
                must-include names (the expected values must all be present)
@@ -19,12 +19,12 @@ from app.assistant.extraction import extract_trip_spec
 
 from .common import NOW, SuiteResult, by_group, gate, load
 
-EXACT = {"date", "start_time", "end_time", "budget_total", "budget_per_person", "party_size",
+EXACT = {"date", "end_date", "start_time", "end_time", "budget_total", "budget_per_person", "party_size",
          "party_type", "pace", "desired_stop_count", "max_stop_count", "indoor_preference"}
 SUBSET = {"interests", "avoid_interests", "dietary_preferences", "meal_preferences",
           "accessibility_requirements", "must"}
 SETEQ = {"areas", "avoid_areas"}
-CRITICAL = {"date", "start_time", "end_time", "budget_total", "budget_per_person", "party_size",
+CRITICAL = {"date", "end_date", "start_time", "end_time", "budget_total", "budget_per_person", "party_size",
             "interests", "areas"}
 HARD = {"budget_total", "budget_per_person", "end_time", "avoid_interests", "dietary_preferences",
         "accessibility_requirements", "must", "avoid_areas"}
@@ -76,7 +76,7 @@ async def run(db, *, llm=None, split: str = "test", config: str = "rules") -> Su
             pf[0] += ok
             pf[1] += 1
             buckets = ["all"] + (["critical"] if name in CRITICAL else []) + \
-                (["hard"] if name in HARD else []) + (["date"] if name == "date" else [])
+                (["hard"] if name in HARD else []) + (["date"] if name in ("date", "end_date") else [])
             for b in buckets:
                 counts[b][0] += ok
                 counts[b][1] += 1

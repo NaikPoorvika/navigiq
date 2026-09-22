@@ -1,3 +1,32 @@
+# NavigIQ environment
+
+## Runtime on this workstation (2026-09-22)
+
+| Service | Where | Port | Notes |
+|---|---|---|---|
+| PostgreSQL 16 + PostGIS 3.4 + pgvector 0.8 | container `navigiq_db` (`infrastructure/database`) | 5433 | database `navigiq`; tests create `navigiq_test` |
+| Redis 7 | container `navigiq_redis` | 6379 | optional: rate limits shared across API workers, caches |
+| NavigIQ API (FastAPI) | `backend/` venv or container `navigiq_backend` | **8010** | 8000 belongs to another service on this machine (baymax-api) — do not use it |
+| Web app | Vite dev server / container `navigiq_web` (nginx) | 5173 dev · 8080 container | proxies `/api` to the API |
+| Ollama | host (GPU) | 11434 | `qwen3:14b`, `nomic-embed-text`; optional |
+| OSRM | container, `routing` profile only | 5000 | deferred (ADR-022) |
+
+Toolchain used: Python 3.11 (backend venv), Node 22.14, npm 10.9, Docker
+28 / Compose 2.33, Playwright browsers (Chromium, Firefox, WebKit).
+
+Settings: `backend/.env.example` (every API setting, with defaults),
+`infrastructure/.env.example` (database credentials for compose),
+`frontend/.env.example` (dev proxy target, E2E base URL). Real `.env` files
+are git-ignored.
+
+Known constraint of this network: the Python package index and the Docker
+registry were unreachable during the final work, so the container images were
+validated with `docker compose config` but not built here; CI builds them.
+
+---
+
+The sections below are the original environment notes, kept for history.
+
 
 ## OSRM build (NQ-018)
 

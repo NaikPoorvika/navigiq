@@ -72,9 +72,14 @@ MUST_RE = re.compile(r"\b(?:must (?:visit|see|include|go to)|definitely (?:visit
 MUST_AT_RE = re.compile(r"\b(?:day|morning|evening|afternoon|picnic|trip|hike|trek|walk|outing|"
                         r"sunrise|sunset)\s+(?:at|to|in)\s+([a-z][a-z.'-]{3,}(?:\s+[a-z][a-z.'-]*){0,3}"
                         r"\s+(?:hills?|palace|fort|falls|lake|gardens?|park|temple|dam|betta))\b")
-# Postfix forms: "Bannerghatta must", "Lalbagh is a must", "Nandi Hills pe trek".
+# Postfix forms: "Bannerghatta must", "Lalbagh is a must", "Nandi Hills pe trek",
+# and a place followed by a verb of going (Hindi "jaana hai", Kannada "hogona")
+# or a time of day it's known for ("Nandi Hills at sunrise").
 MUST_POST_RE = re.compile(r"\b([a-z][a-z.'-]{3,30}(?:\s+[a-z][a-z.'-]{2,20}){0,2})\s+"
-                          r"(?:must|is a must|is a must-see|pe|par)\b(?!\s+(?:visit|see|go|include))")
+                          r"(?:must|is a must|is a must-see|pe|par|jaana|jana|jaenge|jayenge|"
+                          r"chalenge|chalo|hogona|hogbeku|hogthini|nodona|nodbeku|"
+                          r"at sunrise|at sunset|at dawn|for sunrise|for sunset)\b"
+                          r"(?!\s+(?:visit|see|go|include))")
 
 
 @dataclass
@@ -304,6 +309,13 @@ def rule_fields(text: str, today: date, now_min: int) -> tuple[dict, dict]:
     meals = [m for m in ("breakfast", "lunch", "dinner") if re.search(rf"\b{m}\b", t)]
     if re.search(r"\bbrunch\b", t):
         meals.append("lunch")
+    # Hindi / Kannada meal words
+    if re.search(r"\b(nashta|naashta|nashtaa|tiffin|tindi|thindi)\b", t):
+        meals.append("breakfast")
+    if re.search(r"\b(oota|oota ge|dopahar ka khana)\b", t) and "breakfast" not in meals:
+        meals.append("lunch")
+    if re.search(r"\b(raat ka khana|dinner ge)\b", t):
+        meals.append("dinner")
     f["meal_preferences"] = list(dict.fromkeys(meals))
     diet = []
     if re.search(r"\bjain\b", t):
@@ -361,10 +373,15 @@ def merge_llm(fields: dict, llm: dict, text: str, today: date, sources: dict) ->
         fields["party_type"] = PartyType(pt)
         sources["party_type"] = "llm"
     avoid = set(fields.get("avoid_interests", []))
+    wanted = set(fields.get("interests", []))
     for key in ("interests", "avoid_interests"):
         extra = [i for i in (llm.get(key) or []) if isinstance(i, str) and i in VOCABULARY]
+        # The rules win conflicts: the model may add, never flip what the
+        # rules read as wanted into avoided (or the reverse).
         if key == "interests":
             extra = [i for i in extra if i not in avoid]
+        else:
+            extra = [i for i in extra if i not in wanted]
         merged = list(dict.fromkeys(fields.get(key, []) + extra))[:12]
         if len(merged) > len(fields.get(key, [])):
             sources[key] = "rules+llm"

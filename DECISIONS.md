@@ -182,3 +182,167 @@ is waiting for it.
 produces an eval set from real traffic. If either shows the budget is wrong,
 change it here first and re-run the gate rather than quietly accepting a model
 that fails it.
+
+---
+
+The records below were written as the product was rebuilt around the master
+specification (Bengaluru exploration companion). Numbers not listed (011,
+013-019) were never used. Code comments cite these numbers.
+
+## ADR-020: No public transit (alias of ADR-007)
+**Status:** Accepted
+Some routing modules cite ADR-020 for the metro removal; the decision and its
+evidence are ADR-007. Kept as an alias so the citations resolve.
+
+## ADR-021: Product scope - DISCOVER, UNDERSTAND, PLAN within 90 km
+**Status:** Accepted
+**Date:** 2026-09-14
+**Decision:** NavigIQ is a Bengaluru exploration companion: find things to do
+(discover), learn about places (understand, with cited sources), and build
+validated day plans (plan). The exploration envelope is 90 km from the city
+centre. "The LLM understands and communicates; deterministic services decide
+facts, rankings, constraints and validity."
+**Consequences:** Every surface that states a fact (cost, hours, weather,
+distance, a citation) reads it from a deterministic service or the database.
+Anything outside 90 km is out of scope and is refused, not approximated.
+
+## ADR-022: Transportation deferred
+**Status:** Accepted
+**Date:** 2026-09-14
+**Context:** Road ETAs without live traffic were misleading at the times
+people actually travel, and the metro lost every comparison (ADR-007).
+**Decision:** This version calculates no travel: no routes, ETAs, fares or
+traffic. Consecutive stops are separated by a fixed transition buffer (15 min
+by default) and every itinerary says: "Transition buffers are included
+between stops. Actual transportation time is not calculated in this
+version." Core planning talks to a `TransportationProvider`; today it is the
+Null provider. The OSRM routing code (NQ-018..020) is preserved under
+`app/services/routing` for a future provider; the OSRM container sits behind
+the compose `routing` profile.
+**Consequences:** Maps show pins only, never a drawn route. An external "Open
+in OpenStreetMap" link is labelled as external. Hop distance is used only as a
+coherence preference (keep a day geographically tight), never as time.
+
+## ADR-023: Discovery envelope and region buckets
+**Status:** Accepted
+**Decision:** `distance_from_center_km` is a WGS84 geodesic (geographiclib,
+matching PostGIS geography), stored per place; 90 km is inclusive with a 10 cm
+tolerance. Places fall into CITY_CORE, CITY, OUTSKIRTS and NEARBY_ESCAPE
+buckets that drive search scope ("near me" never returns a day trip).
+
+## ADR-024: Closed vocabularies
+**Status:** Accepted
+**Decision:** Categories, experience tags and moods are closed enums checked
+against `data/config/categories.yaml`. The LLM may only choose among them;
+unmapped phrases become free-text interests resolved by the lexicon.
+
+## ADR-025: TripSpec v2 is the only planning contract
+**Status:** Accepted
+**Decision:** One Pydantic model (`app/schemas/tripspec.py`) feeds the planner
+from the form, the assistant, modifications and what-ifs. Three validation
+tiers (schema, semantic, feasibility) run in Python, never in a prompt.
+Defaults applied at planning time are returned as visible assumptions.
+Model-supplied coordinates are rejected unless they come from the gazetteer.
+
+## ADR-026: Lawful, attributable data only
+**Status:** Accepted
+**Decision:** Place data comes from OpenStreetMap (ODbL), Wikidata (CC0) and
+Wikipedia (CC BY-SA), plus a curated editorial set. Photos only from
+Wikimedia Commons with artist and licence stored and shown. No scraping of
+commercial review sites; no ratings (ADR-008). The pipeline is staged,
+idempotent and writes an artefact and drop reasons per stage.
+
+## ADR-027: Deterministic recommendations with reasons
+**Status:** Accepted
+**Decision:** Hard filters exclude; twelve weighted components rank; a
+diversity-aware selection picks; reason codes are derived from the
+components. The model may phrase reasons but never add one. Ranking weights
+live in `data/config/recommendation_weights.yaml` with a version recorded on
+every response.
+
+## ADR-028: Bounded agent as a finite-state machine
+**Status:** Accepted
+**Decision:** The assistant is an explicit state machine with a transition
+table, a typed tool registry with per-role authorisation enforced in Python,
+hard limits (steps, tool calls, identical calls, model calls, wall time) and
+one bounded round of model-selected read-only tools. Read-only tool results
+are memoised per turn. Verified by 500 chaotic-model fuzz runs, the
+prompt-injection suite and failure injection (all terminate; no unauthorised
+tool ever runs).
+
+## ADR-029: Grounded answers or honest refusal
+**Status:** Accepted
+**Decision:** Hybrid retrieval (pgvector HNSW + tsvector, fused with RRF) over
+a licensed corpus. Generated answers must cite retrieved sources for every
+sentence and every number must appear in a source or the fact block;
+otherwise the answer falls back to cited verbatim sentences, or to "I don't
+have reliable information for that yet." Retrieved text is data, never
+instructions (instruction-like chunks are withheld; URLs not in a source are
+rejected).
+
+## ADR-030: Evaluation with held-out splits
+**Status:** Accepted
+**Decision:** Every quality gate (intent, TripSpec, dates, modifications,
+references, retrieval, answers) is measured on a dev split used for tuning and
+a test split that is scored before any change it prompts. A test split that
+has been looked at is relabelled dev and a fresh one written. History,
+including misses, is kept in `docs/reports/evaluation_history.md`.
+
+## ADR-031: Multi-day trips as a sequence of validated days
+**Status:** Accepted
+**Date:** 2026-09-22
+**Context:** Weekends and short holidays were the most common requests the
+single-day planner could not express.
+**Decision:** `TripSpec.end_date` (up to 7 days). `services/planning/trips.py`
+plans each day with the unchanged single-day engine and validator. Places on
+other days are passed as transient exclusions (so no place repeats, and
+freeing a day frees its places); the budget is split evenly; required places
+are spread across days. Each day stores the resolved spec it was planned
+from, so "make day 2 cheaper" re-plans only day 2 from its own constraints
+while the other days are kept verbatim. A trip-level check re-verifies no
+repeats and the total budget. Modifications take an optional `day`; stop
+numbers are trip-wide, or day-local with a day.
+**Rejected:** One CP-SAT model across all days - the solve grows with days x
+candidates, loses the per-day validator report, and makes a one-day change
+re-plan the whole trip.
+**Consequences:** Trip creation costs one solve per day (about 1-3 s per
+day). Cross-day optimality is not attempted: day 1 gets first choice.
+
+## ADR-032: Web app architecture and design system
+**Status:** Accepted
+**Date:** 2026-09-22
+**Decision:** A Vite single-page app (React 19, TypeScript strict, Tailwind v4
+tokens, TanStack Router with a lazy chunk per screen, TanStack Query for all
+server state, Radix primitives, vaul bottom sheets, react-leaflet). The API
+is always same-origin `/api` (Vite proxy in development, nginx in the
+container). The visual identity is carried over from the original NavigIQ
+concept (warm sand, deep olive, Sora and DM Sans) and formalised as one token
+set in `frontend/src/styles/index.css`. The concept project was a reference
+only; none of its mock services ship.
+**Consequences:** Anonymous use is first-class (a browser session id owns
+plans and conversations; they are claimed on sign-in). The structured plan
+builder never needs the language model.
+
+## ADR-033: Imagery honesty
+**Status:** Accepted
+**Date:** 2026-09-22
+**Decision:** A place is shown with its own Wikimedia photo (credited) or with
+generated category artwork (category tone, icon, contour texture varied per
+place). The AI-generated images from the design concept are used only as mood
+illustration (hero, collection tiles) with alt text starting "Illustration:"
+and a visible "Illustration" caption on the hero; images that resembled
+specific landmarks were not brought over.
+**Consequences:** Only about 20 of 12k places have photos, so most cards use
+artwork. That is deliberate: a pretty but wrong photo would be a fabricated
+fact.
+
+## ADR-034: Scale-out on one workstation
+**Status:** Accepted
+**Date:** 2026-09-22
+**Measured:** one API process saturated at about 21 req/s (p50 1.26 s at 50
+users) because CPU-bound scoring and the CP-SAT solve shared one event loop.
+**Decision:** CP-SAT runs on a worker thread (native code releases the GIL);
+the API runs 4 uvicorn workers; rate limits are counted in Redis so they hold
+across workers, with the in-memory counter as a fallback.
+**Result:** 50 users: 0 errors, 38-51 req/s, p50 110-131 ms
+(`docs/reports/load_test.md`).

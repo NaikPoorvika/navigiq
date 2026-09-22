@@ -1,3 +1,50 @@
+# NavigIQ data
+
+## Current inventory (2026-09-22)
+
+Measured on the development database after the ADR-026 pipeline and the
+curated set:
+
+| | Count |
+|---|---:|
+| Active places inside the 90 km envelope | 12,252 |
+| Recommendable (named, categorised, quality-checked) | 4,011 |
+| Curated editorial entries | 55 |
+| With a Wikimedia Commons photo (credited) | 20 |
+| With opening hours from the source (confidence ≥ 0.9) | 999 |
+| Gazetteer places (areas, localities, villages) | 6,725 |
+| Knowledge documents / chunks (all embedded, 768-d) | 539 / 2,494 |
+
+By region bucket: CITY_CORE 9,922 · CITY 1,219 · NEARBY_ESCAPE 591 ·
+OUTSKIRTS 520. Largest recommendable categories: restaurant 637, park 581,
+lake 328, temple 296, church 268, entertainment 224, mosque 195, mall 179,
+cafe 170, monument 126.
+
+What the product does with these limits:
+
+- Opening hours: places without source hours use category defaults at low
+  confidence; the planner treats them as soft, and every screen that shows
+  them says they are unverified.
+- Photos: 20 places have one. Everything else is shown with category
+  artwork, never a stock or generated photo (ADR-033).
+- Costs: per-person estimates from category bands and curated values, always
+  labelled as estimates and excluding travel.
+- Ratings: none exist in the data and none are shown (ADR-008).
+
+Licences: OpenStreetMap (ODbL), Wikidata (CC0), Wikipedia (CC BY-SA 4.0),
+Wikimedia Commons (per file). Attribution is stored per place and shown in
+the app.
+
+Reproduce: `python -m app.ingestion.run` (uses cached raw responses;
+`--refresh` re-downloads), then `python -m app.knowledge.ingest`. Evaluation
+datasets live in `data/evals/` (see `docs/reports/evaluation_history.md`).
+
+---
+
+The sections below are the original task-by-task notes (NQ-011 onwards),
+kept for history. The OSRM sections describe preserved but unused routing
+(ADR-022); the 14,851 figure predates the envelope and quality filters.
+
 
 ## OSM extract (NQ-011)
 

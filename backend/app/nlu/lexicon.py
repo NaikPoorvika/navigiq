@@ -146,6 +146,12 @@ def parse_interests(utterance: str) -> InterestParse:
                 break
             if CLAUSE_BREAK.search(text[ne:start]):
                 continue
+            # A comma between the negator and the interest means the negator
+            # had another object ("avoid Majestic and Shivajinagar, markets
+            # tomorrow"); lists that start right after it ("no malls,
+            # temples") are handled by the connector rule below.
+            if "," in text[ne:start]:
+                continue
             if len(_tokens_between(text, ne, start)) > window:
                 continue
             blockers = [ms for ms, _, _ in matches] + [cs for cs, _ in crowd_spans]
