@@ -176,7 +176,11 @@ async def _persist(
             visit_minutes=s.visit_minutes, cost_inr=s.cost_inr,
             mode_from_prev=s.mode_from_prev,
             travel_seconds_from_prev=s.travel_minutes_from_prev * 60,
-            notes={},
+            # A stored plan must show what the user saw, even if the POI is
+            # renamed or recategorised later.
+            notes={"name": s.name, "category": s.category,
+                   "cost_basis": s.cost_basis,
+                   "hours_verified": s.hours_verified},
         ))
 
     # Everything needed to replay this plan exactly as it was produced.
