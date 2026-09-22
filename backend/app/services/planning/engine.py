@@ -62,6 +62,7 @@ EARLY_START_WEIGHT = 20     # per minute of arrival after the window opens: an i
 DEFAULT_CATEGORY_CAP = 2          # when the request names no categories at all
 UNREQUESTED_CATEGORY_CAP = 1      # otherwise: at most one stop of a category nobody asked for
 COVERAGE_WEIGHT = 40_000          # ~0.7 of a typical stop's score: cover each requested category
+ADJACENT_SAME_PENALTY = 12_000    # ~0.2 of a stop: prefer not to put two cafes back to back
 MEAL_WINDOWS = {"breakfast": (7 * 60 + 30, 10 * 60 + 30), "lunch": (12 * 60, 15 * 60),
                 "dinner": (19 * 60, 22 * 60)}
 
@@ -296,7 +297,8 @@ async def plan(db: AsyncSession, spec: TripSpec, *, now: datetime | None = None,
                   compactness_weight=COMPACTNESS_WEIGHT, early_start_weight=EARLY_START_WEIGHT,
                   coverage_categories=[i for i in spec.interests if is_valid_category(i)
                                        and not category_catalog()[i].theme],
-                  coverage_weight=COVERAGE_WEIGHT)
+                  coverage_weight=COVERAGE_WEIGHT,
+                  adjacent_same_penalty=ADJACENT_SAME_PENALTY)
     attempts = []
     opt = optimize(nodes, arcs, **common, max_stops=max_stops, min_stops=min_stops,
                    meal_required=need_meal, meal_windows=meal_windows,

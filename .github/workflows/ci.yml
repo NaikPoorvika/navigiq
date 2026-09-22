@@ -1,0 +1,89 @@
+# Continuous integration. Runs everything that doesn't need the loaded
+# Bengaluru dataset or a GPU: backend lint + unit/integration/DB tests against
+# a migrated PostGIS/pgvector database with synthetic fixtures, and the
+# frontend's lint, type check, unit tests and production build.
+#
+# Not in CI (documented in README, run on the workstation): the Playwright
+# suite and the eval gates, which need the real POI inventory; and the live
+# Ollama tests, which need the model.
+name: ci
+
+on:
+  push:
+    branches: [master, "feat/**"]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      TEST_DATABASE_URL: postgresql+asyncpg://navigiq_user:navigiq_password@localhost:5433/navigiq_test
+      REAL_DATABASE_URL: postgresql+asyncpg://navigiq_user:navigiq_password@localhost:5433/navigiq
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Start PostGIS + pgvector (the project's own database image)
+        run: |
+          docker build -t navigiq-db infrastructure/database
+          docker run -d --name navigiq_db -p 5433:5432 \
+            -e POSTGRES_USER=navigiq_user -e POSTGRES_PASSWORD=navigiq_password -e POSTGRES_DB=navigiq \
+            navigiq-db
+          for i in $(seq 1 60); do docker exec navigiq_db pg_isready -U navigiq_user && break; sleep 2; done
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: backend/requirements*.txt
+
+      - name: Install
+        working-directory: backend
+        run: pip install -r requirements-dev.txt
+
+      - name: Lint
+        working-directory: backend
+        run: ruff check app tests evals
+
+      - name: Tests with coverage
+        working-directory: backend
+        run: pytest -q -p no:cacheprovider --cov=app --cov-report=term --cov-report=xml
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: backend-coverage
+          path: backend/coverage.xml
+
+  frontend:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci --no-audit --no-fund
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm run test:coverage
+      - run: npm run build
+
+  images:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    needs: [backend, frontend]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build the container images
+        working-directory: infrastructure
+        run: docker compose --env-file .env.example build backend web

@@ -178,6 +178,7 @@ def optimize(
     deterministic_limit: float | None = None,
     coverage_categories: list[str] | None = None,
     coverage_weight: int = 0,
+    adjacent_same_penalty: int = 0,
 ) -> OptimizerResult:
     """Solve. nodes[0] is the origin; arcs maps (i, j) -> OptimizerArc.
 
@@ -186,6 +187,7 @@ def optimize(
       visit_multiplier        override the mode's visit scaling (1.0 = as given)
       compactness_weight      objective penalty per km of hop distance
       category_caps           hard ceiling per category
+      adjacent_same_penalty   objective penalty per back-to-back same-category pair
     """
     n = len(nodes)
     if n < 2:
@@ -356,6 +358,12 @@ def optimize(
         # Hop distance in units of 100 m. A coherence preference, not time.
         obj.append(-sum(lit * int(round(arcs[(i, j)].distance_km * 10 * compactness_weight))
                         for (i, j), lit in arc_lit.items()))
+    if adjacent_same_penalty > 0:
+        # Variety: two cafes (or two museums) back to back is allowed but
+        # costs a little, so an equally good plan that alternates wins.
+        obj.append(-adjacent_same_penalty * sum(
+            lit for (i, j), lit in arc_lit.items()
+            if i != 0 and j != 0 and nodes[i].category == nodes[j].category))
     if coverage_categories and coverage_weight > 0:
         # Each category the user asked for earns a bonus the first time it
         # appears, so "a garden and a museum" does not become two museums

@@ -1,46 +1,32 @@
+# NavigIQ on one workstation (ADR-001: modular monolith, single machine).
+#
+#   docker compose --env-file .env up -d --build        # db, redis, api, web
+#   docker compose --profile routing up -d osrm         # optional, deferred (ADR-022)
+#
+# Ports: web 8080, api 8010 (8000 is taken by another service on this
+# machine), Postgres 5433, Redis 6379. Ollama runs on the host (GPU) and is
+# reached at host.docker.internal:11434; the product works without it.
+
 services:
   db:
     build:
       context: ./database
     container_name: navigiq_db
     restart: unless-stopped
-    env_file:
-      - .env
+    environment:
+      # From infrastructure/.env (copy .env.example), read by compose itself.
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     ports:
       - "5433:5432"
     volumes:
       - navigiq_postgres_data:/var/lib/postgresql/data
-
-  backend:
-    build:
-      context: ../backend
-    container_name: navigiq_backend
-    restart: unless-stopped
-    ports:
-      - "8001:8000"
-    volumes:
-      - ../backend:/app
-    env_file:
-      - ../backend/.env.example
-    depends_on:
-      db:
-        condition: service_healthy
-      redis:
-        condition: service_started
-
-  frontend:
-    build:
-      context: ../frontend
-      dockerfile: Dockerfile
-    container_name: navigiq_frontend
-    restart: unless-stopped
-    ports:
-      - "3000:3000"
-    volumes:
-      - ../frontend:/app
-      - /app/node_modules
-    depends_on:
-      - backend
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
 
   redis:
     image: redis:7-alpine
@@ -50,11 +36,61 @@ services:
       - "6379:6379"
     volumes:
       - navigiq_redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
 
+  backend:
+    build:
+      context: ../backend
+    container_name: navigiq_backend
+    restart: unless-stopped
+    ports:
+      - "8010:8000"
+    env_file:
+      - path: ../backend/.env
+        required: false            # optional: defaults in app/config.py apply
+    environment:
+      # Container-internal addresses override whatever .env says for local runs.
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+      REDIS_URL: redis://redis:6379/0
+      NAVIGIQ_DATA_DIR: /data
+      OLLAMA_HOST: ${OLLAMA_HOST:-http://host.docker.internal:11434}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - ../data:/data            # config, curated data, knowledge corpus, artifacts
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/v1/health', timeout=3)"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+
+  web:
+    build:
+      context: ../frontend
+    container_name: navigiq_web
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+
+  # Road routing is deferred (ADR-022): plans use transition buffers, never
+  # travel times. Kept behind a profile for the routing work to come.
   osrm:
+    profiles: ["routing"]
     image: osrm/osrm-backend:latest
     container_name: navigiq_osrm
-    restart: always
+    restart: unless-stopped
     ports:
       - "5000:5000"
     volumes:

@@ -388,3 +388,28 @@ def test_low_confidence_hours_are_not_enforced():
     f[2].hours_confidence = 0.3
     rep = validate([PlannedStop(1, 1, 600, 660), PlannedStop(2, 2, 1030, 1075)], _rules(), f)
     assert Rule.HOURS.value not in rep.rules_failed()
+
+
+def test_back_to_back_same_category_is_avoided_when_an_alternative_exists():
+    # Regression: a trip day put two cafes one after the other although a
+    # museum could sit between them at no cost to the plan.
+    nodes = [start(), node("Cafe A", "cafe", score=0.6), node("Cafe B", "cafe", score=0.6),
+             node("Museum", "museum", score=0.6)]
+    arcs = arcs_for(4)
+    # The two cafes sit next to each other; the museum is 3 km away, so pure
+    # compactness would put the cafes back to back.
+    for (i, j) in list(arcs):
+        if 0 not in (i, j):
+            arcs[(i, j)] = OptimizerArc(15, 0, 0, "transition", 0.1 if {i, j} == {1, 2} else 3.0)
+    grouped = solve(nodes, arcs, max_stops=3, compactness_weight=200)
+    assert any(a.category == b.category == "cafe" for a, b in zip(grouped.stops, grouped.stops[1:]))
+    varied = solve(nodes, arcs, max_stops=3, compactness_weight=200, adjacent_same_penalty=12_000)
+    cats = [s.category for s in varied.stops]
+    assert len(cats) == 3
+    assert all(a != b for a, b in zip(cats, cats[1:])), cats
+
+
+def test_variety_penalty_never_drops_a_stop_it_can_keep():
+    nodes = [start(), node("Cafe A", "cafe", score=0.6), node("Cafe B", "cafe", score=0.6)]
+    r = solve(nodes, arcs_for(3), max_stops=2, adjacent_same_penalty=12_000)
+    assert len(r.stops) == 2
