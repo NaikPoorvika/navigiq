@@ -215,6 +215,40 @@ async def _hours_for_stops(
     """), {"ids": poi_ids, "dow": day_of_week})).all()
     return {r.poi_id: r for r in rows}
 
+async def _leg_geometry(routing, a, b, mode, depart_at) -> str | None:
+    """The road shape of one leg, for drawing on the map.
+
+    Never affects the plan: if OSRM can't answer, the map draws a straight
+    line and says so. Times and distances still come from the matrix.
+    """
+    try:
+        r = await routing.get_route(
+            a, b,
+            mode="walking" if mode == "walking" else "driving",
+            depart_at=depart_at, include_geometry=True,
+        )
+        return r.geometry
+    except Exception:          # noqa: BLE001 - drawing must never break a plan
+        return None
+
+
+async def _leg_geometries(routing, points, nodes, stops, depart_at) -> dict[int, str]:
+    """Road shapes for every leg, keyed by stop sequence number."""
+    out: dict[int, str] = {}
+    for st in stops:
+        if not st.mode_from_prev:
+            continue
+        prev_idx = 0 if st.seq == 1 else next(
+            (i for i, n in enumerate(nodes)
+             if n.poi_id == stops[st.seq - 2].poi_id), 0)
+        this_idx = next((i for i, n in enumerate(nodes)
+                         if n.poi_id == st.poi_id), 0)
+        geometry = await _leg_geometry(routing, points[prev_idx], points[this_idx],
+                                       st.mode_from_prev, depart_at)
+        if geometry:
+            out[st.seq] = geometry
+    return out
+
 async def _refetch_leg_seconds(routing, a, b, mode, depart_at) -> float | None:
     """Re-derive one chosen leg with an independent /route call, so the
     validator is not comparing the optimizer's travel time with itself.
@@ -480,10 +514,17 @@ async def plan(
 
     result.ok = True
     result.itinerary = opt.to_dict()
+
+    t0 = time.perf_counter()
+    geometries = await _leg_geometries(router.routing, points, nodes,
+                                       opt.stops, depart_at)
+    t["geometry"] = int((time.perf_counter() - t0) * 1000)
+
     for stop in result.itinerary["stops"]:
         p = by_id.get(stop["poi_id"], {})
         for key in ("image_url", "image_credit", "image_license", "image_source_url"):
             stop[key] = p.get(key)
+        stop["geometry"] = geometries.get(stop["seq"])
     result.itinerary["origin"] = {"name": spec.origin.name,
                                   "lat": spec.origin.lat,
                                   "lon": spec.origin.lon}
