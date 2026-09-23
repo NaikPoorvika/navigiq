@@ -36,6 +36,16 @@ Legend:
 - [ ] NQ-024 — Independent itinerary validator
 - [ ] NQ-025 — Planning orchestrator + `POST /plan` + weather client
 - [ ] NQ-026 — Plan form + Leaflet map + timeline + cost breakdown
+## Built beyond the task list
+- Place gazetteer (ADR-011), multi-day trips (ADR-012), LLM draft contract (ADR-013)
+- Cost presented as category estimates (ADR-014)
+- Fame in ranking from Wikidata (ADR-015)
+- Real accounts, server-side profile, delete account (ADR-016)
+- Saved plans on the server: GET/DELETE /itineraries
+- Swap and Remove a place (ADR-017)
+- Real photos from Wikimedia Commons; map snippets where there is none
+- Road-following routes on the map
+- 11 Playwright end-to-end tests
 
 ## Phase 2 — LLM + RAG
 (Tasks TBD upon entering phase)
@@ -51,3 +61,16 @@ Legend:
 
 ## Phase 6 — ADVANCED FEATURES
 (Tasks TBD upon entering phase)
+
+## Deferred idea - Google Maps export (for NQ-026 / NQ-055)
+
+Build a Google Maps directions URL from itinerary coordinates:
+  https://www.google.com/maps/dir/?api=1&origin=LAT,LON&destination=LAT,LON
+    &waypoints=LAT,LON|LAT,LON&travelmode=driving
+
+Gives the USER live traffic and turn-by-turn without any API key or cost.
+Does NOT give NavigIQ live traffic - planning still uses our estimates.
+Waypoint cap is 9 intermediate stops; itineraries are 3-6, so fine.
+
+NQ-026: "Open in Google Maps" button on the itinerary.
+NQ-055: "Navigate to next stop" during an active trip.

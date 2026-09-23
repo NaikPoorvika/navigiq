@@ -1,0 +1,154 @@
+{
+  "entertainment": {
+    "file": "entertainment.jpg",
+    "subject": "Ranga Shankara",
+    "poi_id": 30853,
+    "credit": "Gpkp",
+    "license": "CC BY-SA 4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Ranga_Shankara,_Bangalore_(2024)_22.jpg"
+  },
+  "market": {
+    "file": "market.jpg",
+    "subject": "Russel Market",
+    "poi_id": 39704,
+    "credit": "Thejeshgn",
+    "license": "CC BY-SA 4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Russell_Market.jpg"
+  },
+  "viewpoint": {
+    "file": "viewpoint.jpg",
+    "subject": "Savanadurga",
+    "poi_id": 35883,
+    "credit": "Pravega",
+    "license": "CC BY-SA 4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Savandurga_Hill_01.jpg"
+  },
+  "art_gallery": {
+    "file": "art_gallery.jpg",
+    "subject": "Karnataka Chitrakala Parishath",
+    "poi_id": 36043,
+    "credit": "Rajesh_dangi (talk) (Uploads)",
+    "license": "CC BY 3.0",
+    "source": "https://commons.wikimedia.org/wiki/File:ChitrakalaParishatCampus.jpg"
+  },
+  "park": {
+    "file": "park.jpg",
+    "subject": "Cubbon Park",
+    "poi_id": 39664,
+    "credit": "Augustus Binu/ facebook",
+    "license": "CC BY-SA 3.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Cubbon_Park_W.jpg"
+  },
+  "restaurant": {
+    "file": "restaurant.jpg",
+    "subject": "Mavalli Tiffin Rooms",
+    "poi_id": 29750,
+    "credit": "Gpkp",
+    "license": "CC BY-SA 4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Mavalli_Tiffin_Room_(6),_Lalbagh_Road,_Bengaluru.jpg"
+  },
+  "museum": {
+    "file": "museum.jpg",
+    "subject": "Karnataka Government Museum",
+    "poi_id": 39798,
+    "credit": "PP Yoonus",
+    "license": "CC BY-SA 3.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Government_Museum_Banglore_305.jpg"
+  },
+  "landmark": {
+    "file": "landmark.jpg",
+    "subject": "Lalbagh Botanical Gardens",
+    "poi_id": 39662,
+    "credit": "Chidambara",
+    "license": "CC BY-SA 4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Entry_gate_of_Lalbagh.jpg"
+  },
+  "shopping": {
+    "file": "shopping.jpg",
+    "subject": "Garuda Mall",
+    "poi_id": 39871,
+    "credit": "Wikimedia Commons",
+    "license": "CC BY-SA 2.5",
+    "source": "https://commons.wikimedia.org/wiki/File:Bangalore_garuda_mall.jpg"
+  },
+  "lake": {
+    "file": "lake.jpg",
+    "subject": "Halasuru lake",
+    "poi_id": 40901,
+    "credit": "Prateek Karandikar",
+    "license": "CC BY-SA 4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Ulsoor_Lake_from_a_distance.JPG"
+  },
+  "sunset": {
+    "file": "sunset.jpg",
+    "subject": "Hebbal Lake",
+    "poi_id": 41143,
+    "credit": "Shyamal",
+    "license": "CC BY 3.0",
+    "source": "https://commons.wikimedia.org/wiki/File:HebbalLake.jpg"
+  },
+  "nature": {
+    "file": "nature.jpg",
+    "subject": "Madiwala Lake",
+    "poi_id": 41599,
+    "credit": "Nocturnal Atavistic",
+    "license": "CC BY-SA 4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Sunrise_at_Madiwala_lake,_Bengaluru.jpg"
+  },
+  "temple": {
+    "file": "temple.jpg",
+    "subject": "Dharmaraya Swamy Temple",
+    "poi_id": 40050,
+    "credit": "Muhammad Mahdi Karim",
+    "license": "GFDL 1.2",
+    "source": "https://commons.wikimedia.org/wiki/File:Dharmaraya_Swamy_Temple_Bangalore_edit1.jpg"
+  },
+  "historical": {
+    "file": "historical.jpg",
+    "subject": "St. Francis Xavier's Cathedral",
+    "poi_id": 40102,
+    "credit": "Saad Faruque my blog",
+    "license": "CC BY-SA 2.0",
+    "source": "https://commons.wikimedia.org/wiki/File:St_Francis_Xavier_Cathedral,_Bangalore_oblique.jpg"
+  },
+  "bar": {
+    "file": "bar.jpg",
+    "subject": "Stories Bar and Kitchen, RR Nagar, Bangalore (2024)",
+    "credit": "Gpkp",
+    "license": "CC BY-SA 4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Stories_Bar_and_Kitchen,_RR_Nagar,_Bangalore_(2024).jpg",
+    "found_by": "search"
+  },
+  "cafe": {
+    "file": "cafe.jpg",
+    "subject": "Hard Rock Cafe, Bangalore",
+    "credit": "Gafoor",
+    "license": "CC BY-SA 3.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Hard_Rock_Cafe,_Bangalore.JPG",
+    "found_by": "search"
+  },
+  "dessert": {
+    "file": "dessert.jpg",
+    "subject": "Dessert Works Bangalore",
+    "credit": "VideshiBhaktNRI",
+    "license": "CC0",
+    "source": "https://commons.wikimedia.org/wiki/File:Dessert_Works_Bangalore.jpg",
+    "found_by": "search"
+  },
+  "nightlife": {
+    "file": "nightlife.jpg",
+    "subject": "Brigade Road, Bangalore at night (2024) 01",
+    "credit": "Gpkp",
+    "license": "CC BY-SA 4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Brigade_Road,_Bangalore_at_night_(2024)_01.jpg",
+    "found_by": "search"
+  },
+  "street_food": {
+    "file": "street_food.jpg",
+    "subject": "Avarebele Dose - VV Puram Food Street, Bangalore - Karnataka - PXL5960",
+    "credit": "Harikrishnan N",
+    "license": "CC BY-SA 4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Avarebele_Dose_-_VV_Puram_Food_Street,_Bangalore_-_Karnataka_-_PXL5960.jpg",
+    "found_by": "search"
+  }
+}

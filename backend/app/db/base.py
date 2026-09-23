@@ -1,5 +1,18 @@
-# Import all the models here so that Alembic can read them
+﻿# Import all the models here so that Alembic can read them
+from app.models.place import Place
 from app.db.base_class import Base
 from app.models.user import User
-
-# This allows Alembic to easily import `Base` from `app.db.base`
+from app.models.poi import (
+    POI,
+    POICategory,
+    POICategoryLink,
+    POIInteraction,
+    POIOpeningHours,
+)
+from app.models.itinerary import (
+    Itinerary, ItineraryStop, ItineraryVersion, PlanSnapshot, TripSpecRecord,
+)
+__all__ = [
+    "Base", "User", "POI", "POICategory",
+    "POICategoryLink", "POIInteraction", "POIOpeningHours",
+]

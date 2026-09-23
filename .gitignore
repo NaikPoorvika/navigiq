@@ -70,3 +70,18 @@ dist-ssr
 # Cypress
 cypress/videos/
 cypress/screenshots/
+
+# NQ-011: regenerable pipeline artifacts
+data/artifacts/
+!data/artifacts/*.sha256
+infrastructure/osrm-data/*.pbf
+
+# NQ-011: OSM extract, 72 MB, regenerable from BBBike
+infrastructure/osrm-data/*.pbf
+infrastructure/osrm-data/*.osrm*
+
+# NQ-018: OSRM graph artifacts, ~1.4 GB, rebuilt from the .pbf in ~35 s
+infrastructure/osrm-data/
+infrastructure/osrm-foot/
+
+data/cache/

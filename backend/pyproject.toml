@@ -2,7 +2,7 @@
 name = "navigiq-backend"
 version = "0.1.0"
 description = "NavigIQ Backend API"
-requires-python = ">=3.11"
+requires-python = ">=3.10"
 dependencies = [
     "fastapi>=0.110.0",
     "uvicorn[standard]>=0.29.0",
@@ -30,3 +30,4 @@ test = [
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
+

@@ -10,22 +10,70 @@ services:
       - "5433:5432"
     volumes:
       - navigiq_postgres_data:/var/lib/postgresql/data
+    # backend waits for service_healthy; without this, compose never starts it.
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U navigiq -d navigiq"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  redis:
+    image: redis:7-alpine
+    container_name: navigiq_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - navigiq_redis_data:/data
+
+  # Car and foot are separate graphs. --max-table-size 100: the default
+  # silently truncates matrices, which surfaces as an optimizer bug.
+  osrm-car:
+    image: osrm/osrm-backend:latest
+    container_name: navigiq_osrm_car
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./osrm-data:/data
+    command: osrm-routed --algorithm mld --max-table-size 100 /data/map.osrm
+
+  osrm-foot:
+    image: osrm/osrm-backend:latest
+    container_name: navigiq_osrm_foot
+    restart: unless-stopped
+    ports:
+      - "5001:5000"
+    volumes:
+      - ./osrm-foot:/data
+    command: osrm-routed --algorithm mld --max-table-size 100 /data/map.osrm
 
   backend:
     build:
       context: ../backend
     container_name: navigiq_backend
     restart: unless-stopped
+    # 8001 on the host so it does not collide with a local uvicorn on 8000.
     ports:
       - "8001:8000"
     volumes:
       - ../backend:/app
     env_file:
-      - ../backend/.env.example
+      - ../backend/.env
+    # Inside Docker, 'localhost' is the backend container itself.
+    environment:
+      OSRM_CAR_URL: http://osrm-car:5000
+      OSRM_FOOT_URL: http://osrm-foot:5000
+      REDIS_URL: redis://redis:6379/0
     depends_on:
       db:
         condition: service_healthy
       redis:
+        condition: service_started
+      osrm-car:
+        condition: service_started
+      osrm-foot:
         condition: service_started
 
   frontend:
@@ -39,17 +87,11 @@ services:
     volumes:
       - ../frontend:/app
       - /app/node_modules
+    # vite.config.ts proxies /api here. Without it, it proxies to itself.
+    environment:
+      VITE_API_TARGET: http://backend:8000
     depends_on:
       - backend
-
-  redis:
-    image: redis:7-alpine
-    container_name: navigiq_redis
-    restart: unless-stopped
-    ports:
-      - "6379:6379"
-    volumes:
-      - navigiq_redis_data:/data
 
 volumes:
   navigiq_postgres_data:
