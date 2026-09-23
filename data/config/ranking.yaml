@@ -15,17 +15,21 @@
 # This is NOT a quality signal. Prominence measures documentation and
 # notability only (ADR-013). No star ratings, ever.
 
-version: 2
-updated: 2026-09-03
+version: 3
+updated: 2026-09-22
 rebalanced_against: measured prominence distribution, 14851 POIs
 
 weights:
-  category_match: 0.40    # exact 1.0, secondary by link weight, else 0
-  prominence:     0.10    # was 0.20; see note above
-  proximity:      0.25    # was 0.15
-  diversity:      0.20    # was 0.15
-  weather_fit:    0.05    # was 0.10; binary indoor/outdoor is coarse
+  category_match: 0.34    # exact 1.0, secondary by link weight, else 0
+  fame:           0.18    # Wikipedia language editions, via Wikidata (ADR-015)
+  proximity:      0.20    # was 0.25
+  diversity:      0.18    # was 0.20
+  prominence:     0.05    # was 0.10; fame covers what it was reaching for
+  weather_fit:    0.05    # binary indoor/outdoor is coarse
 
+# Language editions at which fame reaches 1.0. Lalbagh has 18, Cubbon Park
+# 12, a typical neighbourhood temple 0.
+fame_saturation_links: 30
 # Distance at which proximity score reaches zero. Beyond this a POI scores
 # 0 on proximity but is not excluded - the radius filter is the hard bound.
 proximity_falloff_m: 5000

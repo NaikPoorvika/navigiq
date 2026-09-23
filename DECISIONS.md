@@ -177,3 +177,22 @@ budget.
 
 **Consequences:** The UI shows "≈ Rs 600 typical" rather than "Rs 600". Real
 prices, when curated, use `cost_basis: poi_specific` and take precedence.
+
+## ADR-015: Fame in ranking, from Wikidata sitelinks
+**Status:** Accepted
+**Date:** 2026-09-22
+
+**Context:** Ranking picked the nearest matching POI, so a neighbourhood
+temple 200 m away beat Bangalore Palace. Prominence was meant to carry
+notability, but 94% of POIs score below 0.06, so it barely orders anything.
+
+**Decision:** Add a `fame` component: the number of Wikipedia language
+editions about a place, from `wikidata_sitelinks` (collected by
+wikidata_enrich.py), log-scaled and saturating at 30. Weight 0.18, taken
+from proximity, diversity and prominence.
+
+**Consequences:** Well-known places win over merely near ones within the
+search radius, while proximity (0.20) still rules out a famous place across
+the city. Only ~80 POIs carry sitelinks today, so for most categories fame
+is 0 for every candidate and ordering is unchanged. This is notability, not
+quality — ADR-008 still stands: no star ratings.
