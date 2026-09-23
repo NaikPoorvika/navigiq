@@ -100,3 +100,26 @@ test("an unreachable backend says so instead of failing silently", async ({ page
   await page.getByRole("button", { name: /plan my trip/i }).click();
   await expect(page.getByRole("heading", { name: "Can't reach NavigIQ" })).toBeVisible();
 });
+
+
+test("swapping a stop replans without that place", async ({ page }) => {
+  await startFrom(page, "Koramangala");
+  await page.locator("#start").fill("15:00");
+  await page.locator("#end").fill("20:00");
+  await pick(page, "Cafe");
+  await pick(page, "Park");
+  await page.getByRole("button", { name: /plan my trip/i }).click();
+
+  const firstStop = page.locator(".tl-name").first();
+  await expect(firstStop).toBeVisible({ timeout: 60_000 });
+  const before = (await firstStop.textContent()) ?? "";
+
+  await page.locator(".tl-actions button", { hasText: "Swap" }).first().click();
+
+  await expect(page.getByText(/1 place skipped/i)).toBeVisible({ timeout: 60_000 });
+  await expect(page.locator(".tl-name").first()).not.toHaveText(before);
+
+  // And it can be undone.
+  await page.getByRole("button", { name: /allow them again/i }).click();
+  await expect(page.getByText(/place skipped/i)).toBeHidden({ timeout: 60_000 });
+});

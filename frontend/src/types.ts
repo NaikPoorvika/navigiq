@@ -41,6 +41,8 @@ export interface TripSpec {
     max_walking_km: number;
     meal_required?: boolean;
     vegetarian?: boolean;
+    /** Places the planner must not use - how "not this one" works. */
+    avoid_poi_ids?: number[];
   };
   mode: PlanningMode;
   days?: number;

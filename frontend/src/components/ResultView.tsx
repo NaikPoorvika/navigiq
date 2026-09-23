@@ -1,5 +1,5 @@
 import {
-  Cloud, CloudRain, Clock, Footprints, Info, Navigation, Sun, Wallet,
+  Cloud, CloudRain, Clock, Footprints, Info, Navigation, RotateCcw, Sun, Wallet,
   type LucideIcon,
 } from "lucide-react";
 import { googleMapsUrl } from "../lib/maps";
@@ -20,9 +20,15 @@ function weatherBadge(w: PlanResponse["weather"]): { icon: LucideIcon; text: str
 interface Props {
   data: PlanResponse;
   spec: TripSpec;
+  /**
+   * Replan with a changed request. Present on the planner, absent on a saved
+   * plan - a stored plan is a record of what happened and isn't edited.
+   */
+  onChangeSpec?: (spec: TripSpec) => void;
 }
 
-export default function ResultView({ data, spec }: Props) {
+export default function ResultView({ data, spec, onChangeSpec }: Props) {
+
   const it = data.itinerary;
   const first = it.stops[0];
   const last = it.stops[it.stops.length - 1];
@@ -36,6 +42,34 @@ export default function ResultView({ data, spec }: Props) {
     );
   }
 
+  const avoided = spec.constraints.avoid_poi_ids ?? [];
+
+  /** "Not this one": plan the same trip again without that place. */
+  function swap(poiId: number) {
+    onChangeSpec?.({
+      ...spec,
+      constraints: { ...spec.constraints, avoid_poi_ids: [...avoided, poiId] },
+    });
+  }
+
+  /** Drop the stop AND ask for one fewer of its kind, or it comes straight back. */
+  function remove(poiId: number, category: string) {
+    const interests = spec.interests
+      .map((i) => (i.category === category ? { ...i, count: i.count - 1 } : i))
+      .filter((i) => i.count > 0);
+    onChangeSpec?.({
+      ...spec,
+      interests: interests.length > 0 ? interests : spec.interests,
+      constraints: { ...spec.constraints, avoid_poi_ids: [...avoided, poiId] },
+    });
+  }
+
+  function showSkippedAgain() {
+    onChangeSpec?.({ ...spec, constraints: { ...spec.constraints, avoid_poi_ids: [] } });
+  }
+
+  // Removing the last thing asked for would leave nothing to plan.
+  const canRemove = spec.interests.reduce((n, i) => n + i.count, 0) > 1;
   const weather = weatherBadge(data.weather);
   const notices = [
     ...data.relaxations_applied.map((r) => `Adjusted automatically: ${r}`),
@@ -76,8 +110,21 @@ export default function ResultView({ data, spec }: Props) {
         </ul>
       )}
 
+      {avoided.length > 0 && onChangeSpec && (
+        <div className="skipped-note">
+          <span>{avoided.length} place{avoided.length > 1 ? "s" : ""} skipped at your request.</span>
+          <button type="button" className="link" onClick={showSkippedAgain}>
+            <RotateCcw size={14} aria-hidden="true" /> Allow them again
+          </button>
+        </div>
+      )}
+
       <ItineraryMap itinerary={it} />
-      <Timeline itinerary={it} startTime={spec.start_time_local} />
+      <Timeline
+        itinerary={it}
+        startTime={spec.start_time_local}
+        {...(onChangeSpec ? { onSwap: swap, onRemove: remove, canRemove } : {})}
+      />
 
       <p className="fine-print">
         {it.cost_note ?? "Costs are estimates."} Travel times are estimates from road

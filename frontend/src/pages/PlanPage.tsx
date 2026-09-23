@@ -80,7 +80,10 @@ export default function PlanPage() {
             </div>
           )}
           {phase.kind === "loading" && <PlanProgress />}
-          {phase.kind === "result" && <ResultView data={phase.data} spec={phase.spec} />}
+          {phase.kind === "result" && (
+            <ResultView data={phase.data} spec={phase.spec}
+                        onChangeSpec={(s) => void plan(s, true)} />
+          )}
           {phase.kind === "error" && phase.error.code === "INFEASIBLE" && (
             <FeasibilityBanner
               error={phase.error}

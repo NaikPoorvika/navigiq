@@ -36,6 +36,16 @@ Legend:
 - [ ] NQ-024 — Independent itinerary validator
 - [ ] NQ-025 — Planning orchestrator + `POST /plan` + weather client
 - [ ] NQ-026 — Plan form + Leaflet map + timeline + cost breakdown
+## Built beyond the task list
+- Place gazetteer (ADR-011), multi-day trips (ADR-012), LLM draft contract (ADR-013)
+- Cost presented as category estimates (ADR-014)
+- Fame in ranking from Wikidata (ADR-015)
+- Real accounts, server-side profile, delete account (ADR-016)
+- Saved plans on the server: GET/DELETE /itineraries
+- Swap and Remove a place (ADR-017)
+- Real photos from Wikimedia Commons; map snippets where there is none
+- Road-following routes on the map
+- 11 Playwright end-to-end tests
 
 ## Phase 2 — LLM + RAG
 (Tasks TBD upon entering phase)

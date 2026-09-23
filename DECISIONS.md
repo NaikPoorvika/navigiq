@@ -196,3 +196,46 @@ search radius, while proximity (0.20) still rules out a famous place across
 the city. Only ~80 POIs carry sitelinks today, so for most categories fame
 is 0 for every candidate and ordering is unchanged. This is notability, not
 quality — ADR-008 still stands: no star ratings.
+
+
+
+## ADR-016: Accounts and profile on the server
+**Status:** Accepted
+**Date:** 2026-09-22
+
+**Context:** Sign-up, sign-in and the profile lived in the browser. Public
+sign-up also accepted `is_superuser`, so any caller could register as an
+administrator.
+
+**Decision:** Public sign-up takes email and password only; the server sets
+everything else. Emails are normalised to lowercase and password rules are
+enforced server-side. The planning profile — display name, home, interests,
+vegetarian — lives on the user row, changed through `PATCH /auth/users/me`,
+with interests checked against real categories and home against the region.
+`DELETE /auth/users/me` removes an account, asking for the password again.
+
+**Consequences:** A profile follows the account to any device. The login
+token is kept in browser storage — adequate here, and a secure cookie is the
+known next hardening step. Planning still works signed out; an account only
+adds saving.
+
+## ADR-017: Plans are changed by replanning, not editing
+**Status:** Accepted
+**Date:** 2026-09-22
+
+**Context:** People want a different café without redoing the whole form.
+
+**Decision:** Swap and Remove add the place to `constraints.avoid_poi_ids`
+and run the planner again. Remove also decreases that category's count.
+Nothing edits an itinerary in place.
+
+**Rejected — editing the itinerary directly.** Moving or replacing a stop by
+hand breaks the guarantees everything else rests on: times, opening hours,
+budget and travel would all need rechecking, and a hand-edited plan could no
+longer claim the validator passed it. Replanning keeps one path to an
+itinerary (ADR-002).
+
+**Consequences:** A swap may reshuffle other stops, because the whole day is
+re-optimised. Saved plans cannot be edited — they are records. Choosing a
+specific replacement needs the optimizer to accept a pinned place, which is
+a separate decision.

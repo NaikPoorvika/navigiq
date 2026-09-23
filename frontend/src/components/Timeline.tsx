@@ -1,7 +1,7 @@
 import { Fragment } from "react";
 import {
   AlertCircle, Bike, Car, CarFront, CarTaxiFront, Clock, ExternalLink, Flag,
-  Footprints, MapPin, type LucideIcon,
+  Footprints, MapPin, Repeat, X, type LucideIcon,
 } from "lucide-react";
 import { categoryIcon, categoryLabel } from "../lib/categories";
 import { googleSearchUrl } from "../lib/maps";
@@ -17,7 +17,16 @@ const LEG: Record<string, { icon: LucideIcon; label: string }> = {
   bike: { icon: Bike, label: "ride" },
 };
 
-export default function Timeline({ itinerary, startTime }: { itinerary: Itinerary; startTime: string }) {
+interface Props {
+  itinerary: Itinerary;
+  startTime: string;
+  /** Present only where the plan can be changed - not on a saved plan. */
+  onSwap?: (poiId: number) => void;
+  onRemove?: (poiId: number, category: string) => void;
+  canRemove?: boolean;
+}
+
+export default function Timeline({ itinerary, startTime, onSwap, onRemove, canRemove = true }: Props) {
   const last = itinerary.stops[itinerary.stops.length - 1];
 
   return (
@@ -71,10 +80,22 @@ export default function Timeline({ itinerary, startTime }: { itinerary: Itinerar
                       <AlertCircle size={12} aria-hidden="true" /> Hours unverified
                     </span>
                   )}
-                  <a className="tl-ext" href={googleSearchUrl(s.name)} target="_blank" rel="noreferrer">
-                    On Google Maps <ExternalLink size={12} aria-hidden="true" />
-                  </a>
-                </div>
+                {(onSwap || onRemove) && (
+                  <div className="tl-actions">
+                    {onSwap && (
+                      <button type="button" onClick={() => onSwap(s.poi_id)}
+                              title={`Find a different ${categoryLabel(s.category).toLowerCase()}`}>
+                        <Repeat size={13} aria-hidden="true" /> Swap
+                      </button>
+                    )}
+                    {onRemove && canRemove && (
+                      <button type="button" onClick={() => onRemove(s.poi_id, s.category)}
+                              title="Drop this stop and replan without it">
+                        <X size={13} aria-hidden="true" /> Remove
+                      </button>
+                    )}
+                  </div>
+                )}
                 </div>
               </div>
             </li>
