@@ -41,6 +41,10 @@ export interface TripSpec {
     max_walking_km: number;
     meal_required?: boolean;
     vegetarian?: boolean;
+    /** Places the planner must not use - how "not this one" works. */
+    avoid_poi_ids?: number[];
+    /** Places the user chose: the plan must include them. */
+    require_poi_ids?: number[];
   };
   mode: PlanningMode;
   days?: number;
@@ -70,6 +74,8 @@ export interface Stop extends PhotoFields {
   lon: number;
   /** False when the stop's opening hours are a category guess, not real data. */
   hours_verified?: boolean;
+  /** The road shape from the previous stop, as an encoded polyline. */
+  geometry?: string | null;
 }
 
 export interface Itinerary {
@@ -125,7 +131,9 @@ export type ErrorCode =
   | "NO_CANDIDATES"
   | "ROUTING_UNAVAILABLE"
   | "VALIDATION_FAILED"
+  | "PIN_UNAVAILABLE"
   | "NETWORK"
+  | "AUTH"
   | "UNKNOWN";
 
 export interface ApiErrorDetails {
@@ -190,6 +198,27 @@ export interface PoiDetail extends PhotoFields {
   opening_hours: OpeningHours[];
 }
 
+/** A row in GET /itineraries - enough to show a card. */
+export interface SavedPlanSummary {
+  id: number;
+  created_at: string;
+  status: string;
+  mode: string;
+  date: string | null;
+  origin_name: string | null;
+  total_cost_inr: number;
+  total_duration_min: number;
+  total_walk_m: number;
+  stop_count: number;
+  stops: string | null;
+}
+
+/** GET /itineraries/{id} - a saved plan, shaped like a fresh /plan reply. */
+export interface SavedPlan extends PlanResponse {
+  spec: TripSpec;
+  created_at: string;
+}
+
 export interface PlaceMatch {
   name: string;
   lat: number;
@@ -204,6 +233,26 @@ export interface ResolveResult {
   alternatives: PlaceMatch[];
   confidence: "high" | "medium" | "low" | "none";
   needs_clarification: boolean;
+}
+
+/** GET /auth/users/me - the signed-in user and their planning profile. */
+export interface UserMe {
+  id: string;
+  email: string;
+  display_name: string | null;
+  home_name: string | null;
+  home_lat: number | null;
+  home_lon: number | null;
+  interests: string[];
+  vegetarian: boolean;
+}
+
+/** PATCH /auth/users/me - only the fields sent are changed. */
+export interface ProfilePatch {
+  display_name?: string | null;
+  home?: { name: string; lat: number; lon: number } | null;
+  interests?: string[];
+  vegetarian?: boolean;
 }
 
 /** 902 -> "15:02" */

@@ -231,7 +231,7 @@ real fixes are architectural and are the user's decision, not NQ-030's:
 - send a derived decoding schema that lets `transport` carry an out-of-enum
   marker, then drop it when mapping to `TripDraft`; or
 - decode without the grammar and rely on `TripDraft` validation, which under
-  ADR-016 refuses (422) rather than silently substituting. That trades a
+  ADR-020 refuses (422) rather than silently substituting. That trades a
   quiet wrong answer for a loud failure, and schema validity would then
   measure something real; or
 - reorder `TripDraft` fields to match natural sentence order. This changes

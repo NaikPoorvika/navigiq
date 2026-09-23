@@ -11,7 +11,7 @@ RankingStrategy exists so the post-MVP XGBoost ranker is a drop-in. There is
 exactly one implementation today and that is deliberate.
 """
 from __future__ import annotations
-
+import math
 from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
@@ -104,6 +104,19 @@ def _weather_fit(poi: dict, ctx: RankingContext, cfg: dict) -> float:
 
     return score
 
+def _fame(poi: dict, saturation: int) -> float:
+    """How widely a place is written about: the number of Wikipedia language
+    editions with an article, through Wikidata.
+
+    This is the answer to "a famous lake should beat the pond 200 m away".
+    It is NOT a quality rating - it measures notability, is verifiable, and
+    cannot be inflated by fake reviews. Log-scaled, because the step from 0
+    to 3 languages says far more than 30 to 33.
+    """
+    links = poi.get("wikidata_sitelinks") or 0
+    if links <= 0:
+        return 0.0
+    return min(1.0, math.log1p(links) / math.log1p(saturation))
 
 class RankingStrategy(Protocol):
     def score(self, poi: dict, ctx: RankingContext) -> ScoredPOI: ...
@@ -124,13 +137,14 @@ class DeterministicRanker:
         components = {
             "category_match": _category_match(poi, ctx.wanted_categories),
             "prominence": float(prominence),
+            "fame": _fame(poi, self.cfg.get("fame_saturation_links", 30)),
             "proximity": _proximity(poi.get("distance_m", 0),
                                     self.cfg["proximity_falloff_m"]),
             "diversity": _diversity(poi, ctx.chosen_category_counts,
                                     self.cfg["diversity_decay"]),
             "weather_fit": _weather_fit(poi, ctx, self.cfg),
         }
-        total = sum(self.w[k] * v for k, v in components.items())
+        total = sum(self.w.get(k, 0.0) * v for k, v in components.items())
         return ScoredPOI(poi=poi, score=total, components=components)
 
     def rank(

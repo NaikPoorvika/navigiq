@@ -180,4 +180,4 @@ def test_breakdown_is_exposed_for_explanations(ranker, ctx):
     d = ranker.score(poi(1, "cafe"), ctx).to_dict()
     assert "rank_score" in d
     assert set(d["rank_components"]) == {
-        "category_match", "prominence", "proximity", "diversity", "weather_fit"}
+        "category_match", "prominence","fame",  "proximity", "diversity", "weather_fit"}

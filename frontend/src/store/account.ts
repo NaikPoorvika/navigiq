@@ -1,10 +1,13 @@
 import { useSyncExternalStore } from "react";
-import type { Place } from "../types";
+import {
+  deleteMe, getMe, getToken, login, register, setToken, setUnauthorizedHandler, updateMe,
+} from "../api/client";
+import { clearPlans } from "./plans";
+import type { Place, UserMe } from "../types";
 
 /**
- * PREVIEW ACCOUNT STORE. Accounts live in this browser's localStorage until
- * the real /auth endpoints are connected. Nothing here is a security check -
- * this is the single seam to replace with the backend.
+ * The signed-in user, backed by the real /auth API. The token is kept in the
+ * browser; the profile lives on the server, so it follows the account.
  */
 export interface Profile {
   name: string;
@@ -17,66 +20,95 @@ export interface Profile {
 export interface AccountState {
   profile: Profile | null;
   signedIn: boolean;
+  /** False until a saved token has been checked with the server. */
+  ready: boolean;
 }
 
-const PROFILE_KEY = "navigiq.profile";
-const SESSION_KEY = "navigiq.session";
 const listeners = new Set<() => void>();
-
-function load(): AccountState {
-  try {
-    const raw = localStorage.getItem(PROFILE_KEY);
-    const profile = raw ? (JSON.parse(raw) as Profile) : null;
-    return { profile, signedIn: profile !== null && localStorage.getItem(SESSION_KEY) === "1" };
-  } catch {
-    return { profile: null, signedIn: false };
-  }
-}
-
-let state: AccountState = load();
+let state: AccountState = { profile: null, signedIn: false, ready: getToken() === null };
 
 function set(next: AccountState): void {
   state = next;
   listeners.forEach((l) => l());
 }
 
-function subscribe(listener: () => void): () => void {
-  listeners.add(listener);
-  return () => listeners.delete(listener);
+function toProfile(u: UserMe): Profile {
+  return {
+    name: u.display_name ?? u.email.split("@")[0] ?? u.email,
+    email: u.email,
+    home: u.home_lat != null && u.home_lon != null
+      ? { name: u.home_name ?? "Home", lat: u.home_lat, lon: u.home_lon }
+      : null,
+    interests: u.interests,
+    vegetarian: u.vegetarian,
+  };
+}
+
+function signedInAs(me: UserMe): void {
+  set({ profile: toProfile(me), signedIn: true, ready: true });
 }
 
 export function useAccount(): AccountState {
-  return useSyncExternalStore(subscribe, () => state);
+  return useSyncExternalStore(
+    (l) => { listeners.add(l); return () => listeners.delete(l); },
+    () => state,
+  );
 }
 
-export function saveProfile(profile: Profile): void {
+// An expired or rejected token signs the user out everywhere.
+setUnauthorizedHandler(() => set({ profile: null, signedIn: false, ready: true }));
+
+/** On load: if a token is saved, ask the server who it belongs to. */
+async function restoreSession(): Promise<void> {
+  if (!getToken()) return;
   try {
-    localStorage.setItem(PROFILE_KEY, JSON.stringify(profile));
-    localStorage.setItem(SESSION_KEY, "1");
+    signedInAs(await getMe());
   } catch {
-    /* storage unavailable - keep in memory */
+    setToken(null);
+    set({ profile: null, signedIn: false, ready: true });
   }
-  set({ profile, signedIn: true });
+}
+void restoreSession();
+
+export async function signUp(email: string, password: string): Promise<void> {
+  await register(email, password);
+  await login(email, password);
+  signedInAs(await getMe());
 }
 
-/** Preview sign-in: succeeds only for the account created in this browser. */
-export function signIn(email: string): boolean {
-  const current = state.profile;
-  if (!current || current.email.toLowerCase() !== email.trim().toLowerCase()) return false;
-  try { localStorage.setItem(SESSION_KEY, "1"); } catch { /* ignore */ }
-  set({ profile: current, signedIn: true });
-  return true;
+export async function signIn(email: string, password: string): Promise<void> {
+  await login(email, password);
+  signedInAs(await getMe());
+}
+
+export async function saveProfile(changes: {
+  name?: string;
+  home?: Place | null;
+  interests?: string[];
+  vegetarian?: boolean;
+}): Promise<void> {
+  const me = await updateMe({
+    ...(changes.name !== undefined ? { display_name: changes.name } : {}),
+    ...(changes.home !== undefined
+      ? { home: changes.home ? { name: changes.home.name ?? "Home", lat: changes.home.lat, lon: changes.home.lon } : null }
+      : {}),
+    ...(changes.interests !== undefined ? { interests: changes.interests } : {}),
+    ...(changes.vegetarian !== undefined ? { vegetarian: changes.vegetarian } : {}),
+  });
+  signedInAs(me);
 }
 
 export function signOut(): void {
-  try { localStorage.removeItem(SESSION_KEY); } catch { /* ignore */ }
-  set({ profile: state.profile, signedIn: false });
+  setToken(null);
+  set({ profile: null, signedIn: false, ready: true });
 }
 
-export function deleteAccount(): void {
-  try {
-    localStorage.removeItem(PROFILE_KEY);
-    localStorage.removeItem(SESSION_KEY);
-  } catch { /* ignore */ }
-  set({ profile: null, signedIn: false });
+/**
+ * Delete the account on the server, then everything this browser holds for
+ * it: the token and the plans saved here.
+ */
+export async function deleteAccount(password: string): Promise<void> {
+  await deleteMe(password);
+  clearPlans();
+  signOut();
 }

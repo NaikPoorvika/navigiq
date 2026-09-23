@@ -11,7 +11,7 @@ so a hallucinated lat/lon can never reach the planner (ADR-002).
 
 Use TripDraft.model_json_schema() for schema-constrained decoding.
 
-HARDENING (pre-NQ-029, see ADR-015): two fields are stricter here than the
+HARDENING (pre-NQ-029, see ADR-019): two fields are stricter here than the
 same-named fields on TripSpec, deliberately.
 
   start_time_local / end_time_local   TripSpec's own `_hhmm` parser accepts

@@ -1,25 +1,40 @@
 import { useEffect, useState } from "react";
-import { Check, LogOut, Trash2 } from "lucide-react";
-import { getCategories } from "../api/client";
+import { AlertTriangle, Check, Loader2, LogOut, Trash2 } from "lucide-react";
+import { getCategories, PlanError } from "../api/client";
 import PlaceSearch from "../components/PlaceSearch";
 import PreferenceCards from "../components/PreferenceCards";
-import PreviewBadge from "../components/PreviewBadge";
 import { href, navigate } from "../lib/router";
 import { deleteAccount, saveProfile, signOut, useAccount } from "../store/account";
 import type { Category, Place } from "../types";
 
 export default function ProfilePage() {
-  const { profile, signedIn } = useAccount();
+  const { profile, signedIn, ready } = useAccount();
   const [name, setName] = useState(profile?.name ?? "");
   const [home, setHome] = useState<Place | null>(profile?.home ?? null);
   const [interests, setInterests] = useState<string[]>(profile?.interests ?? []);
   const [vegetarian, setVegetarian] = useState(profile?.vegetarian ?? false);
   const [categories, setCategories] = useState<Category[]>([]);
-  const [saved, setSaved] = useState(false);
+  const [status, setStatus] = useState<"idle" | "saving" | "saved">("idle");
+  const [error, setError] = useState("");
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
+  const [deletePassword, setDeletePassword] = useState("");
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState("");
 
   useEffect(() => {
     getCategories().then((r) => setCategories(r.categories)).catch(() => setCategories([]));
   }, []);
+
+  // The profile arrives after the saved session is checked - fill the form then.
+  useEffect(() => {
+    if (!profile) return;
+    setName(profile.name);
+    setHome(profile.home);
+    setInterests(profile.interests);
+    setVegetarian(profile.vegetarian);
+  }, [profile]);
+
+  if (!ready) return <div className="page-narrow empty-state"><Loader2 className="spin" size={28} /></div>;
 
   if (!profile || !signedIn) {
     return (
@@ -30,11 +45,37 @@ export default function ProfilePage() {
     );
   }
 
-  function save() {
-    if (!profile) return;
-    saveProfile({ ...profile, name: name.trim() || profile.name, home, interests, vegetarian });
-    setSaved(true);
-    window.setTimeout(() => setSaved(false), 2000);
+  async function save() {
+    setStatus("saving");
+    setError("");
+    try {
+      await saveProfile({ name: name.trim(), home, interests, vegetarian });
+      setStatus("saved");
+      window.setTimeout(() => setStatus("idle"), 2000);
+    } catch (err) {
+      setStatus("idle");
+      setError(err instanceof PlanError ? err.message : "Couldn't save. Please try again.");
+    }
+  }
+
+  async function remove() {
+    if (!deletePassword) {
+      setDeleteError("Enter your password to confirm.");
+      return;
+    }
+    setDeleting(true);
+    setDeleteError("");
+    try {
+      await deleteAccount(deletePassword);
+      navigate("/");
+    } catch (err) {
+      setDeleteError(
+        err instanceof PlanError && err.code === "AUTH"
+          ? "That password isn't right."
+          : "Couldn't delete the account. Please try again.",
+      );
+      setDeleting(false);
+    }
   }
 
   return (
@@ -42,7 +83,7 @@ export default function ProfilePage() {
       <div className="section-head">
         <div>
           <h1>Your profile</h1>
-          <p className="muted">{profile.email} <PreviewBadge reason="Saved in this browser until accounts are connected to the backend." /></p>
+          <p className="muted">{profile.email}</p>
         </div>
       </div>
 
@@ -63,17 +104,50 @@ export default function ProfilePage() {
         <PreferenceCards categories={categories} value={interests} onChange={setInterests} />
       </section>
 
+      {error && <p className="field-error" role="alert">{error}</p>}
+
       <div className="profile-actions">
-        <button type="button" className="primary inline" onClick={save}>
-          {saved ? <><Check size={17} /> Saved</> : "Save changes"}
+        <button type="button" className="primary inline" onClick={() => void save()} disabled={status === "saving"}>
+          {status === "saving" ? <><Loader2 className="spin" size={17} /> Saving…</>
+            : status === "saved" ? <><Check size={17} /> Saved</> : "Save changes"}
         </button>
         <button type="button" className="btn-outline" onClick={() => { signOut(); navigate("/"); }}>
           <LogOut size={15} /> Sign out
         </button>
-        <button type="button" className="btn-outline danger" onClick={() => { deleteAccount(); navigate("/"); }}>
-          <Trash2 size={15} /> Delete account from this browser
-        </button>
       </div>
+
+      <section className="card danger-zone">
+        <h2 className="card-title">Delete account</h2>
+        <p className="muted">
+          Permanently removes your account and profile — name, home, interests and food
+          preference — from NavigIQ, and the plans saved in this browser. This can't be undone.
+        </p>
+        {!confirmingDelete ? (
+          <button type="button" className="btn-outline danger" onClick={() => setConfirmingDelete(true)}>
+            <Trash2 size={15} /> Delete my account
+          </button>
+        ) : (
+          <div className="confirm-delete step-enter">
+            <p className="warn"><AlertTriangle size={14} aria-hidden="true" /> Enter your password to confirm.</p>
+            <div className="field">
+              <label htmlFor="del-pw">Password</label>
+              <input id="del-pw" type="password" value={deletePassword} autoComplete="current-password"
+                     onChange={(e) => setDeletePassword(e.target.value)} disabled={deleting} />
+            </div>
+            {deleteError && <p className="field-error" role="alert">{deleteError}</p>}
+            <div className="profile-actions">
+              <button type="button" className="btn-danger" onClick={() => void remove()} disabled={deleting}>
+                {deleting ? <><Loader2 className="spin" size={16} /> Deleting…</> : "Delete permanently"}
+              </button>
+              <button type="button" className="btn-outline"
+                      onClick={() => { setConfirmingDelete(false); setDeletePassword(""); setDeleteError(""); }}
+                      disabled={deleting}>
+                Cancel
+              </button>
+            </div>
+          </div>
+        )}
+      </section>
     </div>
   );
 }

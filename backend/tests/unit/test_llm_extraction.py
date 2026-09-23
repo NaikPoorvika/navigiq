@@ -240,7 +240,7 @@ async def test_invented_enum_values_are_refused_not_coerced(payload, field):
 @pytest.mark.parametrize("bad_time", ["9:00", "9am", "09:00:00", "25:00",
                                       "09:60", "morning"])
 async def test_malformed_times_are_refused(bad_time):
-    """ADR-015's strict HH:MM. A loose time here would fail later and more
+    """ADR-019's strict HH:MM. A loose time here would fail later and more
     confusingly, inside TripSpec construction."""
     with pytest.raises(TripDraftExtractionFailed) as exc_info:
         await _extract({"start_time_local": bad_time})
@@ -256,7 +256,7 @@ async def test_out_of_range_values_are_refused():
 
 
 async def test_free_text_overflow_is_refused():
-    """ADR-015 bounds this to 10 entries. A model dumping everything here
+    """ADR-019 bounds this to 10 entries. A model dumping everything here
     instead of mapping categories is doing the task wrong, and that must be
     visible rather than silently truncated."""
     with pytest.raises(TripDraftExtractionFailed) as exc_info:
@@ -402,7 +402,7 @@ def test_the_prompt_never_shows_the_model_a_coordinate(version):
 # resolve_date_phrase() ever stops accepting one of these, a prompt is
 # advertising a phrase that will become a clarifying question instead of a
 # date - silent drift between the prompt and the resolver, which is exactly
-# what ADR-015 pinned for the schema docstring.
+# what ADR-019 pinned for the schema docstring.
 PROMPT_ADVERTISED_PHRASES = [
     "today", "tonight", "tomorrow", "day after tomorrow",
     "weekend", "this weekend",

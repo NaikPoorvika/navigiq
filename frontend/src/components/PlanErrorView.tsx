@@ -1,5 +1,5 @@
 import {
-  AlertTriangle, MapPinOff, RefreshCw, ServerCrash, ShieldAlert, WifiOff,
+  AlertTriangle, CalendarX, MapPinOff, RefreshCw, ServerCrash, ShieldAlert, WifiOff,
   type LucideIcon,
 } from "lucide-react";
 import type { PlanError } from "../api/client";
@@ -9,6 +9,11 @@ const VIEWS: Record<string, { icon: LucideIcon; title: string; body: string }> =
     icon: AlertTriangle,
     title: "Something in the request doesn't add up",
     body: "Check the details below and try again.",
+  },
+    PIN_UNAVAILABLE: {
+    icon: CalendarX,
+    title: "That place doesn't fit this trip",
+    body: "It's closed during your hours, too far from the rest, or one you skipped. Try a longer window, or pick a different place.",
   },
   NO_CANDIDATES: {
     icon: MapPinOff,

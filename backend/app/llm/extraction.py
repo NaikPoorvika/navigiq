@@ -4,7 +4,7 @@
                     |
               LLMGateway (NQ-028, qwen3:14b, schema-constrained)
                     |
-              TripDraft (NQ-029 prep / ADR-015)
+              TripDraft (NQ-029 prep / ADR-019)
 
 This module is the ONLY place a user's free text becomes structured trip
 fields. It is deliberately small and deliberately incapable:

@@ -101,6 +101,9 @@ class Constraints(BaseModel):
     halal: bool = False
     avoid_categories: list[Category] = Field(default_factory=list)
     avoid_poi_ids: list[int] = Field(default_factory=list)
+    # Places the user chose explicitly - the optimizer must include them.
+    # Capped: every pinned place is one the solver cannot trade away.
+    require_poi_ids: list[int] = Field(default_factory=list, max_length=5)
     max_walking_km: Annotated[float, Field(ge=0, le=15)] = 3.0
     max_stops: Annotated[int, Field(ge=1, le=8)] | None = None
     accessibility_required: bool = False

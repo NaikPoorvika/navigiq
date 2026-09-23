@@ -100,3 +100,50 @@ test("an unreachable backend says so instead of failing silently", async ({ page
   await page.getByRole("button", { name: /plan my trip/i }).click();
   await expect(page.getByRole("heading", { name: "Can't reach NavigIQ" })).toBeVisible();
 });
+
+
+test("swapping a stop replans without that place", async ({ page }) => {
+  await startFrom(page, "Koramangala");
+  await page.locator("#start").fill("15:00");
+  await page.locator("#end").fill("20:00");
+  await pick(page, "Cafe");
+  await pick(page, "Park");
+  await page.getByRole("button", { name: /plan my trip/i }).click();
+
+  const firstStop = page.locator(".tl-name").first();
+  await expect(firstStop).toBeVisible({ timeout: 60_000 });
+  const before = (await firstStop.textContent()) ?? "";
+
+  await page.locator(".tl-actions button", { hasText: "Swap" }).first().click();
+  // Swap opens a panel: take the planner's own choice.
+  await page.getByRole("button", { name: /let navigiq choose/i }).click();
+
+  await expect(page.getByText(/1 place skipped/i)).toBeVisible({ timeout: 60_000 });
+  await expect(page.locator(".tl-name").first()).not.toHaveText(before);
+
+  // And it can be undone.
+  await page.getByRole("button", { name: /allow them again/i }).click();
+  await expect(page.getByText(/place skipped/i)).toBeHidden({ timeout: 60_000 });
+});
+
+
+test("choosing a specific alternative puts that place in the plan", async ({ page }) => {
+  await startFrom(page, "Koramangala");
+  await page.locator("#start").fill("15:00");
+  await page.locator("#end").fill("20:00");
+  await pick(page, "Cafe");
+  await pick(page, "Park");
+  await page.getByRole("button", { name: /plan my trip/i }).click();
+
+  await expect(page.locator(".tl-name").first()).toBeVisible({ timeout: 60_000 });
+  await page.locator(".tl-actions button", { hasText: "Swap" }).first().click();
+
+  // The panel lists real nearby places of the same kind.
+  const option = page.locator(".swap-option").nth(1);   // 0 is "Let NavigIQ choose"
+  await expect(option).toBeVisible();
+  const chosen = (await option.locator("strong").textContent()) ?? "";
+  await option.click();
+
+  // The place picked is in the replanned day.
+  await expect(page.locator(".tl-name", { hasText: chosen })).toBeVisible({ timeout: 60_000 });
+});

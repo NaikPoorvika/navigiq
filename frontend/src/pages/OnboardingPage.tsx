@@ -1,12 +1,11 @@
 import { useEffect, useState } from "react";
-import { ArrowLeft, ArrowRight, Check, Eye, EyeOff, Leaf, UtensilsCrossed } from "lucide-react";
-import { getCategories } from "../api/client";
+import { ArrowLeft, ArrowRight, Check, Eye, EyeOff, Leaf, Loader2, UtensilsCrossed } from "lucide-react";
+import { getCategories, PlanError } from "../api/client";
 import PlaceSearch from "../components/PlaceSearch";
 import PreferenceCards from "../components/PreferenceCards";
-import PreviewBadge from "../components/PreviewBadge";
 import { categoryLabel } from "../lib/categories";
 import { href, navigate } from "../lib/router";
-import { saveProfile } from "../store/account";
+import { saveProfile, signUp, useAccount } from "../store/account";
 import type { Category, Place } from "../types";
 import AuthLayout from "./AuthLayout";
 
@@ -25,6 +24,8 @@ export default function OnboardingPage() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [done, setDone] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const { signedIn } = useAccount();
 
   useEffect(() => {
     getCategories().then((r) => setCategories(r.categories)).catch(() => setCategories([]));
@@ -37,7 +38,7 @@ export default function OnboardingPage() {
   ];
   const strength = checks.filter((c) => c.ok).length;
 
-  function next() {
+  async function next() {
     const e: Record<string, string> = {};
     if (step === 0) {
       if (!/^\S+@\S+\.\S+$/.test(email)) e["email"] = "Enter a valid email address.";
@@ -55,12 +56,26 @@ export default function OnboardingPage() {
     setErrors(e);
     if (Object.keys(e).length > 0) return;
 
-    if (step < 2) {
-      setStep(step + 1);
-      return;
+    setBusy(true);
+    try {
+      if (step === 0) {
+        // The account is created here, on the first step. Going Back and
+        // forward again must not try to create it twice.
+        if (!signedIn) await signUp(email.trim(), password);
+        setStep(1);
+      } else if (step === 1) {
+        setStep(2);
+      } else {
+        await saveProfile({ name: name.trim(), home, interests, vegetarian: vegetarian ?? false });
+        setDone(true);
+      }
+    } catch (err) {
+      const message = err instanceof PlanError ? err.message : "Something went wrong. Please try again.";
+      const field = step === 0 && /exist/i.test(message) ? "email" : "form";
+      setErrors({ [field]: field === "email" ? "An account with this email already exists — sign in instead." : message });
+    } finally {
+      setBusy(false);
     }
-    saveProfile({ name: name.trim(), email: email.trim(), home, interests, vegetarian: vegetarian ?? false });
-    setDone(true);
   }
 
   if (done) {
@@ -98,10 +113,7 @@ export default function OnboardingPage() {
         {step === 0 && (
           <div className="step-enter">
             <h1>Let's get you started.</h1>
-            <p className="muted">
-              Create your NavigIQ account.{" "}
-              <PreviewBadge reason="Accounts are saved in this browser until sign-up is connected to the backend." />
-            </p>
+            <p className="muted">Create your NavigIQ account.</p>
             <div className="field">
               <label htmlFor="email">Email address</label>
               <input id="email" type="email" value={email} autoComplete="email" onChange={(e) => setEmail(e.target.value)} />
@@ -164,12 +176,16 @@ export default function OnboardingPage() {
           </div>
         )}
 
+        {errors["form"] && <p className="field-error">{errors["form"]}</p>}
+
         <div className="step-nav">
           {step > 0
-            ? <button type="button" className="link" onClick={() => setStep(step - 1)}><ArrowLeft size={15} /> Back</button>
+            ? <button type="button" className="link" onClick={() => setStep(step - 1)} disabled={busy}><ArrowLeft size={15} /> Back</button>
             : <a className="link" href={href("/signin")}>I already have an account</a>}
-          <button type="button" className="primary inline" onClick={next}>
-            {step === 0 ? "Create account" : step === 2 ? "Finish" : "Continue"} <ArrowRight size={17} />
+          <button type="button" className="primary inline" onClick={() => void next()} disabled={busy}>
+            {busy
+              ? <><Loader2 className="spin" size={17} /> {step === 0 ? "Creating account…" : "Saving…"}</>
+              : <>{step === 0 ? (signedIn ? "Continue" : "Create account") : step === 2 ? "Finish" : "Continue"} <ArrowRight size={17} /></>}
           </button>
         </div>
       </div>

@@ -12,11 +12,12 @@ never the source of truth for coordinates, distances, times, costs or hours.
 If the LLM is unavailable, the planner still works.
 
 ## Current Status
-- **Phase 1 — Deterministic Planner:** 15 of 16 tasks. Only NQ-026 (map UI) remains
-- **Also built:** place gazetteer (ADR-011), multi-day trips (ADR-012),
-  LLM draft contract (ADR-013)
+- **Phase 1 — deterministic planner: complete**, 16 of 16
+- **Accounts:** sign-up, sign-in, server-side profile, delete account
+- **Saved plans:** kept on the server for signed-in users
+- **Photos:** real Wikimedia photos where they exist; a map of the place where they don't
 - **Data:** 14,851 POIs and 9,163 places from OpenStreetMap
-- **Tests:** 190 backend + 30 pipeline
+- **Tests:** 230+ backend, 11 browser
 
 ## Architecture Summary
 A **modular monolith** on a single workstation. The **deterministic planner**
@@ -119,7 +120,7 @@ phrases — in Python, not in the prompt.
 
 Extraction refuses rather than repairs: output that is not valid JSON or does
 not satisfy the schema returns 422 `EXTRACTION_FAILED` with a reason, never a
-salvaged half-draft (ADR-016). `/plan` and `/plan/draft` need no model at
+salvaged half-draft (ADR-020). `/plan` and `/plan/draft` need no model at
 all, so planning keeps working when Ollama is down.
 
 The prompt is versioned at `backend/app/llm/prompts/` (v1 = NQ-029 baseline,

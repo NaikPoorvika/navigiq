@@ -40,7 +40,7 @@ from app.services.planning.validator.itinerary import (
     StopFacts, TripFacts, validate as validate_itinerary,
 )
 from app.services.planning.validators.semantic import validate_semantics
-from app.services.poi.ranking import DeterministicRanker
+from app.services.poi.ranking import DeterministicRanker, ScoredPOI
 from app.services.poi.search import search_pois
 from app.services.routing.multimodal import MultiModalRouter
 from app.services.routing.service import RoutingUnavailable
@@ -63,7 +63,40 @@ class PlanningError(Exception):
 
 class NoCandidatesError(PlanningError):
     code = "NO_CANDIDATES"
+class PinUnavailableError(PlanningError):
+    """A place the user pinned cannot be used."""
 
+    def __init__(self, poi_id: int) -> None:
+        super().__init__(
+            f"That place can't be added (POI {poi_id}): it is outside the "
+            "search area, closed at that time, or one you skipped."
+        )
+        self.poi_id = poi_id
+
+
+def _ensure_required(ranked, flat, required_ids):
+    """Keep pinned places in the candidate set.
+
+    The ranker keeps only the top N, so a place the user chose could be cut
+    before the optimizer sees it. Pinned places go to the front, replacing
+    the weakest candidates rather than growing the set - 20 is what CP-SAT
+    proves optimal at (ADR-010).
+    """
+    have = {s.poi["id"] for s in ranked}
+    missing = [i for i in required_ids if i not in have]
+    if not missing:
+        return ranked
+
+    by_id = {p["id"]: p for p in flat}
+    pinned = []
+    for poi_id in missing:
+        poi = by_id.get(poi_id)
+        if poi is None:
+            raise PinUnavailableError(poi_id)
+        pinned.append(ScoredPOI(poi=poi, score=1.0, components={"pinned": 1.0}))
+
+    keep = ranked[: max(0, len(ranked) - len(pinned))]
+    return pinned + keep
 
 class RoutingUnavailableError(PlanningError):
     code = "ROUTING_UNAVAILABLE"
@@ -176,7 +209,11 @@ async def _persist(
             visit_minutes=s.visit_minutes, cost_inr=s.cost_inr,
             mode_from_prev=s.mode_from_prev,
             travel_seconds_from_prev=s.travel_minutes_from_prev * 60,
-            notes={},
+            # A stored plan must show what the user saw, even if the POI is
+            # renamed or recategorised later.
+            notes={"name": s.name, "category": s.category,
+                   "cost_basis": s.cost_basis,
+                   "hours_verified": s.hours_verified},
         ))
 
     # Everything needed to replay this plan exactly as it was produced.
@@ -214,6 +251,62 @@ async def _hours_for_stops(
         ORDER BY poi_id, confidence DESC, (close_min - open_min) DESC
     """), {"ids": poi_ids, "dow": day_of_week})).all()
     return {r.poi_id: r for r in rows}
+
+async def _leg_geometry(routing, a, b, mode, depart_at) -> str | None:
+    """The road shape of one leg, for drawing on the map.
+
+    Never affects the plan: if OSRM can't answer, the map draws a straight
+    line and says so. Times and distances still come from the matrix.
+    """
+    try:
+        r = await routing.get_route(
+            a, b,
+            mode="walking" if mode == "walking" else "driving",
+            depart_at=depart_at, include_geometry=True,
+        )
+        return r.geometry
+    except Exception:          # noqa: BLE001 - drawing must never break a plan
+        return None
+
+
+async def _leg_geometries(routing, points, nodes, stops, depart_at) -> dict[int, str]:
+    """Road shapes for every leg, keyed by stop sequence number."""
+    out: dict[int, str] = {}
+    for st in stops:
+        if not st.mode_from_prev:
+            continue
+        prev_idx = 0 if st.seq == 1 else next(
+            (i for i, n in enumerate(nodes)
+             if n.poi_id == stops[st.seq - 2].poi_id), 0)
+        this_idx = next((i for i, n in enumerate(nodes)
+                         if n.poi_id == st.poi_id), 0)
+        geometry = await _leg_geometry(routing, points[prev_idx], points[this_idx],
+                                       st.mode_from_prev, depart_at)
+        if geometry:
+            out[st.seq] = geometry
+    return out
+
+def _unique_candidates(pois_by_cat: dict) -> list[dict]:
+    """One entry per POI, whichever categories it matched.
+
+    Searches run per category, so a place matching two requested categories -
+    St Mary's Basilica is both a temple and a historical site - appeared
+    twice. The optimizer treated the copies as different places and could
+    schedule both, which the validator rejected as EXCLUSION_VIOLATED.
+
+    The copy kept is from the category with the FEWEST candidates, so an
+    abundant category doesn't claim a POI that a thin one depends on.
+    """
+    seen: set[int] = set()
+    out: list[dict] = []
+    for _category, rows in sorted(pois_by_cat.items(), key=lambda kv: len(kv[1])):
+        for row in rows:
+            d = row.to_dict()
+            if d["id"] in seen:
+                continue
+            seen.add(d["id"])
+            out.append(d)
+    return out
 
 async def _refetch_leg_seconds(routing, a, b, mode, depart_at) -> float | None:
     """Re-derive one chosen leg with an independent /route call, so the
@@ -321,7 +414,7 @@ async def plan(
 
     # --- 5. rank ------------------------------------------------------------
     t0 = time.perf_counter()
-    flat = [r.to_dict() for rows in pois_by_cat.values() for r in rows]
+    flat = _unique_candidates(pois_by_cat)
     if not flat:
         raise NoCandidatesError("no POIs found for any requested category")
 
@@ -332,6 +425,9 @@ async def plan(
         arrival_min_of_day=spec.start_minute,
     )
     t["rank"] = int((time.perf_counter() - t0) * 1000)
+    required_ids = list(dict.fromkeys(spec.constraints.require_poi_ids))
+    if required_ids:
+        ranked = _ensure_required(ranked, flat, required_ids)
 
     # --- 6. multi-modal arcs -----------------------------------------------
     t0 = time.perf_counter()
@@ -363,6 +459,7 @@ async def plan(
     defaults = await _category_defaults(db)
     nodes = [OptimizerNode(None, "Origin", "origin", 0.0, 0, 0,
                            spec.start_minute, spec.end_minute)]
+    required_set = set(spec.constraints.require_poi_ids)
     for s in ranked:
         p = s.poi
         cost, cost_basis = estimate_poi_cost(
@@ -389,7 +486,8 @@ async def plan(
             hours_confidence=p.get("hours_confidence") or 0.0,
             is_meal=p["category"] in ("restaurant", "cafe",
                                       "street_food", "dessert"),
-            lat=p["lat"], lon=p["lon"], cost_basis=cost_basis,
+            lat=p["lat"], lon=p["lon"], 
+            required=p["id"] in required_set,cost_basis=cost_basis,
         ))
     requirements = [
         InterestRequirement(i.category.value, i.count,
@@ -480,10 +578,17 @@ async def plan(
 
     result.ok = True
     result.itinerary = opt.to_dict()
+
+    t0 = time.perf_counter()
+    geometries = await _leg_geometries(router.routing, points, nodes,
+                                       opt.stops, depart_at)
+    t["geometry"] = int((time.perf_counter() - t0) * 1000)
+
     for stop in result.itinerary["stops"]:
         p = by_id.get(stop["poi_id"], {})
         for key in ("image_url", "image_credit", "image_license", "image_source_url"):
             stop[key] = p.get(key)
+        stop["geometry"] = geometries.get(stop["seq"])
     result.itinerary["origin"] = {"name": spec.origin.name,
                                   "lat": spec.origin.lat,
                                   "lon": spec.origin.lon}

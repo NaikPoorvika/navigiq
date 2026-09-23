@@ -19,7 +19,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.schemas.trip_draft import TripDraft
 from app.services.planning.draft_builder import build_tripspec
 from app.services.planning.orchestrator import plan_trip
-from app.api.deps import get_db, get_llm_gateway
+from app.api.deps import get_db, get_llm_gateway, get_optional_user
+from app.models.user import User
 from app.llm import LLMError, LLMGateway, LLMTimeout, LLMUnavailable
 from app.llm.extraction import (
     MAX_USER_REQUEST_CHARS,
@@ -30,6 +31,7 @@ from app.schemas.tripspec import TripSpec
 from app.services.planning.feasibility.engine import FeasibilityEngine
 from app.services.planning.orchestrator import (
     NoCandidatesError,
+    PinUnavailableError,
     PlanningError,
     RoutingUnavailableError,
     plan as run_plan,
@@ -51,6 +53,7 @@ def _error(code: str, message: str, http_status: int, **details):
 async def create_plan(
     spec: TripSpec,
     db: AsyncSession = Depends(get_db),
+    user: User | None = Depends(get_optional_user),
 ) -> dict:
     """Plan a trip. Returns an itinerary, or an explanation of why not.
 
@@ -64,7 +67,10 @@ async def create_plan(
                             is persisted
     """
     try:
-        result = await run_plan(db, spec, persist=True)
+        result = await run_plan(db, spec, persist=True,
+                                user_id=user.id if user else None)
+    except PinUnavailableError as exc:
+        raise _error("PIN_UNAVAILABLE", str(exc), status.HTTP_409_CONFLICT)
     except NoCandidatesError as exc:
         raise _error("NO_CANDIDATES", str(exc), status.HTTP_404_NOT_FOUND)
     except RoutingUnavailableError as exc:
@@ -122,6 +128,7 @@ async def create_plan(
 async def preview_feasibility(
     spec: TripSpec,
     db: AsyncSession = Depends(get_db),
+    user: User | None = Depends(get_optional_user),
 ) -> dict:
     """Cheap check with no optimization. Milliseconds rather than seconds -
     for a form that wants to warn before the user submits."""
@@ -150,10 +157,12 @@ async def preview_feasibility(
 async def create_trip(
     spec: TripSpec,
     db: AsyncSession = Depends(get_db),
+    user: User | None = Depends(get_optional_user),
 ) -> dict:
     """Multi-day. Each day planned independently, no POI repeated.
     Takes ~15 s PER DAY."""
-    result = await plan_trip(db, spec, persist=True)
+    result = await plan_trip(db, spec, persist=True,
+                             user_id=user.id if user else None)
     return {**result, "attribution": "(c) OpenStreetMap contributors, ODbL"}
 
 
@@ -161,6 +170,7 @@ async def create_trip(
 async def plan_from_draft(
     draft: TripDraft,
     db: AsyncSession = Depends(get_db),
+    user: User | None = Depends(get_optional_user),
 ) -> dict:
     """For NQ-029. The LLM's TripDraft goes in; either clarifying questions
     or a planned trip come out.
@@ -178,7 +188,8 @@ async def plan_from_draft(
     if built.needs_clarification:
         return built.to_dict()
 
-    result = await plan_trip(db, built.tripspec, persist=True)
+    result = await plan_trip(db, built.tripspec, persist=True,
+                             user_id=user.id if user else None)
     return {
         "needs_clarification": False,
         **result,

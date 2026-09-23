@@ -36,6 +36,16 @@ Legend:
 - [ ] NQ-024 — Independent itinerary validator
 - [ ] NQ-025 — Planning orchestrator + `POST /plan` + weather client
 - [ ] NQ-026 — Plan form + Leaflet map + timeline + cost breakdown
+## Built beyond the task list
+- Place gazetteer (ADR-011), multi-day trips (ADR-012), LLM draft contract (ADR-013)
+- Cost presented as category estimates (ADR-014)
+- Fame in ranking from Wikidata (ADR-015)
+- Real accounts, server-side profile, delete account (ADR-016)
+- Saved plans on the server: GET/DELETE /itineraries
+- Swap and Remove a place (ADR-017)
+- Real photos from Wikimedia Commons; map snippets where there is none
+- Road-following routes on the map
+- 11 Playwright end-to-end tests
 
 ## Phase 2 — LLM + RAG
 - [x] NQ-027 — Model install + benchmark on the A5000 + selection decision
@@ -80,7 +90,7 @@ Legend:
         paths - no existing consumer found anywhere in the repo
   - [x] Clarification cap (`MAX_CLARIFICATIONS=2`) and coordinate safety
         (`extra="ignore"`) covered by regression tests
-  - [x] ADR-015 recorded
+  - [x] ADR-019 recorded
 - [x] NQ-029 — natural language -> TripDraft extraction
   - [x] `backend/app/llm/extraction.py` — the only place free text becomes
         structured fields; consumes the NQ-028 `LLMGateway`, no second
@@ -91,7 +101,7 @@ Legend:
   - [x] Schema-constrained decoding via `TripDraft.model_json_schema()`
   - [x] Refuses rather than repairs — typed `TripDraftExtractionFailed`
         (`invalid_json` / `not_an_object` / `schema_invalid`); no fence
-        stripping, no field dropping, no fabricated defaults (ADR-016)
+        stripping, no field dropping, no fabricated defaults (ADR-020)
   - [x] `POST /api/v1/plan/extract` — extraction only. `/plan/draft` and
         `/plan` are unchanged and still need no model (ADR-002)
   - [x] Gateway injected by FastAPI DI (`get_llm_gateway`, lifespan-owned,
@@ -101,7 +111,7 @@ Legend:
         100%, critical-field accuracy 92.6%, coordinate leakage 0%,
         malformed-time 0%, **hallucination 26.9%**, **unsupported date
         phrase 18.2%** - the last two are recorded, not smoothed over
-  - [x] ADR-016 recorded
+  - [x] ADR-020 recorded
 - [x] NQ-030 — Extraction prompt v2 (restraint) + held-out evaluation
   - [x] `tripdraft_extraction_v2.md` is the default; v1 kept byte-identical
         (sha256-pinned) and still selectable. The NQ-029 runner is pinned to v1
@@ -120,8 +130,8 @@ Legend:
   - [x] FINDING: qwen3:14b on Ollama is not bit-reproducible across sessions
         at temperature 0 / fixed seed (NQ-029 re-run: 2/26 responses changed)
   - [ ] DECISION NEEDED: how to stop grammar coercion (see
-        `ai/evals/nq030/README.md` §7). Would need an ADR; ADR-017 is
-        reserved by the execution plan for the architecture-lint contract
+        `ai/evals/nq030/README.md` §7). Would need an ADR, at the next
+        free number after ADR-020
 - [ ] NQ-031 — Clarification flow
 - [ ] NQ-032 — Grounded explanation + numeric entailment
 - [ ] NQ-033 — NL input UI with editable chips

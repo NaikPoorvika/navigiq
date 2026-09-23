@@ -19,7 +19,7 @@ type Phase =
   | { kind: "error"; error: PlanError; spec: TripSpec };
 
 export default function PlanPage() {
-  const { profile } = useAccount();
+  const { profile, signedIn } = useAccount();
   // Read once: a request handed over from Home, a plan idea, or Plan with AI.
   const [pending] = useState(() => takePendingPlan());
   const [formSpec, setFormSpec] = useState<Partial<TripSpec> | null>(
@@ -38,7 +38,9 @@ export default function PlanPage() {
     }
     try {
       const data = await createPlan(spec);
-      savePlan(spec, data);
+      // Signed in, the backend already saved it to the account - keeping a
+      // browser copy too would show the same trip twice.
+      if (!signedIn) savePlan(spec, data);
       setPhase({ kind: "result", data, spec });
     } catch (e) {
       const error = e instanceof PlanError ? e : new PlanError({ code: "UNKNOWN", message: String(e) });
@@ -78,7 +80,10 @@ export default function PlanPage() {
             </div>
           )}
           {phase.kind === "loading" && <PlanProgress />}
-          {phase.kind === "result" && <ResultView data={phase.data} spec={phase.spec} />}
+          {phase.kind === "result" && (
+            <ResultView data={phase.data} spec={phase.spec}
+                        onChangeSpec={(s) => void plan(s, true)} />
+          )}
           {phase.kind === "error" && phase.error.code === "INFEASIBLE" && (
             <FeasibilityBanner
               error={phase.error}

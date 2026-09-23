@@ -50,6 +50,8 @@ class POISummary:
     image_credit: str | None = None
     image_license: str | None = None
     image_source_url: str | None = None
+    wikidata_sitelinks: int | None = None
+    
 
     def to_dict(self) -> dict:
         return {
@@ -84,6 +86,7 @@ class POISummary:
             "image_credit": self.image_credit,
             "image_license": self.image_license,
             "image_source_url": self.image_source_url,
+                        "wikidata_sitelinks": self.wikidata_sitelinks,
         }
 
 
@@ -134,7 +137,8 @@ SELECT
         ELSE (:minute)::int >= h.open_min AND (:minute)::int < h.close_min
     END AS open_at_requested,
     p.curated,
-    p.image_url, p.image_credit, p.image_license, p.image_source_url
+    p.image_url, p.image_credit, p.image_license, p.image_source_url,
+    p.wikidata_sitelinks
 FROM pois p
 CROSS JOIN origin
 JOIN poi_categories c ON c.id = p.primary_category
@@ -221,6 +225,7 @@ async def search_pois(
             curated=r.curated,
             image_url=r.image_url, image_credit=r.image_credit,
             image_license=r.image_license, image_source_url=r.image_source_url,
+                        wikidata_sitelinks=r.wikidata_sitelinks,
         )
         for r in result
     ]
