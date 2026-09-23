@@ -116,6 +116,12 @@ export default function DiscoverPage({ initialQuery }: { initialQuery: string })
     const originQuestion = (built?.clarifications ?? [])
       .find((c) => c.field === "origin")?.question;
     const name = draft.origin?.name ?? profile?.home?.name ?? null;
+    // "near me", "from here" - a real request, but not a place the gazetteer
+    // can find. Point at the button that can answer it.
+    if (name && /^(me|here|my location|current location|nearby|around me)$/i.test(name.trim())) {
+      setOriginAsked("Press “Use my location” below, or type where you'll be starting from.");
+      return;
+    }
     if (originQuestion) {
       setOriginAsked(originQuestion);
       return;
