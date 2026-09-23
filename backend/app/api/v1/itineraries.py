@@ -13,7 +13,9 @@ from __future__ import annotations
 from fastapi import APIRouter, Depends, HTTPException, Response, status
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
-
+from app.api.deps import get_llm_gateway
+from app.services.explain.explain import explain_plan
+from app.services.explain.facts import build_facts
 from app.api.deps import get_current_active_user, get_db
 from app.models.user import User
 
@@ -157,3 +159,19 @@ async def delete_itinerary(
         {"tid": row[0]})
     await db.commit()
     return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+@router.get("/{itinerary_id}/explain")
+async def explain_itinerary(
+    itinerary_id: int,
+    db: AsyncSession = Depends(get_db),
+    user: User = Depends(get_current_active_user),
+    gateway=Depends(get_llm_gateway),
+) -> dict:
+    """Explain a saved plan, using only facts the validator accepted.
+
+    Built on the server from stored data: a client cannot hand in facts of
+    its own for the model to repeat back.
+    """
+    plan = await get_itinerary(itinerary_id, db, user)
+    facts = build_facts(plan, plan["spec"])
+    return await explain_plan(gateway, facts)

@@ -200,14 +200,14 @@ async def build_tripspec(
     result.resolved = {
         "origin": origin,
         "destination": destination,
-        "date": trip_date.isoformat(),
+        "date": trip_date.isoformat() if trip_date else None,
         "start_time_local": start,
         "end_time_local": end,
         "party_size": draft.party_size or 1,
         "budget_inr": draft.budget_inr,
         "vegetarian": bool(draft.vegetarian),
     }
-    
+
     if result.clarifications:
         return result
 

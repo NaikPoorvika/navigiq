@@ -19,7 +19,7 @@ os.environ.setdefault(
     "postgresql+asyncpg://navigiq:navigiq_local_dev@localhost:5433/navigiq",
 )
 
-from app.config import Settings  # noqa: E402
+from app.config import Settings, settings# noqa: E402
 from app.llm import OllamaGateway, build_llm_gateway  # noqa: E402
 
 ENV_EXAMPLE = Path(__file__).resolve().parents[2] / ".env.example"
@@ -46,12 +46,14 @@ def make_settings(**overrides) -> Settings:
 def test_defaults_are_the_adr_012_values(clean_env):
     settings = make_settings()
     assert settings.OLLAMA_HOST == "http://localhost:11434"
-    assert settings.OLLAMA_GEN_MODEL == "qwen3:14b"
-    assert settings.OLLAMA_EMBED_MODEL == "nomic-embed-text"
-    assert settings.OLLAMA_EMBED_DIM == 768
-    assert settings.OLLAMA_NUM_CTX == 8192
-    assert settings.OLLAMA_KEEP_ALIVE == "10m"
-    assert settings.OLLAMA_TIMEOUT_S == 60.0
+    # The default in config.py, not whatever this machine's .env sets:
+    # laptops run a smaller model locally (ADR-019).
+    assert Settings.model_fields["OLLAMA_GEN_MODEL"].default == "qwen3:14b"
+    assert Settings.model_fields["OLLAMA_EMBED_MODEL"].default == "nomic-embed-text"
+    assert Settings.model_fields["OLLAMA_EMBED_DIM"].default == 768
+    assert Settings.model_fields["OLLAMA_NUM_CTX"].default == 8192
+    assert Settings.model_fields["OLLAMA_KEEP_ALIVE"].default == "10m"
+    assert Settings.model_fields["OLLAMA_TIMEOUT_S"].default == 60.0
     assert settings.OLLAMA_MAX_RETRIES == 2
 
 
@@ -126,8 +128,10 @@ async def test_factory_builds_gateway_from_settings(clean_env):
 async def test_factory_defaults_to_application_settings(clean_env):
     gateway = build_llm_gateway()
     try:
-        assert gateway.generation_model == "qwen3:14b"
-        assert gateway.embedding_model == "nomic-embed-text"
-        assert gateway.embedding_dimension == 768
+        # The settings, not a hardcoded name: a laptop may override the
+        # model locally (ADR-019), and the default itself is checked above.
+        assert gateway.generation_model == settings.OLLAMA_GEN_MODEL
+        assert gateway.embedding_model == settings.OLLAMA_EMBED_MODEL
+        assert gateway.embedding_dimension == settings.OLLAMA_EMBED_DIM
     finally:
         await gateway.aclose()

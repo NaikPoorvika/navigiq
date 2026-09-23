@@ -13,6 +13,14 @@ it is not reachable, the same convention test_routing.py uses for OSRM.
 from __future__ import annotations
 
 import os
+
+from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
+from sqlalchemy.pool import NullPool
+
+from app.api import deps
+
+DB_URL = os.environ.get(
+    "DATABASE_URL", "postgresql+asyncpg://navigiq:navigiq_local_dev@localhost:5433/navigiq")
 import sys
 from pathlib import Path
 
@@ -57,11 +65,30 @@ def _places_gazetteer_up() -> bool:
 
 @pytest_asyncio.fixture
 async def async_client():
-    transport = httpx.ASGITransport(app=app)
-    async with httpx.AsyncClient(transport=transport,
-                                 base_url="http://test") as client:
-        yield client
+    """A client whose database work stays inside this test's event loop.
 
+    Without the override the request uses the application's shared engine,
+    whose pooled asyncpg connections belong to whatever loop created them -
+    and a pooled connection touched from a later test's loop fails with
+    "Event loop is closed". NullPool means a connection is never reused
+    across tests.
+    """
+    engine = create_async_engine(DB_URL, poolclass=NullPool)
+    sessions = async_sessionmaker(engine, expire_on_commit=False)
+
+    async def get_test_db():
+        async with sessions() as session:
+            yield session
+
+    app.dependency_overrides[deps.get_db] = get_test_db
+    transport = httpx.ASGITransport(app=app)
+    try:
+        async with httpx.AsyncClient(transport=transport,
+                                     base_url="http://test") as client:
+            yield client
+    finally:
+        app.dependency_overrides.clear()
+        await engine.dispose()
 
 pytestmark = pytest.mark.asyncio
 
@@ -85,8 +112,11 @@ async def test_clarification_response_shape_matches_the_documented_contract(
         "/api/v1/plan/draft", json={"date_phrase": "not a real phrase"})
     body = response.json()
     assert body["needs_clarification"] is True
+    # "resolved" carries what was worked out before a question stopped the
+    # build - date, times, party size - so the UI doesn't re-resolve them
+    # and drift from the server's answer.
     assert set(body.keys()) == {
-        "needs_clarification", "clarifications", "assumptions", "tripspec"}
+        "needs_clarification", "clarifications", "assumptions", "tripspec", "resolved"}
     for clarification in body["clarifications"]:
         assert set(clarification.keys()) == {"field", "question", "options"}
 
