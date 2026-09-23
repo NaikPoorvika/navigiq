@@ -239,3 +239,18 @@ itinerary (ADR-002).
 re-optimised. Saved plans cannot be edited — they are records. Choosing a
 specific replacement needs the optimizer to accept a pinned place, which is
 a separate decision.
+
+## ADR-018: Pinned places
+**Status:** Accepted
+**Date:** 2026-09-22
+
+**Decision:** `constraints.require_poi_ids` (max 5) forces the optimizer to
+visit those places. A pinned place cut by the ranker's candidate limit is
+put back at the front of the candidate set, replacing the weakest — the
+limit of 20 stays (ADR-010). If a pinned place cannot fit, the plan fails
+with PIN_UNAVAILABLE.
+
+**Consequences:** A chosen place is either in the plan or the user is told
+why not — it is never quietly dropped. Pinning reduces what the optimizer
+can trade away, so heavily pinned days become infeasible sooner, which the
+cap of 5 limits.

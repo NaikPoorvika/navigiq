@@ -131,6 +131,7 @@ export type ErrorCode =
   | "NO_CANDIDATES"
   | "ROUTING_UNAVAILABLE"
   | "VALIDATION_FAILED"
+  | "PIN_UNAVAILABLE"
   | "NETWORK"
   | "AUTH"
   | "UNKNOWN";
