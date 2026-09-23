@@ -132,6 +132,10 @@ export type ErrorCode =
   | "ROUTING_UNAVAILABLE"
   | "VALIDATION_FAILED"
   | "PIN_UNAVAILABLE"
+  | "EXTRACTION_FAILED"
+  | "LLM_UNAVAILABLE"
+  | "LLM_TIMEOUT"
+  | "LLM_ERROR"
   | "NETWORK"
   | "AUTH"
   | "UNKNOWN";
@@ -217,6 +221,49 @@ export interface SavedPlanSummary {
 export interface SavedPlan extends PlanResponse {
   spec: TripSpec;
   created_at: string;
+}
+
+/** What the model proposes: names and phrases only, never coordinates. */
+export interface TripDraft {
+  origin?: { name: string } | null;
+  destination?: { name: string } | null;
+  date_phrase?: string | null;
+  start_time_local?: string | null;
+  end_time_local?: string | null;
+  days?: number | null;
+  budget_inr?: number | null;
+  party_size?: number | null;
+  interests: { category: string; count: number; priority: Priority }[];
+  free_text_interests?: string[];
+  transport?: TransportMode[];
+  max_walking_km?: number | null;
+  vegetarian?: boolean | null;
+  mode?: PlanningMode | null;
+}
+
+/** POST /plan/draft?dry_run=true - the draft resolved, but not planned. */
+export interface BuiltDraft {
+  needs_clarification: boolean;
+  clarifications: { field: string; question: string; options?: unknown[] }[];
+  assumptions: string[];
+  tripspec: TripSpec | null;
+  /** What was resolved before a question stopped the build - dates, times,
+   *  party size - so an incomplete draft still shows the right values. */
+  resolved?: {
+    origin?: Place | null;
+    date?: string;
+    start_time_local?: string;
+    end_time_local?: string;
+    party_size?: number;
+    budget_inr?: number | null;
+    vegetarian?: boolean;
+  };
+}
+export interface Extraction {
+  draft: TripDraft;
+  model: string;
+  prompt_version: string;
+  latency_ms: number;
 }
 
 export interface PlaceMatch {

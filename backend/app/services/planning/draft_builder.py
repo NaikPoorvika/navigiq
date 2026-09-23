@@ -51,6 +51,11 @@ class BuildResult:
     tripspec: TripSpec | None
     clarifications: list[Clarification] = field(default_factory=list)
     assumptions: list[str] = field(default_factory=list)
+        # What was resolved before any question stopped the build: dates,
+    # times, party size. A UI showing the draft for correction needs these
+    # even when the draft is incomplete, or it has to re-resolve them
+    # itself and the two answers drift apart.
+    resolved: dict = field(default_factory=dict)
 
     @property
     def needs_clarification(self) -> bool:
@@ -62,6 +67,7 @@ class BuildResult:
             "clarifications": [c.to_dict()
                                for c in self.clarifications[:MAX_CLARIFICATIONS]],
             "assumptions": self.assumptions,
+            "resolved": self.resolved,
             "tripspec": (self.tripspec.model_dump(mode="json")
                          if self.tripspec else None),
         }
@@ -191,6 +197,17 @@ async def build_tripspec(
         end = _min_to_hhmm(end_min)
         result.assumptions.append(f"Ending by {end}.")
 
+    result.resolved = {
+        "origin": origin,
+        "destination": destination,
+        "date": trip_date.isoformat(),
+        "start_time_local": start,
+        "end_time_local": end,
+        "party_size": draft.party_size or 1,
+        "budget_inr": draft.budget_inr,
+        "vegetarian": bool(draft.vegetarian),
+    }
+    
     if result.clarifications:
         return result
 

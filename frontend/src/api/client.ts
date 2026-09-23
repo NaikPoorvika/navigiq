@@ -1,6 +1,7 @@
 import type {
   ApiError, Category, FieldIssue, PlanResponse, PoiDetail, PoiSummary,
-  ProfilePatch, ResolveResult, SavedPlan, SavedPlanSummary, TripSpec, UserMe,
+  BuiltDraft, Extraction, ProfilePatch, ResolveResult, SavedPlan, SavedPlanSummary,
+  TripDraft, TripSpec, UserMe,
 } from "../types";
 
 // Relative: Vite proxies /api to the backend (see vite.config.ts).
@@ -184,4 +185,32 @@ export function getItinerary(id: number): Promise<SavedPlan> {
 
 export function deleteItinerary(id: number): Promise<void> {
   return request(`/itineraries/${id}`, { method: "DELETE" });
+}
+
+/**
+ * NQ-029: a sentence becomes a TripDraft - names and phrases, no
+ * coordinates. The draft is a PROPOSAL to show and correct, never a plan.
+ * Runs a local model, so it takes seconds, not milliseconds.
+ */
+export function extractDraft(text: string): Promise<Extraction> {
+  return request("/plan/extract", { method: "POST", body: JSON.stringify({ text }) });
+}
+
+/**
+ * Resolve a draft WITHOUT planning it: "tonight" becomes a date and a time
+ * window, defaults are applied, and anything ambiguous comes back as a
+ * question. The UI shows the result for correction, so it never has to
+ * re-implement date or place resolution.
+ */
+export function buildDraft(draft: TripDraft): Promise<BuiltDraft> {
+  return request("/plan/draft?dry_run=true",
+                 { method: "POST", body: JSON.stringify(draft) });
+}
+
+/** The nearest named place to a point - for "use my location". */
+export function nearestPlace(lat: number, lon: number): Promise<{
+  in_region: boolean;
+  place: { name: string; kind: string; distance_m: number } | null;
+}> {
+  return request(`/places/nearest?lat=${lat}&lon=${lon}`);
 }

@@ -93,11 +93,13 @@ test("deleting the account needs the password, and then it's gone", async ({ pag
   await page.locator("#del-pw").fill("wrongpass1");
   await page.getByRole("button", { name: /delete permanently/i }).click();
   await expect(page.getByRole("alert")).toContainText("isn't right");
-
   // Right password: deleted and signed out.
   await page.locator("#del-pw").fill(password);
   await page.getByRole("button", { name: /delete permanently/i }).click();
-  await expect(page.getByRole("link", { name: /sign in/i })).toBeVisible();
+  // The account is gone when the header stops showing it. "Sign in" appears
+  // in more than one place on the home page, so check the avatar instead.
+  await expect(page.locator(".avatar-link")).toHaveCount(0);
+  await expect(page.locator(".account")).toContainText("Sign in");
 
   // The account really is gone.
   await page.goto("/#/signin");

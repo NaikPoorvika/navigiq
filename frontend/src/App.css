@@ -731,3 +731,18 @@ main { min-height: calc(100vh - 140px); }
 .swap-option span { display: flex; flex-direction: column; gap: 2px; font-size: 14px; }
 .swap-option .muted { font-size: 12.5px; }
 .swap-note { font-size: 12px; color: var(--muted-foreground); margin: 8px 2px 0; }
+
+.map-links { display: flex; flex-wrap: wrap; gap: 16px; }
+.map-links .link { margin-top: 0; }
+
+
+/* ---------- use my location ---------- */
+.locate {
+  display: inline-flex; align-items: center; gap: 6px; align-self: flex-start;
+  height: 30px; padding: 0 12px; border-radius: 999px;
+  border: 1px solid var(--border); background: var(--surface);
+  font-size: 13px; font-weight: 600; color: var(--muted-foreground); cursor: pointer;
+}
+.locate:hover:not(:disabled) { background: var(--secondary); color: var(--foreground); }
+.locate:disabled { opacity: 0.7; cursor: default; }
+.locate:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }

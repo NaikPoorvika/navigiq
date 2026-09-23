@@ -15,7 +15,8 @@ from __future__ import annotations
 
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
-
+from sqlalchemy import text
+from app.core.region import in_region
 from app.api.deps import get_db
 from app.services.places.resolver import resolve_place
 
@@ -33,3 +34,29 @@ async def resolve(
         **result.to_dict(),
         "attribution": "(c) OpenStreetMap contributors, ODbL",
     }
+
+@router.get("/nearest")
+async def nearest_place(
+    lat: float,
+    lon: float,
+    db: AsyncSession = Depends(get_db),
+) -> dict:
+    """The gazetteer place closest to a point - for "use my location".
+
+    Returns a NAME only. The caller keeps its own coordinates: the nearest
+    named place is for showing the user where they are, not for moving them
+    to the middle of a neighbourhood.
+    """
+    if not in_region(lat, lon):
+        return {"in_region": False, "place": None}
+
+    row = (await db.execute(text("""
+        SELECT name, kind,
+               ST_Distance(geom, ST_SetSRID(ST_MakePoint(:lon, :lat), 4326)::geography) AS distance_m
+        FROM places
+        WHERE ST_DWithin(geom, ST_SetSRID(ST_MakePoint(:lon, :lat), 4326)::geography, 5000)
+        ORDER BY geom <-> ST_SetSRID(ST_MakePoint(:lon, :lat), 4326)::geography
+        LIMIT 1
+    """), {"lat": lat, "lon": lon})).mappings().first()
+
+    return {"in_region": True, "place": dict(row) if row else None}

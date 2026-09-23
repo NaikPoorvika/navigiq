@@ -2,6 +2,7 @@ import {
   Cloud, CloudRain, Clock, Footprints, Info, Navigation, RotateCcw, Sun, Wallet,
   type LucideIcon,
 } from "lucide-react";
+import { categoryLabel } from "../lib/categories";
 import { googleMapsUrl } from "../lib/maps";
 import { formatDate } from "../lib/time";
 import { distanceLabel, durationLabel, hhmm, type PlanResponse, type TripSpec } from "../types";
@@ -84,6 +85,13 @@ export default function ResultView({ data, spec, onChangeSpec }: Props) {
   // Removing the last thing asked for would leave nothing to plan.
   const canRemove = spec.interests.reduce((n, i) => n + i.count, 0) > 1;
   const weather = weatherBadge(data.weather);
+
+  // Something asked for that no stop covers. A "must" is reported by the
+  // planner; anything softer would otherwise just vanish from the day with
+  // no explanation.
+  const planned = new Set(it.stops.map((s) => s.category));
+  const missing = spec.interests.filter((i) => !planned.has(i.category));
+
   const notices = [
     ...data.relaxations_applied.map((r) => `Adjusted automatically: ${r}`),
     ...it.unsatisfied_must.map((u) => `Couldn't fully fit a must: ${u.replace(/_/g, " ")}`),
@@ -114,7 +122,18 @@ export default function ResultView({ data, spec, onChangeSpec }: Props) {
           <span className="stat"><weather.icon size={14} aria-hidden="true" />{weather.text}</span>
         )}
       </div>
-
+      {missing.length > 0 && (
+        <ul className="notices">
+          {missing.map((i) => (
+            <li key={i.category}>
+              <Info size={14} aria-hidden="true" />
+              No {categoryLabel(i.category).toLowerCase()} fitted this trip
+              {i.priority === "must" ? " — it was a must, so try a longer window" : ""}
+              . There may not be time, or nothing suitable is open nearby.
+            </li>
+          ))}
+        </ul>
+      )}
       {notices.length > 0 && (
         <ul className="notices">
           {notices.map((n) => (

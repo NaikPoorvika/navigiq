@@ -8,9 +8,12 @@ import PlanProgress from "../components/PlanProgress";
 import ResultView from "../components/ResultView";
 import { specFromProfile } from "../lib/defaults";
 import { useAccount } from "../store/account";
-import { takePendingPlan } from "../store/pending";
+import { peekPendingPlan } from "../store/pending";
 import { savePlan } from "../store/plans";
 import type { PlanResponse, TripSpec } from "../types";
+/** The last request planned automatically - module level, so a remount in
+ *  development doesn't plan the same request twice. */
+let lastPlannedToken: string | null = null;
 
 type Phase =
   | { kind: "empty" }
@@ -21,7 +24,7 @@ type Phase =
 export default function PlanPage() {
   const { profile, signedIn } = useAccount();
   // Read once: a request handed over from Home, a plan idea, or Plan with AI.
-  const [pending] = useState(() => takePendingPlan());
+  const [pending] = useState(peekPendingPlan);
   const [formSpec, setFormSpec] = useState<Partial<TripSpec> | null>(
     () => pending?.spec ?? specFromProfile(profile),
   );
@@ -49,8 +52,12 @@ export default function PlanPage() {
   }
 
   useEffect(() => {
-    const s = pending?.spec;
-    if (pending?.autoPlan && s?.origin && s.interests?.length) void plan(s as TripSpec);
+    const p = peekPendingPlan();
+    if (!p || p.token === lastPlannedToken) return;   // already handled
+    lastPlannedToken = p.token;
+    if (p.autoPlan && p.spec.origin && p.spec.interests?.length) {
+      void plan(p.spec as TripSpec);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

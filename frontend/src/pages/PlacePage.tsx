@@ -113,9 +113,14 @@ export default function PlacePage({ id }: { id: number }) {
         <section className="card">
           <h2 className="card-title">Location</h2>
           <PlaceMap lat={poi.lat} lon={poi.lon} />
-          <a className="link" href={osmUrl} target="_blank" rel="noreferrer">
-            View on OpenStreetMap <ExternalLink size={13} aria-hidden="true" />
-          </a>
+          <div className="map-links">
+            <a className="link" href={googleSearchUrl(poi.name)} target="_blank" rel="noreferrer">
+              Open in Google Maps <ExternalLink size={13} aria-hidden="true" />
+            </a>
+            <a className="link" href={osmUrl} target="_blank" rel="noreferrer">
+              View on OpenStreetMap <ExternalLink size={13} aria-hidden="true" />
+            </a>
+          </div>
         </section>
       </div>
 

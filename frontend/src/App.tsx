@@ -26,7 +26,9 @@ export default function App() {
       page = <HomePage />;
       break;
     case "plan":
-      page = <PlanPage />;
+      // Keyed by the query string: arriving from Plan with AI with a new
+      // request remounts the page instead of showing the previous state.
+      page = <PlanPage key={query.get("from") ?? "direct"} />;
       break;
     case "discover":
       page = <DiscoverPage key={query.get("q") ?? ""} initialQuery={query.get("q") ?? ""} />;

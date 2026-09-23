@@ -169,6 +169,7 @@ async def create_trip(
 @router.post("/draft")
 async def plan_from_draft(
     draft: TripDraft,
+    dry_run: bool = False,
     db: AsyncSession = Depends(get_db),
     user: User | None = Depends(get_optional_user),
 ) -> dict:
@@ -185,7 +186,10 @@ async def plan_from_draft(
     added, so this is additive rather than a breaking change.
     """
     built = await build_tripspec(db, draft)
-    if built.needs_clarification:
+    # dry_run: resolve the draft - date phrase, times, defaults, questions -
+    # and stop. The UI shows the result for correction before planning, so
+    # it does not have to re-implement any of that resolution itself.
+    if dry_run or built.needs_clarification:
         return built.to_dict()
 
     result = await plan_trip(db, built.tripspec, persist=True,
