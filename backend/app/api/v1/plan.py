@@ -22,6 +22,7 @@ from app.schemas.tripspec import TripSpec
 from app.services.planning.feasibility.engine import FeasibilityEngine
 from app.services.planning.orchestrator import (
     NoCandidatesError,
+    PinUnavailableError,
     PlanningError,
     RoutingUnavailableError,
     plan as run_plan,
@@ -59,6 +60,8 @@ async def create_plan(
     try:
         result = await run_plan(db, spec, persist=True,
                                 user_id=user.id if user else None)
+    except PinUnavailableError as exc:
+        raise _error("PIN_UNAVAILABLE", str(exc), status.HTTP_409_CONFLICT)
     except NoCandidatesError as exc:
         raise _error("NO_CANDIDATES", str(exc), status.HTTP_404_NOT_FOUND)
     except RoutingUnavailableError as exc:

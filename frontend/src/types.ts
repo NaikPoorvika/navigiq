@@ -43,6 +43,8 @@ export interface TripSpec {
     vegetarian?: boolean;
     /** Places the planner must not use - how "not this one" works. */
     avoid_poi_ids?: number[];
+    /** Places the user chose: the plan must include them. */
+    require_poi_ids?: number[];
   };
   mode: PlanningMode;
   days?: number;

@@ -1,13 +1,14 @@
-import { Fragment } from "react";
+import { Fragment, useEffect, useState } from "react";
 import {
   AlertCircle, Bike, Car, CarFront, CarTaxiFront, Clock, ExternalLink, Flag,
-  Footprints, MapPin, Repeat, X, type LucideIcon,
+  Footprints, MapPin, Repeat, Sparkles, X, type LucideIcon,
 } from "lucide-react";
+import { searchPois } from "../api/client";
 import { categoryIcon, categoryLabel } from "../lib/categories";
 import { googleSearchUrl } from "../lib/maps";
 import { href } from "../lib/router";
 import PlacePhoto from "./PlacePhoto";
-import { costLabel, hhmm, type Itinerary } from "../types";
+import { costLabel, distanceLabel, hhmm, type Itinerary, type PoiSummary, type Stop } from "../types";
 
 const LEG: Record<string, { icon: LucideIcon; label: string }> = {
   walking: { icon: Footprints, label: "walk" },
@@ -17,17 +18,81 @@ const LEG: Record<string, { icon: LucideIcon; label: string }> = {
   bike: { icon: Bike, label: "ride" },
 };
 
+/** Other places of the same kind, near the one being replaced. */
+function SwapPanel({ stop, exclude, onChoose, onAuto, onClose }: {
+  stop: Stop;
+  exclude: number[];
+  onChoose: (poiId: number) => void;
+  onAuto: () => void;
+  onClose: () => void;
+}) {
+  const [options, setOptions] = useState<PoiSummary[] | null>(null);
+  const [failed, setFailed] = useState(false);
+
+  useEffect(() => {
+    let alive = true;
+    searchPois({ lat: stop.lat, lon: stop.lon, radiusKm: 2,
+                 categories: [stop.category], limit: 12 })
+      .then((r) => {
+        if (alive) setOptions(r.results.filter((p) => !exclude.includes(p.id)).slice(0, 6));
+      })
+      .catch(() => { if (alive) setFailed(true); });
+    return () => { alive = false; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [stop.poi_id]);
+
+  return (
+    <div className="swap-panel step-enter">
+      <div className="swap-head">
+        <strong>Replace {stop.name}</strong>
+        <button type="button" className="swap-close" onClick={onClose} aria-label="Close">
+          <X size={15} />
+        </button>
+      </div>
+
+      <button type="button" className="swap-option auto" onClick={onAuto}>
+        <Sparkles size={15} aria-hidden="true" />
+        <span><strong>Let NavigIQ choose</strong>
+          <span className="muted">Picks the best fit for your time and route</span></span>
+      </button>
+
+      {failed && <p className="field-error">Couldn't load nearby options.</p>}
+      {!failed && options === null && <p className="muted">Looking nearby…</p>}
+      {options?.length === 0 && (
+        <p className="muted">No other {categoryLabel(stop.category).toLowerCase()} within 2 km.</p>
+      )}
+
+      {options?.map((p) => (
+        <button key={p.id} type="button" className="swap-option" onClick={() => onChoose(p.id)}>
+          <MapPin size={15} aria-hidden="true" />
+          <span><strong>{p.name}</strong>
+            <span className="muted">{distanceLabel(p.distance_m)} from this stop</span></span>
+        </button>
+      ))}
+
+      <p className="swap-note">
+        A replacement is planned into your day — if it can't fit the times, you'll be told.
+      </p>
+    </div>
+  );
+}
+
 interface Props {
   itinerary: Itinerary;
   startTime: string;
   /** Present only where the plan can be changed - not on a saved plan. */
   onSwap?: (poiId: number) => void;
+  onReplace?: (oldPoiId: number, newPoiId: number) => void;
   onRemove?: (poiId: number, category: string) => void;
   canRemove?: boolean;
 }
 
-export default function Timeline({ itinerary, startTime, onSwap, onRemove, canRemove = true }: Props) {
+export default function Timeline({
+  itinerary, startTime, onSwap, onReplace, onRemove, canRemove = true,
+}: Props) {
   const last = itinerary.stops[itinerary.stops.length - 1];
+  const [swapping, setSwapping] = useState<number | null>(null);
+  const inPlan = itinerary.stops.map((s) => s.poi_id);
 
   return (
     <ol className="timeline">
@@ -80,11 +145,16 @@ export default function Timeline({ itinerary, startTime, onSwap, onRemove, canRe
                       <AlertCircle size={12} aria-hidden="true" /> Hours unverified
                     </span>
                   )}
+                  <a className="tl-ext" href={googleSearchUrl(s.name)} target="_blank" rel="noreferrer">
+                    On Google Maps <ExternalLink size={12} aria-hidden="true" />
+                  </a>
+                </div>
                 {(onSwap || onRemove) && (
                   <div className="tl-actions">
                     {onSwap && (
-                      <button type="button" onClick={() => onSwap(s.poi_id)}
-                              title={`Find a different ${categoryLabel(s.category).toLowerCase()}`}>
+                      <button type="button"
+                              onClick={() => setSwapping(swapping === s.poi_id ? null : s.poi_id)}
+                              title={`Choose a different ${categoryLabel(s.category).toLowerCase()}`}>
                         <Repeat size={13} aria-hidden="true" /> Swap
                       </button>
                     )}
@@ -95,6 +165,15 @@ export default function Timeline({ itinerary, startTime, onSwap, onRemove, canRe
                       </button>
                     )}
                   </div>
+                )}
+                {swapping === s.poi_id && onSwap && (
+                  <SwapPanel
+                    stop={s}
+                    exclude={inPlan}
+                    onClose={() => setSwapping(null)}
+                    onAuto={() => { setSwapping(null); onSwap(s.poi_id); }}
+                    onChoose={(newId) => { setSwapping(null); onReplace?.(s.poi_id, newId); }}
+                  />
                 )}
                 </div>
               </div>

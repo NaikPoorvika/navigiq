@@ -64,6 +64,19 @@ export default function ResultView({ data, spec, onChangeSpec }: Props) {
     });
   }
 
+    /** The user picked the replacement: ban the old one, pin the new one. */
+  function replaceWith(oldPoiId: number, newPoiId: number) {
+    const pinned = (spec.constraints.require_poi_ids ?? []).filter((id) => id !== oldPoiId);
+    onChangeSpec?.({
+      ...spec,
+      constraints: {
+        ...spec.constraints,
+        avoid_poi_ids: [...avoided, oldPoiId],
+        require_poi_ids: [...pinned, newPoiId],
+      },
+    });
+  }
+
   function showSkippedAgain() {
     onChangeSpec?.({ ...spec, constraints: { ...spec.constraints, avoid_poi_ids: [] } });
   }
@@ -123,7 +136,9 @@ export default function ResultView({ data, spec, onChangeSpec }: Props) {
       <Timeline
         itinerary={it}
         startTime={spec.start_time_local}
-        {...(onChangeSpec ? { onSwap: swap, onRemove: remove, canRemove } : {})}
+        {...(onChangeSpec
+          ? { onSwap: swap, onReplace: replaceWith, onRemove: remove, canRemove }
+          : {})}
       />
 
       <p className="fine-print">

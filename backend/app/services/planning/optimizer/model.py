@@ -55,6 +55,7 @@ class OptimizerNode:
     lat: float | None = None
     lon: float | None = None
     cost_basis: str = "poi_specific"
+    required: bool = False        # pinned by the user; must be visited
 
 
 @dataclass
@@ -81,7 +82,7 @@ class Stop:
     travel_minutes_from_prev: int
     lat: float | None = None
     lon: float | None = None
-    cost_basis: str = "poi_specific"
+    cost_basis: str = "poi_specific"      
     hours_verified: bool | None = None
 
 
@@ -186,7 +187,11 @@ def optimize(
     # --- variables --------------------------------------------------------
     visit = [m.NewBoolVar(f"visit_{i}") for i in range(n)]
     m.Add(visit[0] == 1)                       # origin is always visited
-
+        # Places the user picked. If one cannot fit the times, the solve is
+    # infeasible and they are told - better than silently dropping it.
+    for i, node in enumerate(nodes):
+        if node.required:
+            m.Add(visit[i] == 1)
     arc_lit: dict[tuple[int, int], cp_model.IntVar] = {}
     circuit_arcs: list[tuple[int, int, cp_model.IntVar]] = []
 

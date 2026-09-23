@@ -40,7 +40,7 @@ from app.services.planning.validator.itinerary import (
     StopFacts, TripFacts, validate as validate_itinerary,
 )
 from app.services.planning.validators.semantic import validate_semantics
-from app.services.poi.ranking import DeterministicRanker
+from app.services.poi.ranking import DeterministicRanker, ScoredPOI
 from app.services.poi.search import search_pois
 from app.services.routing.multimodal import MultiModalRouter
 from app.services.routing.service import RoutingUnavailable
@@ -63,7 +63,40 @@ class PlanningError(Exception):
 
 class NoCandidatesError(PlanningError):
     code = "NO_CANDIDATES"
+class PinUnavailableError(PlanningError):
+    """A place the user pinned cannot be used."""
 
+    def __init__(self, poi_id: int) -> None:
+        super().__init__(
+            f"That place can't be added (POI {poi_id}): it is outside the "
+            "search area, closed at that time, or one you skipped."
+        )
+        self.poi_id = poi_id
+
+
+def _ensure_required(ranked, flat, required_ids):
+    """Keep pinned places in the candidate set.
+
+    The ranker keeps only the top N, so a place the user chose could be cut
+    before the optimizer sees it. Pinned places go to the front, replacing
+    the weakest candidates rather than growing the set - 20 is what CP-SAT
+    proves optimal at (ADR-010).
+    """
+    have = {s.poi["id"] for s in ranked}
+    missing = [i for i in required_ids if i not in have]
+    if not missing:
+        return ranked
+
+    by_id = {p["id"]: p for p in flat}
+    pinned = []
+    for poi_id in missing:
+        poi = by_id.get(poi_id)
+        if poi is None:
+            raise PinUnavailableError(poi_id)
+        pinned.append(ScoredPOI(poi=poi, score=1.0, components={"pinned": 1.0}))
+
+    keep = ranked[: max(0, len(ranked) - len(pinned))]
+    return pinned + keep
 
 class RoutingUnavailableError(PlanningError):
     code = "ROUTING_UNAVAILABLE"
@@ -392,6 +425,9 @@ async def plan(
         arrival_min_of_day=spec.start_minute,
     )
     t["rank"] = int((time.perf_counter() - t0) * 1000)
+    required_ids = list(dict.fromkeys(spec.constraints.require_poi_ids))
+    if required_ids:
+        ranked = _ensure_required(ranked, flat, required_ids)
 
     # --- 6. multi-modal arcs -----------------------------------------------
     t0 = time.perf_counter()
@@ -423,6 +459,7 @@ async def plan(
     defaults = await _category_defaults(db)
     nodes = [OptimizerNode(None, "Origin", "origin", 0.0, 0, 0,
                            spec.start_minute, spec.end_minute)]
+    required_set = set(spec.constraints.require_poi_ids)
     for s in ranked:
         p = s.poi
         cost, cost_basis = estimate_poi_cost(
@@ -449,7 +486,8 @@ async def plan(
             hours_confidence=p.get("hours_confidence") or 0.0,
             is_meal=p["category"] in ("restaurant", "cafe",
                                       "street_food", "dessert"),
-            lat=p["lat"], lon=p["lon"], cost_basis=cost_basis,
+            lat=p["lat"], lon=p["lon"], 
+            required=p["id"] in required_set,cost_basis=cost_basis,
         ))
     requirements = [
         InterestRequirement(i.category.value, i.count,
