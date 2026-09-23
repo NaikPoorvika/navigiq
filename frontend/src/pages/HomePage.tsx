@@ -7,17 +7,17 @@ import { categoryLabel } from "../lib/categories";
 import { CENTRAL, specFromProfile } from "../lib/defaults";
 import { PLAN_IDEAS, type PlanIdea } from "../lib/ideas";
 import { href, navigate } from "../lib/router";
-import { formatDate, greeting } from "../lib/time";
+import { greeting } from "../lib/time";
 import { useAccount } from "../store/account";
 import { setPendingPlan } from "../store/pending";
-import { useSavedPlans } from "../store/plans";
+import { useRecentPlans } from "../lib/plan-cards";
 import type { Category, PoiSummary } from "../types";
 
 export default function HomePage() {
   const { profile } = useAccount();
   const home = profile?.home ?? CENTRAL;
   const interests = profile?.interests ?? [];
-  const plans = useSavedPlans();
+  const { cards: plans, onServer } = useRecentPlans();
 
   const [nearby, setNearby] = useState<PoiSummary[] | null>(null);
   const [nearbyFailed, setNearbyFailed] = useState(false);
@@ -165,7 +165,7 @@ export default function HomePage() {
         <div className="section-head">
           <div>
             <h2>Your plans</h2>
-            <p>Saved in this browser.</p>
+            <p>{onServer ? "Saved to your account." : "Saved in this browser."}</p>
           </div>
           {plans.length > 3 && <a className="link" href={href("/plans")}>See all</a>}
         </div>
@@ -178,10 +178,10 @@ export default function HomePage() {
           <div className="plan-grid">
             {plans.slice(0, 3).map((p) => (
               <a key={p.id} className="plan-card" href={href(`/plans/${p.id}`)}>
-                <span className="plan-date"><CalendarDays size={14} aria-hidden="true" /> {formatDate(p.spec.date)}</span>
-                <strong>From {p.spec.origin.name ?? "your start"}</strong>
-                <span className="plan-stops">{p.data.itinerary.stops.map((s) => s.name).join(" → ")}</span>
-                <span className="muted">{p.data.itinerary.stops.length} stops · {p.spec.start_time_local}–{p.spec.end_time_local}</span>
+                <span className="plan-date"><CalendarDays size={14} aria-hidden="true" /> {p.dateLabel}</span>
+                <strong>From {p.originName}</strong>
+                <span className="plan-stops">{p.stops}</span>
+                <span className="muted">{p.stopCount} stops · {p.timeRange}</span>
               </a>
             ))}
           </div>

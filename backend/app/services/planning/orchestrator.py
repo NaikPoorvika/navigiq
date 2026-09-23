@@ -253,6 +253,28 @@ async def _leg_geometries(routing, points, nodes, stops, depart_at) -> dict[int,
             out[st.seq] = geometry
     return out
 
+def _unique_candidates(pois_by_cat: dict) -> list[dict]:
+    """One entry per POI, whichever categories it matched.
+
+    Searches run per category, so a place matching two requested categories -
+    St Mary's Basilica is both a temple and a historical site - appeared
+    twice. The optimizer treated the copies as different places and could
+    schedule both, which the validator rejected as EXCLUSION_VIOLATED.
+
+    The copy kept is from the category with the FEWEST candidates, so an
+    abundant category doesn't claim a POI that a thin one depends on.
+    """
+    seen: set[int] = set()
+    out: list[dict] = []
+    for _category, rows in sorted(pois_by_cat.items(), key=lambda kv: len(kv[1])):
+        for row in rows:
+            d = row.to_dict()
+            if d["id"] in seen:
+                continue
+            seen.add(d["id"])
+            out.append(d)
+    return out
+
 async def _refetch_leg_seconds(routing, a, b, mode, depart_at) -> float | None:
     """Re-derive one chosen leg with an independent /route call, so the
     validator is not comparing the optimizer's travel time with itself.
@@ -359,7 +381,7 @@ async def plan(
 
     # --- 5. rank ------------------------------------------------------------
     t0 = time.perf_counter()
-    flat = [r.to_dict() for rows in pois_by_cat.values() for r in rows]
+    flat = _unique_candidates(pois_by_cat)
     if not flat:
         raise NoCandidatesError("no POIs found for any requested category")
 

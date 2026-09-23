@@ -1,6 +1,6 @@
 import type {
   ApiError, Category, FieldIssue, PlanResponse, PoiDetail, PoiSummary,
-  ProfilePatch, ResolveResult, TripSpec, UserMe,
+  ProfilePatch, ResolveResult, SavedPlan, SavedPlanSummary, TripSpec, UserMe,
 } from "../types";
 
 // Relative: Vite proxies /api to the backend (see vite.config.ts).
@@ -169,4 +169,19 @@ export function updateMe(patch: ProfilePatch): Promise<UserMe> {
 /** Permanently delete the signed-in account. The password is asked again. */
 export function deleteMe(password: string): Promise<void> {
   return request("/auth/users/me", { method: "DELETE", body: JSON.stringify({ password }) });
+}
+
+// -------------------------------------------------------------- saved plans
+
+/** The signed-in user's plans, newest first. */
+export function listItineraries(limit = 20): Promise<{ count: number; itineraries: SavedPlanSummary[] }> {
+  return request(`/itineraries?limit=${limit}`);
+}
+
+export function getItinerary(id: number): Promise<SavedPlan> {
+  return request(`/itineraries/${id}`);
+}
+
+export function deleteItinerary(id: number): Promise<void> {
+  return request(`/itineraries/${id}`, { method: "DELETE" });
 }

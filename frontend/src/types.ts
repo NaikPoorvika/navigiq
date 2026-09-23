@@ -193,6 +193,27 @@ export interface PoiDetail extends PhotoFields {
   opening_hours: OpeningHours[];
 }
 
+/** A row in GET /itineraries - enough to show a card. */
+export interface SavedPlanSummary {
+  id: number;
+  created_at: string;
+  status: string;
+  mode: string;
+  date: string | null;
+  origin_name: string | null;
+  total_cost_inr: number;
+  total_duration_min: number;
+  total_walk_m: number;
+  stop_count: number;
+  stops: string | null;
+}
+
+/** GET /itineraries/{id} - a saved plan, shaped like a fresh /plan reply. */
+export interface SavedPlan extends PlanResponse {
+  spec: TripSpec;
+  created_at: string;
+}
+
 export interface PlaceMatch {
   name: string;
   lat: number;
