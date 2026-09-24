@@ -1,15 +1,14 @@
 import Shell from "./components/Shell";
-import { useRoute } from "./lib/router";
+import { href, useRoute } from "./lib/router";
+import CreditsPage from "./pages/CreditsPage";
 import DiscoverPage from "./pages/DiscoverPage";
 import HomePage from "./pages/HomePage";
 import OnboardingPage from "./pages/OnboardingPage";
 import PlacePage from "./pages/PlacePage";
-import { PlansPage, SavedPlanPage } from "./pages/PlansPage";
 import PlanPage from "./pages/PlanPage";
+import { PlansPage, SavedPlanPage } from "./pages/PlansPage";
 import ProfilePage from "./pages/ProfilePage";
 import SignInPage from "./pages/SignInPage";
-import CreditsPage from "./pages/CreditsPage";
-import { href } from "./lib/router";
 import "./App.css";
 
 export default function App() {
